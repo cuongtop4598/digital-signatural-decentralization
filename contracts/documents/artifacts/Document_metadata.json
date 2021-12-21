@@ -1,0 +1,187 @@
+{
+	"compiler": {
+		"version": "0.8.6+commit.11564f7e"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "publicKey",
+						"type": "bytes32"
+					}
+				],
+				"name": "getUserID",
+				"outputs": [
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "userID",
+						"type": "string"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "signature",
+						"type": "bytes32"
+					}
+				],
+				"name": "saveDoc",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "userID",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "name",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "cmnd",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "dateOB",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "phone",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "gmail",
+						"type": "string"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "publicKey",
+						"type": "bytes32"
+					}
+				],
+				"name": "storeUser",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "userID",
+						"type": "string"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "signature",
+						"type": "bytes32"
+					}
+				],
+				"name": "verifyDoc",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"details": "Implementation of the {IDC} interface ",
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/documents/Document.sol": "Document"
+		},
+		"evmVersion": "berlin",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/documents/Document.sol": {
+			"keccak256": "0x7a3c625ea16b7bde334670fda784eef49114d7d0fa43259141b54817bf07c14a",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://d123158df35897a59f68ee8bc6176f1cd0f11ed43f74ba90a4fd2d079046363e",
+				"dweb:/ipfs/QmYCc6oy4t7wDc6gZFLfDzrcSKvdwREG4pQjBXVhCz6Y7j"
+			]
+		},
+		"contracts/documents/IDC.sol": {
+			"keccak256": "0xa3f7a1e85378052f73d4cda3c54b405f4343aba2ab451512baae5da11f8e5286",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://63ae1d7a67c6b725f02d9b100609e6544ac092e0e737cf65205c09f645a5a9f6",
+				"dweb:/ipfs/QmcBn5fhzVUmsgHFn4719RgKsseAY5RhzjUn4SsxWCr1g5"
+			]
+		},
+		"contracts/documents/extensions/IDCMetadata.sol": {
+			"keccak256": "0x21a7b1e5b37c4eef182533d890dda7ea9ca9a49d0c624f8497eee12a400d8f67",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://509b5115b5652970d7c8a29dd4c29aa1bea04019d45cca5f9fa3bd765905e8c3",
+				"dweb:/ipfs/QmXE76tJLnTnw1PyPzX7haoEWiEj82rUat9Z52PMgX7c3h"
+			]
+		},
+		"contracts/utils/Context.sol": {
+			"keccak256": "0xe03a02b8163342bb5a9503811a08c89c9c16b63430445206edc26203c66e8b6f",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://54feaf87bb8137d804e67d545db5742424e9263b0ba62cf8b3560a7d5929e570",
+				"dweb:/ipfs/QmUwgX77iFMhQCubSwT3pgh26MB7b4616GYzukzZZPEYtD"
+			]
+		}
+	},
+	"version": 1
+}
