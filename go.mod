@@ -1,4 +1,4 @@
-module depocket.io
+module digitalsignature
 
 go 1.16
 

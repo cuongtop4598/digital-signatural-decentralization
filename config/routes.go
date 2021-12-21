@@ -1,7 +1,8 @@
 package config
 
 import (
-	"depocket.io/app/controllers"
+	"digitalsignature/internal/app/controllers"
+
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gin-gonic/gin"
 	"github.com/go-pg/pg/v10"
