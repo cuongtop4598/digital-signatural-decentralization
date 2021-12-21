@@ -8,9 +8,9 @@
 			{
 				"inputs": [
 					{
-						"internalType": "bytes32",
+						"internalType": "address",
 						"name": "publicKey",
-						"type": "bytes32"
+						"type": "address"
 					}
 				],
 				"name": "getUserID",
@@ -32,9 +32,9 @@
 						"type": "string"
 					},
 					{
-						"internalType": "bytes32",
+						"internalType": "bytes",
 						"name": "signature",
-						"type": "bytes32"
+						"type": "bytes"
 					}
 				],
 				"name": "saveDoc",
@@ -81,9 +81,9 @@
 						"type": "string"
 					},
 					{
-						"internalType": "bytes32",
+						"internalType": "address",
 						"name": "publicKey",
-						"type": "bytes32"
+						"type": "address"
 					}
 				],
 				"name": "storeUser",
@@ -106,8 +106,13 @@
 					},
 					{
 						"internalType": "bytes32",
-						"name": "signature",
+						"name": "digest",
 						"type": "bytes32"
+					},
+					{
+						"internalType": "uint256",
+						"name": "indexDoc",
+						"type": "uint256"
 					}
 				],
 				"name": "verifyDoc",
@@ -118,14 +123,24 @@
 						"type": "bool"
 					}
 				],
-				"stateMutability": "nonpayable",
+				"stateMutability": "view",
 				"type": "function"
 			}
 		],
 		"devdoc": {
 			"details": "Implementation of the {IDC} interface ",
 			"kind": "dev",
-			"methods": {},
+			"methods": {
+				"saveDoc(string,bytes)": {
+					"details": "Save Document to Chain  Return index of Document in the document list of the owner"
+				},
+				"storeUser(string,string,string,string,string,string,address)": {
+					"details": "Return True if user information is stored successfully, otherwise return False."
+				},
+				"verifyDoc(string,bytes32,uint256)": {
+					"details": "Return True if Doc wasn't change else False"
+				}
+			},
 			"version": 1
 		},
 		"userdoc": {
@@ -151,19 +166,19 @@
 	},
 	"sources": {
 		"contracts/documents/Document.sol": {
-			"keccak256": "0x7a3c625ea16b7bde334670fda784eef49114d7d0fa43259141b54817bf07c14a",
+			"keccak256": "0x1bab00a2e28f07ec6b90a419b370b1887ea047d75d79e3634df8fc64ab37fe73",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://d123158df35897a59f68ee8bc6176f1cd0f11ed43f74ba90a4fd2d079046363e",
-				"dweb:/ipfs/QmYCc6oy4t7wDc6gZFLfDzrcSKvdwREG4pQjBXVhCz6Y7j"
+				"bzz-raw://f48292bdbb39593f47c1351e5222de351a26c1790df0de24cbb52b367683e606",
+				"dweb:/ipfs/QmQJ5nZ8rT1c32oReqLGkCSL5MNptGrC9ESVKGe5MwyKR8"
 			]
 		},
 		"contracts/documents/IDC.sol": {
-			"keccak256": "0xa3f7a1e85378052f73d4cda3c54b405f4343aba2ab451512baae5da11f8e5286",
+			"keccak256": "0x72b7bea744608c0e97ceea904399dfd4406c0484e89774fea69aeeb8abdbecd4",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://63ae1d7a67c6b725f02d9b100609e6544ac092e0e737cf65205c09f645a5a9f6",
-				"dweb:/ipfs/QmcBn5fhzVUmsgHFn4719RgKsseAY5RhzjUn4SsxWCr1g5"
+				"bzz-raw://24eb26a884ab7f86fd4a61494d57bab8a091221dfc0234e1655c8116652fe213",
+				"dweb:/ipfs/QmaihnPuAEsGXz7j7iLVBE5FuCdKXHhSbqw2CAfKT3BiGu"
 			]
 		},
 		"contracts/documents/extensions/IDCMetadata.sol": {
