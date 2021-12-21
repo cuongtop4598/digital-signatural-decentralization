@@ -1,5 +1,5 @@
 server:
   mode: "development"
 ethereum-network:
-  #endpoint-mainnet: "https://mainnet.infura.io"
-  endpoint-local: "/home/user/.ethereum/geth.ipc"
+  #endpoint: "https://mainnet.infura.io"
+  endpoint: "/home/user/.ethereum/geth.ipc"
