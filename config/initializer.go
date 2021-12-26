@@ -1,6 +1,7 @@
 package config
 
 import (
+	"digitalsignature/internal/pkg/ethereum"
 	"log"
 	"path/filepath"
 	"runtime"
@@ -33,7 +34,8 @@ func Load(env string) *Configuration {
 
 // Configuration holds data necessery for configuring application
 type Configuration struct {
-	Server *Server `yaml:"server"`
+	Server   *Server                 `yaml:"server"`
+	Ethereum *ethereum.NetworkConfig `yaml:"ethereum"`
 }
 
 // Server holds data necessary for server configuration
@@ -45,10 +47,8 @@ func setGinMode(mode string) {
 	switch mode {
 	case "production":
 		gin.SetMode(gin.ReleaseMode)
-		break
 	case "test":
 		gin.SetMode(gin.TestMode)
-		break
 	default:
 		gin.SetMode(gin.DebugMode)
 	}

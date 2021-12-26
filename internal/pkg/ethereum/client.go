@@ -6,11 +6,11 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
-type Config struct {
-	Endpoint string `mapstructure:"endpoint"`
+type NetworkConfig struct {
+	Endpoint string `yaml:"endpoint`
 }
 
-func NewClient(cfg *Config) (*ethclient.Client, error) {
+func NewClient(cfg *NetworkConfig) (*ethclient.Client, error) {
 	client, err := ethclient.Dial(cfg.Endpoint)
 	if err != nil {
 		return nil, err

@@ -14,14 +14,23 @@ import (
 )
 
 type AccountService interface {
-	CreateNewWallet()
+	CreateNewAccount(c *gin.Context) ([]byte, error)
+	CreateNewKeyStores(password string, c *gin.Context) (publickey string, err error)
+	ImportKeyStores(c gin.Context, keyPath string, password string)
 }
 type Account struct {
-	Client      *ethclient.Client
-	AccountRepo *offchain.AccountRepo
-	walletsDir  string
+	client      *ethclient.Client
+	accountRepo *offchain.AccountRepo
+	savePath    string // path for saving private key
 }
 
+func NewAccountService(client *ethclient.Client, accountRepo *offchain.AccountRepo, savePath string) AccountService {
+	return &Account{
+		client:      client,
+		accountRepo: accountRepo,
+		savePath:    savePath,
+	}
+}
 func (a *Account) CreateNewAccount(c *gin.Context) ([]byte, error) {
 	privateKey, err := crypto.GenerateKey()
 	if err != nil {
@@ -32,7 +41,7 @@ func (a *Account) CreateNewAccount(c *gin.Context) ([]byte, error) {
 }
 
 func (a *Account) CreateNewKeyStores(password string, c *gin.Context) (publickey string, err error) {
-	ks := keystore.NewKeyStore(a.walletsDir, keystore.StandardScryptN, keystore.StandardScryptP)
+	ks := keystore.NewKeyStore(a.savePath, keystore.StandardScryptN, keystore.StandardScryptP)
 	account, err := ks.NewAccount(password)
 	if err != nil {
 		return "", err
@@ -40,7 +49,7 @@ func (a *Account) CreateNewKeyStores(password string, c *gin.Context) (publickey
 	return account.Address.Hex(), nil
 }
 
-func (a *Account) ImportKeyStores(password string, keyPath string, c gin.Context) {
+func (a *Account) ImportKeyStores(c gin.Context, keyPath string, password string) {
 	file := keyPath
 	ks := keystore.NewKeyStore("./tmp", keystore.StandardScryptN, keystore.StandardScryptP)
 	jsonBytes, err := ioutil.ReadFile(file)
