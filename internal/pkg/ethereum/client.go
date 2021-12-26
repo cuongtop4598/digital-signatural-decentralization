@@ -7,7 +7,7 @@ import (
 )
 
 type NetworkConfig struct {
-	Endpoint string `yaml:"endpoint`
+	Endpoint string `yaml:"endpoint"`
 }
 
 func NewClient(cfg *NetworkConfig) (*ethclient.Client, error) {

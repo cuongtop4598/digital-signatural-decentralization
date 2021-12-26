@@ -2,12 +2,9 @@ package app
 
 import (
 	"digitalsignature/config"
-	"digitalsignature/internal/pkg/database"
-	"digitalsignature/internal/pkg/redis"
-	"os"
+	"digitalsignature/internal/pkg/ethereum"
 	"time"
 
-	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gin-contrib/cors"
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
@@ -16,12 +13,18 @@ import (
 	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 )
 
+// Configuration hold all config of server
+var Configuration *config.Configuration
+
 // Server holds all the routes and their services
 type Server struct{}
 
 // Run runs our API server
 func (server *Server) Run(env string) error {
+	Configuration = config.Load(env)
+
 	r := gin.Default()
+
 	headerPolicies := cors.DefaultConfig()
 	headerPolicies.AllowOrigins = []string{
 		"http://localhost:3000",
@@ -53,33 +56,27 @@ func (server *Server) Run(env string) error {
 		)
 	}
 
-	db := database.GetConnection(log)
-	rd := redis.GetConnection()
+	//db := database.GetConnection(log)
+	//rd := redis.GetConnection()
 
-	eth_endpoint, _ := os.LookupEnv("CHAIN_ENDPOINT")
-	client, err := ethclient.Dial(eth_endpoint)
-
-	defer tracer.Stop()
-
+	client, err := ethereum.NewClient(Configuration.Ethereum)
 	if err != nil {
 		log.Sugar().Error(err)
 	}
 
+	defer tracer.Stop()
 	defer log.Sync()
 
 	rsDefault := &config.Services{
 		EthClient: client,
-		DB:        db,
-		Redis:     rd,
+		DB:        nil,
+		Redis:     nil,
 		Log:       log,
 		R:         r,
 	}
+
 	rsDefault.SetupRoutes()
-
-	port, ok := os.LookupEnv("DIGITAL_SIGNATURE_BACKEND_PORT")
-	if !ok {
-		port = "8080"
-	}
-
-	return r.Run(":" + port)
+	host := Configuration.Server.Host
+	port := Configuration.Server.Port
+	return r.Run(host + ":" + port)
 }
