@@ -7,20 +7,24 @@ import (
 )
 
 type AccountController struct {
-	accountService *service.AccountService
+	accountService service.AccountService
 }
 
-func AccountRouter(accountService *service.AccountService, r *gin.RouterGroup) {
+func AccountRouter(accountService service.AccountService, r *gin.RouterGroup) {
 	ac := AccountController{
 		accountService: accountService,
 	}
 	ar := r.Group("/account")
-	ar.POST("/account/signup", ac.SignUp)
-	ar.POST("/account/signin", ac.SignIn)
+	ar.GET("/signup", ac.SignUp)
+	ar.POST("/signin", ac.SignIn)
 }
 
 func (ac *AccountController) SignUp(c *gin.Context) {
-
+	key, err := ac.accountService.CreateNewAccount(c)
+	if err != nil {
+		c.JSON(400, gin.H{"message": "Create account ERROR :", "error": err.Error()})
+	}
+	c.JSON(200, key)
 }
 
 func (ac *AccountController) SignIn(c *gin.Context) {

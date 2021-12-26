@@ -1,0 +1,5 @@
+# vendor folder using for deploying only
+/vendor
+
+# cmd folder using for testing only
+/cmd

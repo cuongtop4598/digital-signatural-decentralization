@@ -2,6 +2,7 @@ package config
 
 import (
 	"digitalsignature/internal/app/controllers"
+	"digitalsignature/internal/app/service"
 
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gin-gonic/gin"
@@ -28,8 +29,9 @@ type Services struct {
 func (s *Services) SetupRoutes() {
 
 	// Create services handle
-
 	controllers.HomeRouter(s.R)
+	rg := s.R.Group("/v1")
 
-	_ = s.R.Group("/v1")
+	accountService := service.NewAccountService(s.EthClient, nil, "../internal/app/keys")
+	controllers.AccountRouter(accountService, rg)
 }

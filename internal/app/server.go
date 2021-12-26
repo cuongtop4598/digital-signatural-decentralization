@@ -75,7 +75,9 @@ func (server *Server) Run(env string) error {
 		R:         r,
 	}
 
+	// setup router
 	rsDefault.SetupRoutes()
+
 	host := Configuration.Server.Host
 	port := Configuration.Server.Port
 	return r.Run(host + ":" + port)
