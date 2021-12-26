@@ -7,6 +7,7 @@ import (
 )
 
 type NetworkConfig struct {
+	Wallets  string `yaml:"wallets"`
 	Endpoint string `yaml:"endpoint"`
 }
 

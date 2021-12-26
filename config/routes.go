@@ -12,8 +12,8 @@ import (
 )
 
 // NewServices creates a new router services
-func NewServices(client *ethclient.Client, DB *pg.DB, RD *redis.Client, Log *zap.Logger, R *gin.Engine) *Services {
-	return &Services{client, DB, RD, Log, R}
+func NewServices(client *ethclient.Client, DB *pg.DB, RD *redis.Client, Log *zap.Logger, R *gin.Engine, config *Configuration) *Services {
+	return &Services{client, DB, RD, Log, R, config}
 }
 
 // Services lets us bind specific services when setting up routes
@@ -23,6 +23,7 @@ type Services struct {
 	Redis     *redis.Client
 	Log       *zap.Logger
 	R         *gin.Engine
+	Config    *Configuration
 }
 
 // SetupRoutes instances various repos and services and sets up the routers
@@ -32,6 +33,6 @@ func (s *Services) SetupRoutes() {
 	controllers.HomeRouter(s.R)
 	rg := s.R.Group("/v1")
 
-	accountService := service.NewAccountService(s.EthClient, nil, "../internal/app/keys")
+	accountService := service.NewAccountService(s.EthClient, nil, s.Config.Ethereum.Wallets)
 	controllers.AccountRouter(accountService, rg)
 }

@@ -3,6 +3,7 @@ package app
 import (
 	"digitalsignature/config"
 	"digitalsignature/internal/pkg/ethereum"
+	"fmt"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -13,16 +14,16 @@ import (
 	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 )
 
-// Configuration hold all config of server
-var Configuration *config.Configuration
+// configuration hold all config of server
+var configuration *config.Configuration
 
 // Server holds all the routes and their services
 type Server struct{}
 
 // Run runs our API server
 func (server *Server) Run(env string) error {
-	Configuration = config.Load(env)
-
+	configuration = config.Load(env)
+	fmt.Println(configuration.Ethereum.Wallets)
 	r := gin.Default()
 
 	headerPolicies := cors.DefaultConfig()
@@ -59,7 +60,7 @@ func (server *Server) Run(env string) error {
 	//db := database.GetConnection(log)
 	//rd := redis.GetConnection()
 
-	client, err := ethereum.NewClient(Configuration.Ethereum)
+	client, err := ethereum.NewClient(configuration.Ethereum)
 	if err != nil {
 		log.Sugar().Error(err)
 	}
@@ -73,12 +74,13 @@ func (server *Server) Run(env string) error {
 		Redis:     nil,
 		Log:       log,
 		R:         r,
+		Config:    configuration,
 	}
 
 	// setup router
 	rsDefault.SetupRoutes()
 
-	host := Configuration.Server.Host
-	port := Configuration.Server.Port
+	host := configuration.Server.Host
+	port := configuration.Server.Port
 	return r.Run(host + ":" + port)
 }

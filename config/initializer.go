@@ -2,7 +2,6 @@ package config
 
 import (
 	"digitalsignature/internal/pkg/ethereum"
-	"fmt"
 	"log"
 	"path/filepath"
 	"runtime"
@@ -14,10 +13,8 @@ import (
 // Load returns Configuration struct
 func Load(env string) *Configuration {
 	_, filePath, _, _ := runtime.Caller(0)
-	fmt.Println(filePath)
 	configName := "config." + env + ".yaml"
-	configPath := filePath[:len(filePath)-14] + string(filepath.Separator) + "files" + string(filepath.Separator)
-	fmt.Println(configPath)
+	configPath := filePath[:len(filePath)-14] + "files" + string(filepath.Separator)
 	viper.SetConfigName(configName)
 	viper.AddConfigPath(configPath)
 	viper.SetConfigType("yaml")

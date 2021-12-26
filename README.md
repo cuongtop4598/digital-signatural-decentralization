@@ -6,8 +6,22 @@
 
 ### How to setup
 
-### How to install 
+### How to install
 
 ### How to run
+
+##### 1. Running blockchain network
+
+```
+make run-network
+```
+
+
+##### 2. Running application
+
+```
+make run
+```
+
 
 ### Documents
