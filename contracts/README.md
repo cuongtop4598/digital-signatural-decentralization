@@ -59,3 +59,8 @@ miner.stop()
 eth.getBalance("0x...")
 ```
 ---
+## Expose Network to use by HTTP based JSON RPC API
+Command:
+```
+geth --datadir ./ --networkid 120999 --http --http.addr 0.0.0.0 --http.port 8545 --http.corsdomain "*" --http.api "web3,personal,eth,net,admin"
+```
