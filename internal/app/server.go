@@ -1,12 +1,12 @@
 package app
 
 import (
+	"digitalsignature/config"
+	"digitalsignature/internal/pkg/database"
+	"digitalsignature/internal/pkg/redis"
 	"os"
 	"time"
 
-	"depocket.io/config"
-	"depocket.io/pkg/database"
-	"depocket.io/pkg/redis"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gin-contrib/cors"
 	ginzap "github.com/gin-contrib/zap"

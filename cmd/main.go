@@ -1,9 +1,9 @@
 package main
 
 import (
+	"digitalsignature/internal/app"
 	"log"
 
-	"depocket.io/app"
 	"github.com/joho/godotenv"
 )
 
