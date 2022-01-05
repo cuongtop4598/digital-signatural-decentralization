@@ -2,8 +2,6 @@ package config
 
 import (
 	"log"
-	"path/filepath"
-	"runtime"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
@@ -11,10 +9,10 @@ import (
 
 // Load returns Configuration struct
 func Load(env string) *Configuration {
-	_, filePath, _, _ := runtime.Caller(0)
+	// _, filePath, _, _ := runtime.Caller(0)
 	configName := "config." + env + ".yaml"
-	configPath := filePath[:len(filePath)-9] + "files" + string(filepath.Separator)
-
+	// configPath := filePath[:len(filePath)-9] + "files" + string(filepath.Separator)
+	configPath := "./config/files/"
 	viper.SetConfigName(configName)
 	viper.AddConfigPath(configPath)
 	viper.SetConfigType("yaml")
@@ -33,12 +31,23 @@ func Load(env string) *Configuration {
 
 // Configuration holds data necessery for configuring application
 type Configuration struct {
-	Server *Server `yaml:"server"`
+	Server   *Server        `yaml:"server"`
+	Postgres PostgresConfig `yaml:"postgres"`
 }
 
 // Server holds data necessary for server configuration
 type Server struct {
 	Mode string `yaml:"mode"`
+}
+
+type PostgresConfig struct {
+	PostgresqlHost     string
+	PostgresqlPort     string
+	PostgresqlUser     string
+	PostgresqlPassword string
+	PostgresqlDbname   string
+	PostgresqlSSLMode  bool
+	PgDriver           string
 }
 
 func setGinMode(mode string) {

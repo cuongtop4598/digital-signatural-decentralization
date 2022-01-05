@@ -2,12 +2,9 @@ package database
 
 import (
 	"context"
-	"errors"
+	"digitalsignature/config"
 	"fmt"
-	"net/url"
-	"strings"
 
-	"github.com/caarlos0/env/v6"
 	"github.com/go-pg/pg/v10"
 	"go.uber.org/zap"
 )
@@ -27,26 +24,30 @@ type PgConfig struct {
 // usage:
 // db := config.GetConnection()
 // defer db.Close()
-func GetConnection(log *zap.Logger) *pg.DB {
-	c := GetPgConfig()
-	fmt.Println(c.Host)
-	fmt.Println(c.User)
-	// if DATABASE_URL is valid, we will use its constituent values in preference
-	validConfig, err := validPostgresURL(c.URL)
-	if err == nil {
-		c = validConfig
+func GetConnection(log *zap.Logger, p *config.PostgresConfig) (*pg.DB, error) {
+	dbURL := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		p.PostgresqlUser,
+		p.PostgresqlPassword,
+		p.PostgresqlHost,
+		p.PostgresqlPort,
+		p.PostgresqlDbname,
+	)
+	opt, err := pg.ParseURL(dbURL)
+	if err != nil {
+		return nil, err
 	}
-	db := pg.Connect(&pg.Options{
-		Addr:     c.Host + ":" + c.Port,
-		User:     c.User,
-		Password: c.Password,
-		Database: c.Database,
-		PoolSize: 150,
-	})
+	db := pg.Connect(opt)
+
+	ctx := context.Background()
+
+	if err := db.Ping(ctx); err != nil {
+		return nil, err
+	}
 	db.AddQueryHook(dbLogger{
 		log: log,
 	})
-	return db
+
+	return db, nil
 }
 
 type dbLogger struct {
@@ -61,33 +62,4 @@ func (d dbLogger) AfterQuery(c context.Context, q *pg.QueryEvent) error {
 	fq, _ := q.FormattedQuery()
 	d.log.Sugar().Info(string(fq))
 	return nil
-}
-
-// GetPostgresConfig returns a PostgresConfig pointer with the correct Postgres Config values
-func GetPgConfig() *PgConfig {
-	c := PgConfig{}
-	if err := env.Parse(&c); err != nil {
-		fmt.Printf("%+v\n", err)
-		fmt.Println("Lỗi")
-	}
-	return &c
-}
-
-func validPostgresURL(URL string) (*PgConfig, error) {
-	if URL == "" || strings.TrimSpace(URL) == "" {
-		return nil, errors.New("database url is blank")
-	}
-
-	validURL, err := url.Parse(URL)
-	if err != nil {
-		return nil, err
-	}
-	c := &PgConfig{}
-	c.URL = URL
-	c.Host = validURL.Host
-	c.Database = validURL.Path
-	c.Port = validURL.Port()
-	c.User = validURL.User.Username()
-	c.Password, _ = validURL.User.Password()
-	return c, nil
 }
