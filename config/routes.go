@@ -2,6 +2,7 @@ package config
 
 import (
 	"digitalsignature/internal/app/controllers"
+	"digitalsignature/internal/app/service"
 
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gin-gonic/gin"
@@ -11,8 +12,8 @@ import (
 )
 
 // NewServices creates a new router services
-func NewServices(client *ethclient.Client, DB *pg.DB, RD *redis.Client, Log *zap.Logger, R *gin.Engine) *Services {
-	return &Services{client, DB, RD, Log, R}
+func NewServices(client *ethclient.Client, DB *pg.DB, RD *redis.Client, Log *zap.Logger, R *gin.Engine, config *Configuration) *Services {
+	return &Services{client, DB, RD, Log, R, config}
 }
 
 // Services lets us bind specific services when setting up routes
@@ -22,14 +23,16 @@ type Services struct {
 	Redis     *redis.Client
 	Log       *zap.Logger
 	R         *gin.Engine
+	Config    *Configuration
 }
 
 // SetupRoutes instances various repos and services and sets up the routers
 func (s *Services) SetupRoutes() {
 
 	// Create services handle
-
 	controllers.HomeRouter(s.R)
+	rg := s.R.Group("/v1")
 
-	_ = s.R.Group("/v1")
+	accountService := service.NewAccountService(s.EthClient, nil, s.Config.Ethereum.Wallets)
+	controllers.AccountRouter(accountService, rg)
 }

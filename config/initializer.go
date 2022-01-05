@@ -1,6 +1,7 @@
 package config
 
 import (
+	"digitalsignature/internal/pkg/ethereum"
 	"log"
 	"path/filepath"
 	"runtime"
@@ -13,8 +14,7 @@ import (
 func Load(env string) *Configuration {
 	_, filePath, _, _ := runtime.Caller(0)
 	configName := "config." + env + ".yaml"
-	configPath := filePath[:len(filePath)-9] + "files" + string(filepath.Separator)
-
+	configPath := filePath[:len(filePath)-14] + "files" + string(filepath.Separator)
 	viper.SetConfigName(configName)
 	viper.AddConfigPath(configPath)
 	viper.SetConfigType("yaml")
@@ -33,22 +33,23 @@ func Load(env string) *Configuration {
 
 // Configuration holds data necessery for configuring application
 type Configuration struct {
-	Server *Server `yaml:"server"`
+	Server   *Server                 `yaml:"server"`
+	Ethereum *ethereum.NetworkConfig `yaml:"ethereum"`
 }
 
 // Server holds data necessary for server configuration
 type Server struct {
 	Mode string `yaml:"mode"`
+	Host string `yaml:"host"`
+	Port string `yaml:"port"`
 }
 
 func setGinMode(mode string) {
 	switch mode {
 	case "production":
 		gin.SetMode(gin.ReleaseMode)
-		break
 	case "test":
 		gin.SetMode(gin.TestMode)
-		break
 	default:
 		gin.SetMode(gin.DebugMode)
 	}
