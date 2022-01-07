@@ -19,7 +19,9 @@
 ##### 1. Running blockchain network
 
 ```
-make run-network
+copy genesis.json into your local machine, change path of this file in init-network command on Makefile
+run make init-network
+run make run-network
 ```
 
 ##### 2. Running application
@@ -30,5 +32,10 @@ make run
 
 ### Documents
 
+- Run private network tutorial
+
+  - https://geth.ethereum.org/docs/getting-started/private-net
+  - https://medium.com/swlh/how-to-set-up-a-private-ethereum-blockchain-c0e74260492c#:~:text=To%20run%20a%20private%20network,with%20a%20custom%20genesis%20file.
 - Contract complier tutorial
+
   - https://www.metachris.com/2021/05/creating-go-bindings-for-ethereum-smart-contracts/
