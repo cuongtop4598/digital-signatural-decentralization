@@ -76,7 +76,6 @@ func (server *Server) Run(env string) error {
 		R:         r,
 		Config:    configuration,
 	}
-
 	// setup router
 	rsDefault.SetupRoutes()
 

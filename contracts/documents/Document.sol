@@ -4,14 +4,15 @@ pragma solidity ^0.8.0;
 
 import "./IDC.sol";
 import "./extensions/IDCMetadata.sol";
-import "../utils/Context.sol";
+import "./utils/Context.sol";
 
 /**
  * @dev Implementation of the {IDC} interface
  * 
  */
-contract Document is Context, IDC, IDCMetadata {
 
+contract Document is Context, IDC, IDCMetadata {
+                             
     struct User {
         string userID;
         bytes32 infoHash;
