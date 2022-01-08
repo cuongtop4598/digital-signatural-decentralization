@@ -5,5 +5,5 @@ server:
 ethereum:
   #you need to change cuongtop to your username in these bellow path 
   wallets: "/home/cuongtop/ethereum-development/wallets"
-  endpoint: "/home/cuongtop/.ethereum/geth.ipc" #for mainnet "https://mainnet.infura.io"
+  endpoint: "http://localhost:8545" #for mainnet "https://mainnet.infura.io"
   
