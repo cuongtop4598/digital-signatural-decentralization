@@ -9,6 +9,7 @@ import (
 type NetworkConfig struct {
 	Wallets  string `yaml:"wallets"`
 	Endpoint string `yaml:"endpoint"`
+	Password string `yaml:"passadmin"`
 }
 
 func NewClient(cfg *NetworkConfig) (*ethclient.Client, error) {

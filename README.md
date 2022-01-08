@@ -19,9 +19,11 @@
 ##### 1. Running blockchain network
 
 ```
-copy genesis.json into your local machine, change path of this file in init-network command on Makefile
-run make init-network
-run make run-network
+1. copy genesis.json into your local machine, change path of this file in init-network command on Makefile
+2. replace keystore folder in datadir of your local machine with keystore folder in /wallets
+3. remove old geth and geth.ipc 
+4. run make init-network
+5. run make run-network
 ```
 
 ##### 2. Running application
