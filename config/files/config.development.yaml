@@ -6,7 +6,7 @@ ethereum-network:
 postgres:
   PostgresqlHost: 172.18.0.3
   PostgresqlPort: 5432
-  PostgresqlUser: elysia
+  PostgresqlUser: admin
   PostgresqlPassword: mypassword
   PostgresqlDbname: dsd
   PostgresqlSslmode: false
