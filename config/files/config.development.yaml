@@ -3,3 +3,11 @@ server:
 ethereum-network:
   #endpoint-mainnet: "https://mainnet.infura.io"
   endpoint-local: "/home/user/.ethereum/geth.ipc"
+postgres:
+  PostgresqlHost: 172.18.0.3
+  PostgresqlPort: 5432
+  PostgresqlUser: admin
+  PostgresqlPassword: mypassword
+  PostgresqlDbname: dsd
+  PostgresqlSslmode: false
+  PgDriver: pgx

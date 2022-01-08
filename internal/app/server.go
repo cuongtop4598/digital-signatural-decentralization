@@ -52,8 +52,16 @@ func (server *Server) Run(env string) error {
 			tracer.WithService(""),
 		)
 	}
+	cfg := config.Load("development")
+	db, err := database.GetConnection(log, &cfg.Postgres)
+	if err != nil {
+		log.Sugar().Error(err)
+		os.Exit(1)
+	} else {
+		log.Sugar().Infof("Postgres connected, Status: ", db.PoolStats())
+	}
+	defer db.Close()
 
-	db := database.GetConnection(log)
 	rd := redis.GetConnection()
 
 	eth_endpoint, _ := os.LookupEnv("CHAIN_ENDPOINT")
@@ -63,6 +71,7 @@ func (server *Server) Run(env string) error {
 
 	if err != nil {
 		log.Sugar().Error(err)
+		// os.Exit(1)
 	}
 
 	defer log.Sync()
