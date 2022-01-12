@@ -4,6 +4,6 @@ server:
   port: "8081"
 ethereum:
   #you need to change cuongtop to your username in these bellow path 
-  wallets: "/home/cuongtop/ethereum-development/wallets"
+  wallets: "/home/cuongtop/Desktop/DigitalSignaturalNetwork"
   endpoint: "http://localhost:8545" #for mainnet "https://mainnet.infura.io"
   passadmin: 123456

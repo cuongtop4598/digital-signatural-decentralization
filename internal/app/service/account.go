@@ -16,7 +16,7 @@ import (
 type AccountService interface {
 	CreateNewAccount(c *gin.Context) ([]byte, error)
 	CreateNewKeyStores(password string, c *gin.Context) (publickey string, err error)
-	ImportKeyStores(c gin.Context, keyPath string, password string)
+	ImportKeyStores(keyPath string, password string, c *gin.Context)
 }
 type Account struct {
 	client      *ethclient.Client
@@ -49,9 +49,9 @@ func (a *Account) CreateNewKeyStores(password string, c *gin.Context) (publickey
 	return account.Address.Hex(), nil
 }
 
-func (a *Account) ImportKeyStores(c gin.Context, keyPath string, password string) {
+func (a *Account) ImportKeyStores(keyPath string, password string, c *gin.Context) {
 	file := keyPath
-	ks := keystore.NewKeyStore("./tmp", keystore.StandardScryptN, keystore.StandardScryptP)
+	ks := keystore.NewKeyStore(a.savePath, keystore.StandardScryptN, keystore.StandardScryptP)
 	jsonBytes, err := ioutil.ReadFile(file)
 	if err != nil {
 		log.Fatal(err)
