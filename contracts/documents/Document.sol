@@ -59,7 +59,7 @@ contract Document is Context, IDC, IDCMetadata {
     /**
      * @dev Return Public key of the owner
      */
-    function getPublicKey(string memory userID) private view returns (address ) {
+    function getPublicKey(string memory userID) public view returns (address ) {
         return _userlist._ulistUID[userID].publicKey;
     }
 
