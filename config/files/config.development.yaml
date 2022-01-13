@@ -1,5 +1,6 @@
 server:
   mode: "development"
+<<<<<<< HEAD
   host: "localhost"
   port: "8081"
 ethereum:
@@ -7,3 +8,16 @@ ethereum:
   wallets: "/home/cuongtop/Desktop/DigitalSignaturalNetwork"
   endpoint: "http://localhost:8545" #for mainnet "https://mainnet.infura.io"
   passadmin: 123456
+=======
+ethereum-network:
+  #endpoint-mainnet: "https://mainnet.infura.io"
+  endpoint-local: "/home/user/.ethereum/geth.ipc"
+postgres:
+  PostgresqlHost: 172.18.0.3
+  PostgresqlPort: 5432
+  PostgresqlUser: admin
+  PostgresqlPassword: mypassword
+  PostgresqlDbname: dsd
+  PostgresqlSslmode: false
+  PgDriver: pgx
+>>>>>>> 9f6e7e0518fb0485cbc523bc72780b84c348139d

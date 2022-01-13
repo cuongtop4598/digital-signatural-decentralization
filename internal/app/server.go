@@ -2,8 +2,10 @@ package app
 
 import (
 	"digitalsignature/config"
+	"digitalsignature/internal/pkg/database"
 	"digitalsignature/internal/pkg/ethereum"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -56,6 +58,15 @@ func (server *Server) Run(env string) error {
 			tracer.WithService(""),
 		)
 	}
+	cfg := config.Load("development")
+	db, err := database.GetConnection(log, &cfg.Postgres)
+	if err != nil {
+		log.Sugar().Error(err)
+		os.Exit(1)
+	} else {
+		log.Sugar().Infof("Postgres connected, Status: ", db.PoolStats())
+	}
+	defer db.Close()
 
 	//db := database.GetConnection(log)
 	//rd := redis.GetConnection()
@@ -63,6 +74,7 @@ func (server *Server) Run(env string) error {
 	client, err := ethereum.NewClient(configuration.Ethereum)
 	if err != nil {
 		log.Sugar().Error(err)
+		// os.Exit(1)
 	}
 
 	defer tracer.Stop()

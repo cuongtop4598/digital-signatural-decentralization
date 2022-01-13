@@ -44,6 +44,16 @@ type Server struct {
 	Port string `yaml:"port"`
 }
 
+type PostgresConfig struct {
+	PostgresqlHost     string
+	PostgresqlPort     string
+	PostgresqlUser     string
+	PostgresqlPassword string
+	PostgresqlDbname   string
+	PostgresqlSSLMode  bool
+	PgDriver           string
+}
+
 func setGinMode(mode string) {
 	switch mode {
 	case "production":

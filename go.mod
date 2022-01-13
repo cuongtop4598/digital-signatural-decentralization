@@ -13,6 +13,12 @@ require (
 	github.com/go-playground/validator/v10 v10.6.1 // indirect
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/google/uuid v1.3.0 // indirect
+<<<<<<< HEAD
+=======
+	github.com/jackc/pgx v3.6.2+incompatible // indirect
+	github.com/jmoiron/sqlx v1.3.4 // indirect
+	github.com/joho/godotenv v1.3.0
+>>>>>>> 9f6e7e0518fb0485cbc523bc72780b84c348139d
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/mattn/go-isatty v0.0.13 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
