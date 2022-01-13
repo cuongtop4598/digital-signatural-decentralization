@@ -14,6 +14,7 @@ require (
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/jackc/pgx v3.6.2+incompatible // indirect
+	github.com/jackc/pgx/v4 v4.14.1 // indirect
 	github.com/jmoiron/sqlx v1.3.4 // indirect
 	github.com/joho/godotenv v1.3.0
 	github.com/leodido/go-urn v1.2.1 // indirect
@@ -24,5 +25,8 @@ require (
 	github.com/vmihailenco/msgpack/v5 v5.3.4 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
 	go.uber.org/zap v1.19.1
+	golang.org/x/crypto v0.0.0-20220112180741-5e0467b6c7ce // indirect
 	gopkg.in/DataDog/dd-trace-go.v1 v1.32.0
+	gorm.io/driver/postgres v1.2.3 // indirect
+	gorm.io/gorm v1.22.5 // indirect
 )

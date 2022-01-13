@@ -1,12 +1,15 @@
 package database
 
 import (
-	"context"
 	"digitalsignature/config"
 	"fmt"
+	"log"
+	"os"
+	"time"
 
-	"github.com/go-pg/pg/v10"
-	"go.uber.org/zap"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 // PostgresConfig persists the config for our PostgreSQL database connection
@@ -24,42 +27,29 @@ type PgConfig struct {
 // usage:
 // db := config.GetConnection()
 // defer db.Close()
-func GetConnection(log *zap.Logger, p *config.PostgresConfig) (*pg.DB, error) {
-	dbURL := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
+func GetConnection(p *config.PostgresConfig) (*gorm.DB, error) {
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
+		p.PostgresqlHost,
 		p.PostgresqlUser,
 		p.PostgresqlPassword,
-		p.PostgresqlHost,
-		p.PostgresqlPort,
 		p.PostgresqlDbname,
+		p.PostgresqlPort,
 	)
-	opt, err := pg.ParseURL(dbURL)
+	// define logger
+	newLogger := logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+		logger.Config{
+			SlowThreshold:             time.Second,   // Slow SQL threshold
+			LogLevel:                  logger.Silent, // Log level
+			IgnoreRecordNotFoundError: true,          // Ignore ErrRecordNotFound error for logger
+			Colorful:                  false,         // Disable color
+		},
+	)
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger: newLogger,
+	})
 	if err != nil {
 		return nil, err
 	}
-	db := pg.Connect(opt)
-
-	ctx := context.Background()
-
-	if err := db.Ping(ctx); err != nil {
-		return nil, err
-	}
-	db.AddQueryHook(dbLogger{
-		log: log,
-	})
-
 	return db, nil
-}
-
-type dbLogger struct {
-	log *zap.Logger
-}
-
-func (d dbLogger) BeforeQuery(c context.Context, q *pg.QueryEvent) (context.Context, error) {
-	return c, nil
-}
-
-func (d dbLogger) AfterQuery(c context.Context, q *pg.QueryEvent) error {
-	fq, _ := q.FormattedQuery()
-	d.log.Sugar().Info(string(fq))
-	return nil
 }

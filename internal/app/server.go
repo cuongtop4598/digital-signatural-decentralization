@@ -2,6 +2,7 @@ package app
 
 import (
 	"digitalsignature/config"
+	"digitalsignature/internal/app/migration"
 	"digitalsignature/internal/pkg/database"
 	"digitalsignature/internal/pkg/redis"
 	"os"
@@ -53,15 +54,18 @@ func (server *Server) Run(env string) error {
 		)
 	}
 	cfg := config.Load("development")
-	db, err := database.GetConnection(log, &cfg.Postgres)
+	db, err := database.GetConnection(&cfg.Postgres)
 	if err != nil {
 		log.Sugar().Error(err)
 		os.Exit(1)
 	} else {
-		log.Sugar().Infof("Postgres connected, Status: ", db.PoolStats())
+		log.Sugar().Infof("Postgres connected successfully")
 	}
-	defer db.Close()
-
+	err = migration.Migrate(db)
+	if err != nil {
+		log.Sugar().Error(err)
+		os.Exit(1)
+	}
 	rd := redis.GetConnection()
 
 	eth_endpoint, _ := os.LookupEnv("CHAIN_ENDPOINT")
