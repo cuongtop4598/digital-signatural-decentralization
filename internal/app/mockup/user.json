@@ -1,0 +1,24 @@
+[{
+    "ID": "2cec0f58-878c-48d5-ba56-3cc22a178e45",
+    "Name": "Nguyen Manh Cuong",
+    "PublicKey": "0xb8CE9ab6943e0eCED004cDe8e3bBed6568B2Fa01",
+    "IDCard": "036099004321",
+    "Phone": "0120990034",
+    "Gmail": "cuongtop4598@gmail.com",
+    "DateOfBirth": "2006-01-02T15:04:05",
+    "CreateAt": "2006-01-02T15:04:05",
+    "UpdateAt": "2006-01-02T15:04:05",
+    "DeleteAt": ""
+},
+{
+    "ID": "12ac5fff-c5da-4250-85cd-f11e9338f705",
+    "Name": "Nguyen Quoc Khanh",
+    "PublicKey": "0xF2CD2AA0c7926743B1D4310b2BC984a0a453c3d4",
+    "IDCard": "036099004321",
+    "Phone": "0120990034",
+    "Gmail": "cuongtop4598@gmail.com",
+    "DateOfBirth": "2006-01-02T15:04:05",
+    "CreateAt": "2006-01-02T15:04:05",
+    "UpdateAt": "2006-01-02T15:04:05",
+    "DeleteAt": ""
+}]

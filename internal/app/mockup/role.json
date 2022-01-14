@@ -1,0 +1,12 @@
+[
+    {
+        "ID": "3a6fb4ba-089d-4ce1-9e91-b40748fdf760",
+        "Name": "user",
+        "Type": "normal"
+    },
+    {
+        "ID": "5500061b-8491-4771-b676-33be1b64da92",
+        "Name": "admin",
+        "Type": "all permissions"
+    }
+]
