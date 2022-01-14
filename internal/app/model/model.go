@@ -13,10 +13,10 @@ type User struct {
 	IDCard      string
 	Phone       string
 	Gmail       string
-	DateOfBirth time.Time
-	CreateAt    time.Time
-	UpdateAt    time.Time
-	DeleteAt    time.Time
+	DateOfBirth time.Time `json:"dateo_of_birth,omitempty"`
+	CreateAt    time.Time `json:"creat_at,omitempty"`
+	UpdateAt    time.Time `json:"update_at,omitempty"`
+	DeleteAt    time.Time `json:"dalete_at,omitempty"`
 }
 
 type Document struct {
@@ -26,9 +26,9 @@ type Document struct {
 	Type     string
 	Path     string
 	Public   bool
-	CreateAt time.Time
-	UpdateAt time.Time
-	DeleteAt time.Time
+	CreateAt time.Time `json:"create_at,omitempty"`
+	UpdateAt time.Time `json:"update_at,omitempty"`
+	DeleteAt time.Time `json:"delete_at,omitempty"`
 }
 
 type UserAllow struct {
@@ -38,7 +38,7 @@ type UserAllow struct {
 
 type Transaction struct {
 	ID        uuid.UUID `gorm:"type:uuid;primaryKey"`
-	Timestamp time.Time
+	Timestamp time.Time `json:"time"`
 	Type      string
 }
 
