@@ -1,15 +1,8 @@
 package database
 
 import (
-	"context"
-	"errors"
-	"fmt"
-	"net/url"
-	"strings"
-
-	"github.com/caarlos0/env/v6"
-	"github.com/go-pg/pg/v10"
-	"go.uber.org/zap"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 // PostgresConfig persists the config for our PostgreSQL database connection
@@ -27,67 +20,11 @@ type PgConfig struct {
 // usage:
 // db := config.GetConnection()
 // defer db.Close()
-func GetConnection(log *zap.Logger) *pg.DB {
-	c := GetPgConfig()
-	fmt.Println(c.Host)
-	fmt.Println(c.User)
-	// if DATABASE_URL is valid, we will use its constituent values in preference
-	validConfig, err := validPostgresURL(c.URL)
-	if err == nil {
-		c = validConfig
-	}
-	db := pg.Connect(&pg.Options{
-		Addr:     c.Host + ":" + c.Port,
-		User:     c.User,
-		Password: c.Password,
-		Database: c.Database,
-		PoolSize: 150,
-	})
-	db.AddQueryHook(dbLogger{
-		log: log,
-	})
-	return db
-}
-
-type dbLogger struct {
-	log *zap.Logger
-}
-
-func (d dbLogger) BeforeQuery(c context.Context, q *pg.QueryEvent) (context.Context, error) {
-	return c, nil
-}
-
-func (d dbLogger) AfterQuery(c context.Context, q *pg.QueryEvent) error {
-	fq, _ := q.FormattedQuery()
-	d.log.Sugar().Info(string(fq))
-	return nil
-}
-
-// GetPostgresConfig returns a PostgresConfig pointer with the correct Postgres Config values
-func GetPgConfig() *PgConfig {
-	c := PgConfig{}
-	if err := env.Parse(&c); err != nil {
-		fmt.Printf("%+v\n", err)
-		fmt.Println("Lỗi")
-	}
-	return &c
-}
-
-func validPostgresURL(URL string) (*PgConfig, error) {
-	if URL == "" || strings.TrimSpace(URL) == "" {
-		return nil, errors.New("database url is blank")
-	}
-
-	validURL, err := url.Parse(URL)
+func GetConnection() (*gorm.DB, error) {
+	dsn := "host=172.18.0.3 user=admin password=mypassword dbname=dsd port=5432 sslmode=disable"
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
-	c := &PgConfig{}
-	c.URL = URL
-	c.Host = validURL.Host
-	c.Database = validURL.Path
-	c.Port = validURL.Port()
-	c.User = validURL.User.Username()
-	c.Password, _ = validURL.User.Password()
-	return c, nil
+	return db, nil
 }

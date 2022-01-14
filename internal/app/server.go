@@ -2,6 +2,8 @@ package app
 
 import (
 	"digitalsignature/config"
+	"digitalsignature/internal/app/migration"
+	"digitalsignature/internal/pkg/database"
 	"digitalsignature/internal/pkg/ethereum"
 	"fmt"
 	"time"
@@ -57,7 +59,14 @@ func (server *Server) Run(env string) error {
 		)
 	}
 
-	//db := database.GetConnection(log)
+	db, err := database.GetConnection()
+	if err != nil {
+		log.Sugar().Errorf("Connect to database fail ", err)
+	}
+	err = migration.Migrate(db)
+	if err != nil {
+		log.Sugar().Errorf("Migrate fail ", err)
+	}
 	//rd := redis.GetConnection()
 
 	client, err := ethereum.NewClient(configuration.Ethereum)
@@ -70,7 +79,7 @@ func (server *Server) Run(env string) error {
 
 	rsDefault := &config.Services{
 		EthClient: client,
-		DB:        nil,
+		DB:        db,
 		Redis:     nil,
 		Log:       log,
 		R:         r,
