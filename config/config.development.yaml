@@ -7,3 +7,9 @@ ethereum:
   wallets: "/home/cuongtop/Desktop/DigitalSignaturalNetwork"
   endpoint: "http://localhost:8545" #for mainnet "https://mainnet.infura.io"
   passadmin: 123456
+database:
+  host: "localhost" 
+  user: "root"
+  password: "local"
+  dbname: "digital"
+  port: 5432

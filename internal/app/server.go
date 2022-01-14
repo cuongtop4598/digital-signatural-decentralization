@@ -6,6 +6,8 @@ import (
 	"digitalsignature/internal/pkg/database"
 	"digitalsignature/internal/pkg/ethereum"
 	"fmt"
+	"log"
+	"os"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -16,15 +18,16 @@ import (
 	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 )
 
-// configuration hold all config of server
-var configuration *config.Configuration
-
 // Server holds all the routes and their services
 type Server struct{}
 
 // Run runs our API server
 func (server *Server) Run(env string) error {
-	configuration = config.Load(env)
+	os.Chdir(".")
+	configuration, err := config.NewConfig("./config/", "development")
+	if err != nil {
+		log.Fatal(err)
+	}
 	fmt.Println(configuration.Ethereum.Wallets)
 	r := gin.Default()
 
@@ -59,7 +62,7 @@ func (server *Server) Run(env string) error {
 		)
 	}
 
-	db, err := database.GetConnection()
+	db, err := database.GetConnection(configuration.Database)
 	if err != nil {
 		log.Sugar().Errorf("Connect to database fail ", err)
 	}

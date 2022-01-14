@@ -19,11 +19,13 @@ const (
 )
 
 func GetKeyStoreAdmin() (*keystore.KeyStore, error) {
-	config := config.Load("development")
-
+	config, err := config.NewConfig("/config/", "development")
+	if err != nil {
+		return nil, err
+	}
 	account := GetAccountAdmin(config.Ethereum.Password)
 	ks := keystore.NewKeyStore(dataDir+"/keystore", keystore.StandardScryptN, keystore.StandardScryptP)
-	err := ks.Unlock(account, config.Ethereum.Password)
+	err = ks.Unlock(account, config.Ethereum.Password)
 	if err != nil {
 		return nil, err
 	}

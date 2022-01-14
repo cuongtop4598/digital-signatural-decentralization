@@ -1,40 +1,43 @@
 package config
 
 import (
+	"digitalsignature/internal/pkg/database"
 	"digitalsignature/internal/pkg/ethereum"
+	"fmt"
 	"log"
-	"path/filepath"
-	"runtime"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 )
 
-// Load returns Configuration struct
-func Load(env string) *Configuration {
-	_, filePath, _, _ := runtime.Caller(0)
-	configName := "config." + env + ".yaml"
-	configPath := filePath[:len(filePath)-14] + "files" + string(filepath.Separator)
-	viper.SetConfigName(configName)
-	viper.AddConfigPath(configPath)
-	viper.SetConfigType("yaml")
+func NewConfig(path, stage string) (config *Configuration, err error) {
+	conf := Configuration{}
+	name := fmt.Sprintf("config.%s", stage)
 
-	err := viper.ReadInConfig()
-	if err != nil {
-		log.Fatal(err)
+	vp := viper.New()
+	vp.AddConfigPath(path)
+	vp.SetConfigName(name)
+	vp.AutomaticEnv()
+	vp.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	if err := vp.ReadInConfig(); err != nil {
+		return nil, err
 	}
-
-	var config Configuration
-	viper.Unmarshal(&config)
-	setGinMode(config.Server.Mode)
-
-	return &config
+	// binding
+	if err := vp.Unmarshal(&conf); err != nil {
+		log.Println("Failed to unmarshal config: ", err)
+		return nil, err
+	}
+	setGinMode(conf.Server.Mode)
+	log.Printf("Config: %+v", conf)
+	return &conf, nil
 }
 
 // Configuration holds data necessery for configuring application
 type Configuration struct {
 	Server   *Server                 `yaml:"server"`
 	Ethereum *ethereum.NetworkConfig `yaml:"ethereum"`
+	Database *database.DBConfig      `yaml:"database"`
 }
 
 // Server holds data necessary for server configuration

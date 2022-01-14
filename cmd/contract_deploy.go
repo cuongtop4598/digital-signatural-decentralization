@@ -48,7 +48,10 @@ func GetAccountAdmin(password string) accounts.Account {
 }
 
 func main() {
-	config := config.Load("development")
+	config, err := config.NewConfig("/config/", "development")
+	if err != nil {
+		log.Fatal(err)
+	}
 	client, err := ethereum.NewClient(config.Ethereum)
 	if err != nil {
 		log.Fatal(err)
