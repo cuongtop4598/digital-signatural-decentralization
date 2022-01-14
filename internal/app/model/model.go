@@ -13,7 +13,7 @@ type User struct {
 	IDCard      string
 	Phone       string
 	Gmail       string
-	DateOfBirth time.Time `json:"dateo_f_birth,omitempty"`
+	DateOfBirth time.Time `json:"dateo_of_birth,omitempty"`
 	CreateAt    time.Time `json:"creat_at,omitempty"`
 	UpdateAt    time.Time `json:"update_at,omitempty"`
 	DeleteAt    time.Time `json:"dalete_at,omitempty"`
