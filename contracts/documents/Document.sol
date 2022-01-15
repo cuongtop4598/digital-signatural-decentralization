@@ -15,7 +15,7 @@ contract Document is Context, IDC, IDCMetadata {
                              
     struct User {
         string userID;
-        bytes32 infoHash;
+        bytes infoSignature;
         address publicKey;
         uint256 numDoc;
         mapping(uint256 => Doc) docs;
@@ -34,18 +34,16 @@ contract Document is Context, IDC, IDCMetadata {
     /**
      * @dev Return True if user information is stored successfully, otherwise return False.
      */
-    function storeUser(string memory userID,string memory name,string memory cmnd, string memory dateOB, string memory phone,string memory gmail,address publicKey) 
+    function storeUser(string memory userID, bytes memory infoSignature, address publicKey) 
     public override returns(bool) {
-        bytes32 hashif = hashUserInfo(userID,name,cmnd,dateOB,phone,gmail);
         
         User storage u = _userlist._ulistpubKey[publicKey];
         
         u.userID = userID;
-        u.infoHash = hashif;
+        u.infoSignature = infoSignature;
         u.publicKey = publicKey;
 
         u = _userlist._ulistUID[userID];
-
         return true;
     }
 
@@ -76,6 +74,14 @@ contract Document is Context, IDC, IDCMetadata {
         doc.signature = signature;
         doc.finDocument = signature;
         return numDoc;
+    }
+
+    /**
+     * @dev Return True if Doc wasn't change else False
+     */
+    function verifyUserInfo(string memory userID, bytes32 digest) public view override returns(bool) {
+        User storage u = _userlist._ulistUID[userID];
+        return recoverSigner(digest,u.infoSignature) == u.publicKey;
     }
 
     /**
@@ -121,11 +127,4 @@ contract Document is Context, IDC, IDCMetadata {
         // implicitly return (r, s, v)
     }
 
-    /**
-     * @dev Return a hash of user information 
-     */
-    function hashUserInfo(string memory uID, string memory name, string memory cmnd, string memory dOB, string memory phone, string memory gmail) 
-    private pure returns (bytes32) {
-        return keccak256(abi.encodePacked(uID,name,cmnd,dOB,phone,gmail));
-    }
 }
