@@ -1,7 +1,6 @@
 package document
 
 import (
-	"digitalsignature/internal/app/utils"
 	"log"
 
 	"github.com/ethereum/go-ethereum/accounts"
@@ -10,44 +9,54 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	// geth dumpgenesis
+	chainID = 451998                                            // change chainID equals chainID in your genesis.json
+	dataDir = "/home/cuongtop/Desktop/DigitalSignaturalNetwork" // path of --datadir setting in your network
+)
+
 type DocumentService interface {
 	GetUserIdByPublicKey(c *gin.Context, userAddress common.Address) (id string, err error)
+	SaveDocument(userID string, passUnlock string) int64
 }
 
 type document struct {
 	client   *ethclient.Client
 	instance *Document
 	account  *accounts.Account
-	data     []byte
+	Data     []byte
 	chanID   int64
 }
 
-func NewDocumentService(data []byte, client *ethclient.Client, userAddress common.Address, account *accounts.Account, chainID int64) DocumentService {
+func NewDocumentService(client *ethclient.Client, chainID int64) DocumentService {
+	return &document{
+		client: client,
+		chanID: chainID,
+	}
+}
+
+func (d *document) SetAccount(account *accounts.Account) *document {
+	d.account = account
+	return d
+}
+
+func (d *document) CreateInstance(userAddress common.Address, client *ethclient.Client) *document {
 	doc, err := NewDocument(userAddress, client)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return &document{
-		client:   client,
-		instance: doc,
-		account:  account,
-		data:     data,
-		chanID:   chainID,
-	}
+	d.instance = doc
+	return d
 }
 
 func (d *document) GetUserIdByPublicKey(c *gin.Context, userAddress common.Address) (id string, err error) {
 	return d.instance.GetUserID(nil, userAddress)
 }
 
-// func (d *document) GetPublicKeyByUserId(c *gin.Context, userID string) (publicKey string, err error) {
-// 	return d.instance.GetPublicKey()
-// }
-
-func (d *document) SaveDocument(userID string) int64 {
+func (d *document) SaveDocument(userID string, passUnlock string) int64 {
 	signatura := []byte{}
 	// tạm thời gọi với auth là admin
-	ks, err := utils.GetKeyStoreAdmin()
+	ks, err := GetKeyStoreAdmin(passUnlock)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -71,10 +80,10 @@ func (d *document) VerifyDoc(userID string, digest []byte, DocID string) bool {
 }
 
 // Store user info
-func (d *document) StoreUser(userInfo *UserInformation) bool {
+func (d *document) StoreUser(userInfo *UserInformation, passUnlock string) bool {
 	address := common.HexToAddress(userInfo.PublicKey)
 	// tạm thời gọi với auth là admin
-	ks, err := utils.GetKeyStoreAdmin()
+	ks, err := GetKeyStoreAdmin(passUnlock)
 	if err != nil {
 		log.Fatal(err)
 	}

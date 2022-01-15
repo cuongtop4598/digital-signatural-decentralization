@@ -5,7 +5,6 @@ import (
 	"digitalsignature/internal/app/migration"
 	"digitalsignature/internal/pkg/database"
 	"digitalsignature/internal/pkg/ethereum"
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -28,7 +27,6 @@ func (server *Server) Run(env string) error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(configuration.Ethereum.Wallets)
 	r := gin.Default()
 
 	headerPolicies := cors.DefaultConfig()
@@ -83,7 +81,6 @@ func (server *Server) Run(env string) error {
 	rsDefault := &config.Services{
 		EthClient: client,
 		DB:        db,
-		Redis:     nil,
 		Log:       log,
 		R:         r,
 		Config:    configuration,
