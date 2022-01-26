@@ -17,7 +17,7 @@ const (
 
 type DocumentService interface {
 	GetUserIdByPublicKey(c *gin.Context, userAddress common.Address) (id string, err error)
-	SaveDocument(userID string, passUnlock string) int64
+	SaveDocument(userID string) int64
 }
 
 type document struct {
@@ -53,23 +53,8 @@ func (d *document) GetUserIdByPublicKey(c *gin.Context, userAddress common.Addre
 	return d.instance.GetUserID(nil, userAddress)
 }
 
-func (d *document) SaveDocument(userID string, passUnlock string) int64 {
-	signatura := []byte{}
-	// tạm thời gọi với auth là admin
-	ks, err := GetKeyStoreAdmin(passUnlock)
-	if err != nil {
-		log.Fatal(err)
-	}
-	auth, err := CreateAuthForSigning(*d.account, d.client, ks, d.chanID)
-	if err != nil {
-		log.Fatal(err)
-	}
-	tnx, err := d.instance.SaveDoc(auth, userID, signatura)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	_ = tnx // get tnx info here
+func (d *document) SaveDocument(userID string) int64 {
+	//signatura := []byte{}
 	return 0
 }
 

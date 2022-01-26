@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"digitalsignature/internal/app/request"
 	"digitalsignature/internal/app/service/document"
 
 	"github.com/gin-gonic/gin"
@@ -16,22 +15,27 @@ func DocumentRouter(documentService document.DocumentService, r *gin.RouterGroup
 		documentService: documentService,
 	}
 	dr := r.Group("/document")
-	dr.POST("/sign", dc.SignDocument)
-	dr.POST("/verify", dc.VerifyDocument)
+	dr.POST("/upload/public", dc.UploadPublic)
+	dr.POST("/upload/private")
+	dr.POST("/download", dc.Download)
+	dr.POST("/verify", dc.Verify)
 }
 
-func (d *DocumentController) SignDocument(c *gin.Context) {
-	signDocInfo := request.SignDocumentRequest{}
-	err := c.BindJSON(signDocInfo)
-	if err != nil {
-		c.JSON(200, gin.H{"message": "your request is wrong format"})
-	} else {
-		docID := d.documentService.SaveDocument(signDocInfo.UserID, "")
-		c.JSON(200, gin.H{"DocID": docID, "State": "Success"})
-	}
+// Upload document using IPFS
+func (d *DocumentController) UploadPublic(c *gin.Context) {
 
 }
 
-func (d *DocumentController) VerifyDocument(c *gin.Context) {
+// Upload document and save to server
+func (d *DocumentController) UploadPrivate(c *gin.Context) {
+
+}
+
+// Upload
+func (d *DocumentController) Verify(c *gin.Context) {
+
+}
+
+func (d *DocumentController) Download(c *gin.Context) {
 
 }

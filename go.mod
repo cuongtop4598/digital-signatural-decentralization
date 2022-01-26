@@ -11,6 +11,7 @@ require (
 	github.com/gin-gonic/gin v1.7.4
 	github.com/go-playground/validator/v10 v10.6.1 // indirect
 	github.com/google/uuid v1.3.0
+	github.com/ipfs/go-ipfs-api v0.3.0
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/mattn/go-isatty v0.0.13 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
