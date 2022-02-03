@@ -13,3 +13,6 @@ database:
   password: "local"
   dbname: "digital"
   port: 5432
+ipfs:
+  host: "127.0.0.1"
+  port: "10118"

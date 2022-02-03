@@ -1,6 +1,7 @@
 package config
 
 import (
+	"digitalsignature/internal/app/service/ipfs"
 	"digitalsignature/internal/pkg/database"
 	"digitalsignature/internal/pkg/ethereum"
 	"fmt"
@@ -38,6 +39,7 @@ type Configuration struct {
 	Server   *Server                 `yaml:"server"`
 	Ethereum *ethereum.NetworkConfig `yaml:"ethereum"`
 	Database *database.DBConfig      `yaml:"database"`
+	Ipfs     *ipfs.IPFSConfig        `yaml:"ipfs"`
 }
 
 // Server holds data necessary for server configuration
