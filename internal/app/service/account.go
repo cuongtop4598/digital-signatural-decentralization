@@ -57,7 +57,7 @@ func (s *AccountService) BindTransactionOption(account accounts.Account, client 
 	return &bind.TransactOpts{
 		From:      [20]byte{},
 		Nonce:     big.NewInt(int64(nonce)),
-		Signer:    keySigner(big.NewInt(451998)),
+		Signer:    keySigner(big.NewInt(451998), nil),
 		Value:     big.NewInt(0),
 		GasPrice:  gasPrice,
 		GasFeeCap: &big.Int{},

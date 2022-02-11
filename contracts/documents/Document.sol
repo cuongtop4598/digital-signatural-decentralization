@@ -36,7 +36,7 @@ contract Document is Context, IDC, IDCMetadata {
      */
     function storeUser(string memory userID,string memory name,string memory cmnd, string memory dateOB, string memory phone,string memory gmail,address publicKey) 
     public override returns(bool) {
-        bytes32 hashif = hashUserInfo(userID,name,cmnd,dateOB,phone,gmail);
+        bytes32 hashif = hashUserInfo(name,cmnd,dateOB,phone,gmail);
         
         User storage u = _userlist._ulistpubKey[publicKey];
         
@@ -124,8 +124,8 @@ contract Document is Context, IDC, IDCMetadata {
     /**
      * @dev Return a hash of user information 
      */
-    function hashUserInfo(string memory uID, string memory name, string memory cmnd, string memory dOB, string memory phone, string memory gmail) 
+    function hashUserInfo(string memory name, string memory cmnd, string memory dOB, string memory phone, string memory gmail) 
     private pure returns (bytes32) {
-        return keccak256(abi.encodePacked(uID,name,cmnd,dOB,phone,gmail));
+        return keccak256(abi.encodePacked(name,cmnd,dOB,phone,gmail));
     }
 }
