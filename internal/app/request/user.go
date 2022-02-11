@@ -3,8 +3,8 @@ package request
 type UserInfo struct {
 	Name        string `json:"name"`
 	Email       string `json:"email"`
-	CardID      string `json:"idcard"`
+	CardID      string `json:"card_id"`
 	Phone       string `json:"phone"`
-	DateOfBirth string `json:"dateofbirth"`
-	PublicKey   string `json:"publickey"`
+	DateOfBirth string `json:"date_of_birth"`
+	PublicKey   string `json:"public_key"`
 }

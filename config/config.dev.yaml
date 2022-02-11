@@ -4,12 +4,13 @@ server:
   port: "8081"
 ethereum:
   endpoint: "http://27.72.105.169:10199"
-  keystore_path: "/wallets/keystore/"
+  keystore_path: "./wallets/keystore/"
   chain_id: 451998
-  pass_admin: 123456
+  pass_admin: "123456"
 database:
   host: "localhost" 
   user: "root"
   password: "local"
-  dbname: "digital"
-  port: 5432
+  database: "digital_signatural"
+  port: 5433
+  env: "development"

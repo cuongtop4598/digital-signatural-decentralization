@@ -1,10 +1,20 @@
 package service
 
 import (
+	"context"
+	"crypto/ecdsa"
 	"errors"
+	"log"
+	"math/big"
+	"os"
 
 	"github.com/ethereum/go-ethereum/accounts"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 // This service use to interface with admin account ethereum
@@ -21,6 +31,7 @@ func NewAccountService(keyPath string, password string) *AccountService {
 }
 
 func (s *AccountService) GetAminAccount() (*accounts.Account, *keystore.KeyStore, error) {
+	os.Chdir(".")
 	ks := keystore.NewKeyStore(s.KeyPath, keystore.StandardScryptN, keystore.StandardScryptP)
 	accounts := ks.Accounts()
 	if len(accounts) > 0 {
@@ -31,4 +42,40 @@ func (s *AccountService) GetAminAccount() (*accounts.Account, *keystore.KeyStore
 		return &accounts[0], ks, nil
 	}
 	return nil, nil, errors.New("No key file in keystore path")
+}
+
+func (s *AccountService) BindTransactionOption(account accounts.Account, client *ethclient.Client) *bind.TransactOpts {
+	fromAddress := account.Address
+	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
+	if err != nil {
+		log.Fatal(err)
+	}
+	gasPrice, err := client.SuggestGasPrice(context.Background())
+	if err != nil {
+		log.Fatal(err)
+	}
+	return &bind.TransactOpts{
+		From:      [20]byte{},
+		Nonce:     big.NewInt(int64(nonce)),
+		Signer:    keySigner(big.NewInt(451998)),
+		Value:     big.NewInt(0),
+		GasPrice:  gasPrice,
+		GasFeeCap: &big.Int{},
+		GasTipCap: &big.Int{},
+		GasLimit:  uint64(100000000),
+		Context:   nil,
+		NoSend:    false,
+	}
+
+}
+
+func keySigner(chainID *big.Int, key *ecdsa.PrivateKey) (signerfn bind.SignerFn) {
+	signerfn = func(address common.Address, tx *types.Transaction) (*types.Transaction, error) {
+		keyAddr := crypto.PubkeyToAddress(key.PublicKey)
+		if address != keyAddr {
+			return nil, errors.New("not authorized to sign this account")
+		}
+		return types.SignTx(tx, types.NewEIP155Signer(chainID), key)
+	}
+	return
 }

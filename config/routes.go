@@ -29,13 +29,15 @@ type Services struct {
 
 // SetupRoutes instances various repos and services and sets up the routers
 func (s *Services) SetupRoutes() {
-
+	s.Log.Info("Config", zap.Any("", s.Config.Ethereum))
 	// Create services handle
+	accountSrv := service.NewAccountService(s.Config.Ethereum.KeystorePath, s.Config.Ethereum.Password)
+
 	controllers.HomeRouter(s.R)
 	rg := s.R.Group("/v1")
 
 	// Create repo
 	userRepo := repository.NewUserRepository(s.DB)
-	accountService := service.NewUserService(s.EthClient, userRepo)
-	controllers.AccountRouter(*accountService, rg)
+	userService := service.NewUserService(s.EthClient, userRepo, accountSrv, s.Log)
+	controllers.UserRouter(*userService, rg)
 }

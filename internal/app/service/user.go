@@ -20,6 +20,7 @@ import (
 
 type AccountSrv interface {
 	GetAminAccount() (*accounts.Account, *keystore.KeyStore, error)
+	BindTransactionOption(account accounts.Account, client *ethclient.Client) *bind.TransactOpts
 }
 type UserService struct {
 	ethclient  *ethclient.Client
@@ -28,10 +29,12 @@ type UserService struct {
 	accountSrv AccountSrv
 }
 
-func NewUserService(client *ethclient.Client, userRepo *repository.UserRepo) *UserService {
+func NewUserService(client *ethclient.Client, userRepo *repository.UserRepo, accountSrv AccountSrv, log *zap.Logger) *UserService {
 	return &UserService{
-		ethclient: client,
-		userRepo:  userRepo,
+		ethclient:  client,
+		userRepo:   userRepo,
+		logger:     log,
+		accountSrv: accountSrv,
 	}
 }
 func (s *UserService) Create(c *gin.Context, userInfo request.UserInfo) error {
@@ -52,27 +55,26 @@ func (s *UserService) Create(c *gin.Context, userInfo request.UserInfo) error {
 	err := s.userRepo.Create(user)
 	if err != nil {
 		s.logger.Error("create new account error", zap.String("error", err.Error()))
-		return err
 	}
-	s.logger.Info("created user", zap.String("publickey", userInfo.PublicKey))
-
 	// make transaction with admin account
 	adminAccount, _, err := s.accountSrv.GetAminAccount()
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	contractAddress := common.HexToAddress("0xF78540428B81A25B7DBe04c19767F47A6f95FEe3")
 	// store hash user info to blockchain
-	documentIntance, err := document.NewDocument(adminAccount.Address, s.ethclient)
+	documentIntance, err := document.NewDocument(contractAddress, s.ethclient)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	userAddress := common.HexToAddress(user.PublicKey)
-	txn, err := documentIntance.StoreUser(&bind.TransactOpts{}, user.ID.String(), user.Name, user.CardID, user.DateOfBirth, user.Phone, user.Gmail, userAddress)
+	tnxOption := s.accountSrv.BindTransactionOption(*adminAccount, s.ethclient)
+	txn, err := documentIntance.StoreUser(tnxOption, user.ID.String(), user.Name, user.CardID, user.DateOfBirth, user.Phone, user.Gmail, userAddress)
 	if err != nil {
 		log.Fatal(err)
 	}
 	s.logger.Info(txn.Hash().String())
+	s.logger.Info("created user", zap.String("publickey", userInfo.PublicKey))
 	return nil
 }

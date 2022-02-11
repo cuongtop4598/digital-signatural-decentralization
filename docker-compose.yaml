@@ -1,17 +1,30 @@
-version: "3.9"
+version: "3.2"
 services:
-  local_posgresql:
-    container_name: digital_postgres
-    image: postgres:12.8
+  postgres:
+    container_name: postgres11
+    image: postgres:11.4
     environment:
+      POSTGRES_DB: digital_signatural
       POSTGRES_USER: root
       POSTGRES_PASSWORD: local
-      PGDATA: /data/postgres
     volumes:
-      - postgres:/data/postgres
+      - postgres-data:/var/lib/postgres/data
     ports:
-      - "5432:5432"
-  local_task:
-    container_name: digital_signature_2021
-    image: "digital_signature_2021:latest"
-    command: ./main
+      - "5433:5432"
+  pgadmin4: 
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin4
+    restart: always
+    environment:
+        PGADMIN_DEFAULT_EMAIL: digital@gmail.com
+        PGADMIN_DEFAULT_PASSWORD: local
+        PGADMIN_LISTEN_PORT: 80
+    ports: 
+        - "8080:80"
+    volumes:
+        - pgadmin-data:/var/lib/pgadmin/data
+    links:
+        - "postgres:pgsql-server"
+volumes:
+  postgres-data:
+  pgadmin-data:
