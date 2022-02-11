@@ -5,11 +5,12 @@ import (
 	"digitalsignature/internal/app/repository"
 	"digitalsignature/internal/app/request"
 	"digitalsignature/internal/app/service/document"
-	"digitalsignature/internal/app/utils"
 	"log"
 	"time"
 
+	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gin-gonic/gin"
@@ -17,10 +18,14 @@ import (
 	"go.uber.org/zap"
 )
 
+type AccountSrv interface {
+	GetAminAccount() (*accounts.Account, *keystore.KeyStore, error)
+}
 type UserService struct {
-	ethclient *ethclient.Client
-	userRepo  *repository.UserRepo
-	logger    *zap.Logger
+	ethclient  *ethclient.Client
+	userRepo   *repository.UserRepo
+	logger     *zap.Logger
+	accountSrv AccountSrv
 }
 
 func NewUserService(client *ethclient.Client, userRepo *repository.UserRepo) *UserService {
@@ -52,13 +57,17 @@ func (s *UserService) Create(c *gin.Context, userInfo request.UserInfo) error {
 	s.logger.Info("created user", zap.String("publickey", userInfo.PublicKey))
 
 	// make transaction with admin account
-	adminAccount, err := utils.GetAccountFromKeystore("/wallets/keystore", "123456")
+	adminAccount, _, err := s.accountSrv.GetAminAccount()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// store hash user info to blockchain
 	documentIntance, err := document.NewDocument(adminAccount.Address, s.ethclient)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	userAddress := common.HexToAddress(user.PublicKey)
 	txn, err := documentIntance.StoreUser(&bind.TransactOpts{}, user.ID.String(), user.Name, user.CardID, user.DateOfBirth, user.Phone, user.Gmail, userAddress)
 	if err != nil {

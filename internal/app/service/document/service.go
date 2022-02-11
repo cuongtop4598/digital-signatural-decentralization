@@ -2,7 +2,6 @@ package document
 
 import (
 	"context"
-	"digitalsignature/internal/app/service"
 	"log"
 	"math/big"
 
@@ -14,12 +13,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type AccountSrv interface {
+	GetAminAccount() (*accounts.Account, *keystore.KeyStore, error)
+}
+
 type DocumentService interface {
 	GetUserIdByPublicKey(c *gin.Context, userAddress common.Address) (id string, err error)
 }
 
 type document struct {
-	accountSrv *service.AccountService
+	accountSrv AccountSrv
 	instance   *Document
 	data       []byte
 	Network    struct {
@@ -28,13 +31,13 @@ type document struct {
 	}
 }
 
-func NewDocumentService(data []byte, client *ethclient.Client, chainID int64, userAddress common.Address, account *accounts.Account) DocumentService {
+func NewDocumentService(data []byte, client *ethclient.Client, chainID int64, accountSrv AccountSrv, userAddress common.Address, account *accounts.Account) DocumentService {
 	doc, err := NewDocument(userAddress, client)
 	if err != nil {
 		log.Fatal(err)
 	}
 	return &document{
-		accountSrv: &service.AccountService{},
+		accountSrv: accountSrv,
 		instance:   doc,
 		data:       data,
 		Network: struct {
