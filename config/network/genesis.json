@@ -1,14 +1,22 @@
 {
     "config": {
-        "chainId": 451998,
-        "homesteadBlock": 0,
-        "eip150Block": 0,
-        "eip155Block": 0,
-        "eip158Block": 0,
-        "ethash": {}
+      "chainId": 451998,
+      "homesteadBlock": 0,
+      "eip150Block": 0,
+      "eip155Block": 0,
+      "eip158Block": 0,
+      "byzantiumBlock": 0,
+      "constantinopleBlock": 0,
+      "petersburgBlock": 0,
+      "clique": {
+        "period": 0,
+        "epoch": 30000
+      }
     },
-    "coinbase": "0xa9371cdcc9c4f9Cb4eCD9ac85fD8Ef03Ee452e1b",
-    "difficulty":"0x1",
-    "gasLimit": "0x8000000",
-    "alloc": {"0xa9371cdcc9c4f9Cb4eCD9ac85fD8Ef03Ee452e1b" :{"balance": "999999999999999999999999"}}
-}
+    "difficulty": "1",
+    "gasLimit": "8000000",
+    "extradata": "0x0000000000000000000000000000000000000000000000000000000000000000ef9b2bf462f2f953b38ff2da71a31d837db9629d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "alloc": {
+      "0xef9b2bf462f2f953b38ff2da71a31d837db9629d": { "balance": "100000000000000" }
+    }
+  }
