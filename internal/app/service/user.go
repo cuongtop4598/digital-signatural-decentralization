@@ -5,6 +5,7 @@ import (
 	"digitalsignature/internal/app/repository"
 	"digitalsignature/internal/app/request"
 	"digitalsignature/internal/app/service/document"
+	"fmt"
 	"log"
 	"time"
 
@@ -75,5 +76,11 @@ func (s *UserService) Create(c *gin.Context, userInfo request.UserInfo) error {
 	}
 	s.logger.Info(txn.Hash().String())
 	s.logger.Info("created user", zap.String("publickey", userInfo.PublicKey))
+	time.Sleep(5 * time.Second)
+	hash, err := documentIntance.GetHashUserInfo(&bind.CallOpts{}, userAddress)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(hash)
 	return nil
 }

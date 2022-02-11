@@ -1,7 +1,11 @@
 Create Go bindings
 
-- abigen --sol TokenBalances.sol --pkg fetchtokenbalances --out fetch_token_balance.go
+- abigen --sol Document.sol --pkg document --out document.go
 
 Create ABI
 
 - solc --abi Document.sol -o build
+
+Build smart contract and create bindings
+
+    solc --abi ./contracts/documents/Document.sol -o build && abigen --abi ./contracts/documents/build/Document.abi --pkg document --out document.go

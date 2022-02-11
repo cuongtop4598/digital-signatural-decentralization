@@ -122,10 +122,17 @@ contract Document is Context, IDC, IDCMetadata {
     }
 
     /**
+    * @dev Return hash UserInfo 
+    */
+    function GetHashUserInfo(address userAddress) public view returns (bytes32) {
+        return _userlist._ulistpubKey[userAddress].infoHash;
+    }  
+    /**
      * @dev Return a hash of user information 
      */
     function hashUserInfo(string memory name, string memory cmnd, string memory dOB, string memory phone, string memory gmail) 
     private pure returns (bytes32) {
         return keccak256(abi.encodePacked(name,cmnd,dOB,phone,gmail));
     }
+
 }

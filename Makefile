@@ -1,5 +1,6 @@
 build-sc:
-	abigen --abi ./contracts/documents/build/Document.abi --bin ./contracts/documents/build/Document.bin --pkg document --out document.go
+	solc --abi ./contracts/documents/Document.sol -o build && \
+	abigen --abi ./contracts/documents/build/Document.abi --pkg document --out document.go 
 setup:
 	docker-compose up -d 
 run:
