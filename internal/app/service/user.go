@@ -20,7 +20,7 @@ import (
 
 type AccountSrv interface {
 	GetAminAccount() (*accounts.Account, *keystore.KeyStore, error)
-	BindTransactionOption(account accounts.Account, client *ethclient.Client) *bind.TransactOpts
+	BindTransactionOption(account accounts.Account, password string, ks *keystore.KeyStore, client *ethclient.Client) *bind.TransactOpts
 }
 type UserService struct {
 	ethclient  *ethclient.Client
@@ -38,7 +38,6 @@ func NewUserService(client *ethclient.Client, userRepo *repository.UserRepo, acc
 	}
 }
 func (s *UserService) Create(c *gin.Context, userInfo request.UserInfo) error {
-
 	// Validate user info including gmail, phone, id card
 
 	// Insert user info to offchain
@@ -57,7 +56,7 @@ func (s *UserService) Create(c *gin.Context, userInfo request.UserInfo) error {
 		s.logger.Error("create new account error", zap.String("error", err.Error()))
 	}
 	// make transaction with admin account
-	adminAccount, _, err := s.accountSrv.GetAminAccount()
+	adminAccount, ks, err := s.accountSrv.GetAminAccount()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -69,7 +68,7 @@ func (s *UserService) Create(c *gin.Context, userInfo request.UserInfo) error {
 	}
 
 	userAddress := common.HexToAddress(user.PublicKey)
-	tnxOption := s.accountSrv.BindTransactionOption(*adminAccount, s.ethclient)
+	tnxOption := s.accountSrv.BindTransactionOption(*adminAccount, "123456", ks, s.ethclient)
 	txn, err := documentIntance.StoreUser(tnxOption, user.ID.String(), user.Name, user.CardID, user.DateOfBirth, user.Phone, user.Gmail, userAddress)
 	if err != nil {
 		log.Fatal(err)

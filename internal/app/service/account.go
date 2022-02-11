@@ -44,27 +44,33 @@ func (s *AccountService) GetAminAccount() (*accounts.Account, *keystore.KeyStore
 	return nil, nil, errors.New("No key file in keystore path")
 }
 
-func (s *AccountService) BindTransactionOption(account accounts.Account, client *ethclient.Client) *bind.TransactOpts {
+func (s *AccountService) BindTransactionOption(account accounts.Account, password string, ks *keystore.KeyStore, client *ethclient.Client) *bind.TransactOpts {
+	ks.Unlock(account, password)
+	keyJson, err := ks.Export(account, password, password)
+	if err != nil {
+		log.Fatal(err)
+	}
+	key, err := keystore.DecryptKey(keyJson, password)
+	if err != nil {
+		log.Fatal(err)
+	}
 	fromAddress := account.Address
 	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
 	if err != nil {
 		log.Fatal(err)
 	}
-	gasPrice, err := client.SuggestGasPrice(context.Background())
-	if err != nil {
-		log.Fatal(err)
-	}
+	// gasPrice, err := client.SuggestGasPrice(context.Background())
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 	return &bind.TransactOpts{
-		From:      [20]byte{},
-		Nonce:     big.NewInt(int64(nonce)),
-		Signer:    keySigner(big.NewInt(451998), nil),
-		Value:     big.NewInt(0),
-		GasPrice:  gasPrice,
-		GasFeeCap: &big.Int{},
-		GasTipCap: &big.Int{},
-		GasLimit:  uint64(100000000),
-		Context:   nil,
-		NoSend:    false,
+		From:     fromAddress,
+		Nonce:    big.NewInt(int64(nonce)),
+		Signer:   keySigner(big.NewInt(451998), key.PrivateKey),
+		GasPrice: big.NewInt(200),
+		GasLimit: uint64(100000000),
+		Context:  context.TODO(),
+		NoSend:   true,
 	}
 
 }
