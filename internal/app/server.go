@@ -23,7 +23,7 @@ type Server struct{}
 // Run runs our API server
 func (server *Server) Run(env string) error {
 	os.Chdir(".")
-	configuration, err := config.NewConfig("./config/", "development")
+	configuration, err := config.NewConfig("./config/", "dev")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -64,11 +64,11 @@ func (server *Server) Run(env string) error {
 	if err != nil {
 		log.Sugar().Errorf("Connect to database fail ", err)
 	}
+
 	err = migration.Migrate(db)
 	if err != nil {
 		log.Sugar().Errorf("Migrate fail ", err)
 	}
-	//rd := redis.GetConnection()
 
 	client, err := ethereum.NewClient(configuration.Ethereum)
 	if err != nil {

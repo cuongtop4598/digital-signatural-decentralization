@@ -1,52 +1,47 @@
 package document
 
 import (
+	"context"
+	"digitalsignature/internal/app/service"
 	"log"
+	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gin-gonic/gin"
 )
 
-const (
-	// geth dumpgenesis
-	chainID = 451998                                            // change chainID equals chainID in your genesis.json
-	dataDir = "/home/cuongtop/Desktop/DigitalSignaturalNetwork" // path of --datadir setting in your network
-)
-
 type DocumentService interface {
 	GetUserIdByPublicKey(c *gin.Context, userAddress common.Address) (id string, err error)
-	SaveDocument(userID string) int64
 }
 
 type document struct {
-	client   *ethclient.Client
-	instance *Document
-	account  *accounts.Account
-	Data     []byte
-	chanID   int64
-}
-
-func NewDocumentService(client *ethclient.Client, chainID int64) DocumentService {
-	return &document{
-		client: client,
-		chanID: chainID,
+	accountSrv *service.AccountService
+	instance   *Document
+	data       []byte
+	Network    struct {
+		ChainID int64
+		Client  *ethclient.Client
 	}
 }
 
-func (d *document) SetAccount(account *accounts.Account) *document {
-	d.account = account
-	return d
-}
-
-func (d *document) CreateInstance(userAddress common.Address, client *ethclient.Client) *document {
+func NewDocumentService(data []byte, client *ethclient.Client, chainID int64, userAddress common.Address, account *accounts.Account) DocumentService {
 	doc, err := NewDocument(userAddress, client)
 	if err != nil {
 		log.Fatal(err)
 	}
-	d.instance = doc
-	return d
+	return &document{
+		accountSrv: &service.AccountService{},
+		instance:   doc,
+		data:       data,
+		Network: struct {
+			ChainID int64
+			Client  *ethclient.Client
+		}{ChainID: chainID, Client: client},
+	}
 }
 
 func (d *document) GetUserIdByPublicKey(c *gin.Context, userAddress common.Address) (id string, err error) {
@@ -54,7 +49,6 @@ func (d *document) GetUserIdByPublicKey(c *gin.Context, userAddress common.Addre
 }
 
 func (d *document) SaveDocument(userID string) int64 {
-	//signatura := []byte{}
 	return 0
 }
 
@@ -65,21 +59,48 @@ func (d *document) VerifyDoc(userID string, digest []byte, DocID string) bool {
 }
 
 // Store user info
-func (d *document) StoreUser(userInfo *UserInformation, passUnlock string) bool {
-	address := common.HexToAddress(userInfo.PublicKey)
-	// tạm thời gọi với auth là admin
-	ks, err := GetKeyStoreAdmin(passUnlock)
+func (d *document) StoreUser(userInfo *UserInformation) bool {
+
+	adminAccount, ks, err := d.accountSrv.GetAminAccount()
+
+	userAddress := common.HexToAddress(userInfo.PublicKey)
+
 	if err != nil {
 		log.Fatal(err)
 	}
-	auth, err := CreateAuthForSigning(*d.account, d.client, ks, d.chanID)
+	auth, err := createAuthForSigning(*adminAccount, d.Network.Client, ks, d.Network.ChainID)
 	if err != nil {
 		log.Fatal(err)
 	}
-	tnx, err := d.instance.StoreUser(auth, userInfo.ID, userInfo.Name, userInfo.IdentityCard, userInfo.DateOfBirth, userInfo.Phone, userInfo.Gmail, address)
+	tnx, err := d.instance.StoreUser(auth, userInfo.ID, userInfo.Name, userInfo.IdentityCard, userInfo.DateOfBirth, userInfo.Phone, userInfo.Gmail, userAddress)
 	if err != nil {
 		log.Fatal(err)
 	}
 	_ = tnx
 	return true
+}
+
+func createAuthForSigning(account accounts.Account, client *ethclient.Client, ks *keystore.KeyStore, chainID int64) (auth *bind.TransactOpts, err error) {
+
+	fromAddress := account.Address
+	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	gasPrice, err := client.SuggestGasPrice(context.Background())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	auth, err = bind.NewKeyStoreTransactorWithChainID(ks, account, big.NewInt(chainID))
+	if err != nil {
+		log.Fatal(err)
+	}
+	auth.From = account.Address
+	auth.Nonce = big.NewInt(int64(nonce))
+	auth.Value = big.NewInt(0)      // in wei
+	auth.GasLimit = uint64(8000000) // in units gas limit: 134217728
+	auth.GasPrice = gasPrice
+	return auth, nil
 }

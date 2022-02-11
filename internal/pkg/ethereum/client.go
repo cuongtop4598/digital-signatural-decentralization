@@ -6,13 +6,18 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
-type NetworkConfig struct {
-	Wallets  string `yaml:"wallets"`
-	Endpoint string `yaml:"endpoint"`
-	Password string `yaml:"passadmin"`
+type EthereumNetworkConfig struct {
+	KeystorePath string `yaml:"keystore_path"`
+	Endpoint     string `yaml:"endpoint"`
+	Password     string `yaml:"pass_admin"`
+	ChainID      string `yaml:"chain_id"`
 }
 
-func NewClient(cfg *NetworkConfig) (*ethclient.Client, error) {
+func NewEthereumNetworkConfig() {
+
+}
+
+func NewClient(cfg *EthereumNetworkConfig) (*ethclient.Client, error) {
 	client, err := ethclient.Dial(cfg.Endpoint)
 	if err != nil {
 		return nil, err

@@ -1,7 +1,6 @@
 package config
 
 import (
-	"digitalsignature/internal/app/service/ipfs"
 	"digitalsignature/internal/pkg/database"
 	"digitalsignature/internal/pkg/ethereum"
 	"fmt"
@@ -36,10 +35,9 @@ func NewConfig(path, stage string) (config *Configuration, err error) {
 
 // Configuration holds data necessery for configuring application
 type Configuration struct {
-	Server   *Server                 `yaml:"server"`
-	Ethereum *ethereum.NetworkConfig `yaml:"ethereum"`
-	Database *database.DBConfig      `yaml:"database"`
-	Ipfs     *ipfs.IPFSConfig        `yaml:"ipfs"`
+	Server   *Server                         `yaml:"server"`
+	Ethereum *ethereum.EthereumNetworkConfig `yaml:"ethereum"`
+	Database *database.DBConfig              `yaml:"database"`
 }
 
 // Server holds data necessary for server configuration

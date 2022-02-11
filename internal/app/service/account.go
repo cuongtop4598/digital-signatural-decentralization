@@ -1,69 +1,34 @@
 package service
 
 import (
-	"digitalsignature/internal/app/repository/offchain"
-	"fmt"
-	"io/ioutil"
-	"log"
-	"os"
+	"errors"
 
+	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/gin-gonic/gin"
 )
 
-type AccountService interface {
-	CreateNewAccount(c *gin.Context) ([]byte, error)
-	CreateNewKeyStores(password string, c *gin.Context) (publickey string, err error)
-	ImportKeyStores(keyPath string, password string, c *gin.Context)
-}
-type Account struct {
-	client      *ethclient.Client
-	accountRepo *offchain.AccountRepo
-	savePath    string // path for saving private key
+// This service use to interface with admin account ethereum
+type AccountService struct {
+	KeyPath  string
+	Password string
 }
 
-func NewAccountService(client *ethclient.Client, accountRepo *offchain.AccountRepo, savePath string) AccountService {
-	return &Account{
-		client:      client,
-		accountRepo: accountRepo,
-		savePath:    savePath,
+func NewAccountService(keyPath string, password string) *AccountService {
+	return &AccountService{
+		KeyPath:  keyPath,
+		Password: password,
 	}
 }
-func (a *Account) CreateNewAccount(c *gin.Context) ([]byte, error) {
-	privateKey, err := crypto.GenerateKey()
-	if err != nil {
-		return nil, err
-	}
-	privateKeyBytes := crypto.FromECDSA(privateKey)
-	return privateKeyBytes, nil
-}
 
-func (a *Account) CreateNewKeyStores(password string, c *gin.Context) (publickey string, err error) {
-	ks := keystore.NewKeyStore(a.savePath, keystore.StandardScryptN, keystore.StandardScryptP)
-	account, err := ks.NewAccount(password)
-	if err != nil {
-		return "", err
+func (s *AccountService) GetAminAccount() (*accounts.Account, *keystore.KeyStore, error) {
+	ks := keystore.NewKeyStore(s.KeyPath, keystore.StandardScryptN, keystore.StandardScryptP)
+	accounts := ks.Accounts()
+	if len(accounts) > 0 {
+		err := ks.Unlock(accounts[0], s.Password)
+		if err != nil {
+			return nil, nil, err
+		}
+		return &accounts[0], ks, nil
 	}
-	return account.Address.Hex(), nil
-}
-
-func (a *Account) ImportKeyStores(keyPath string, password string, c *gin.Context) {
-	file := keyPath
-	ks := keystore.NewKeyStore(a.savePath, keystore.StandardScryptN, keystore.StandardScryptP)
-	jsonBytes, err := ioutil.ReadFile(file)
-	if err != nil {
-		log.Fatal(err)
-	}
-	account, err := ks.Import(jsonBytes, password, password)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println(account.Address.Hex())
-
-	if err := os.Remove(file); err != nil {
-		log.Fatal(err)
-	}
+	return nil, nil, errors.New("No key file in keystore path")
 }

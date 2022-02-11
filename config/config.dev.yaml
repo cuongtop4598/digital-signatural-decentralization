@@ -3,16 +3,13 @@ server:
   host: "localhost"
   port: "8081"
 ethereum:
-  #you need to change cuongtop to your username in these bellow path 
-  wallets: "/home/cuongtop/Desktop/DigitalSignaturalNetwork"
-  endpoint: "http://localhost:8545" #for mainnet "https://mainnet.infura.io"
-  passadmin: 123456
+  endpoint: "http://27.72.105.169:10199"
+  keystore_path: "/wallets/keystore/"
+  chain_id: 451998
+  pass_admin: 123456
 database:
   host: "localhost" 
   user: "root"
   password: "local"
   dbname: "digital"
   port: 5432
-ipfs:
-  host: "127.0.0.1"
-  port: "10118"
