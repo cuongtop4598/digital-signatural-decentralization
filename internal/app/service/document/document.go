@@ -181,16 +181,13 @@ func (_Context *ContextTransactorRaw) Transact(opts *bind.TransactOpts, method s
 
 // DocumentMetaData contains all meta data concerning the Document contract.
 var DocumentMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"userAddress\",\"type\":\"address\"}],\"name\":\"GetHashUserInfo\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"userID\",\"type\":\"string\"}],\"name\":\"getPublicKey\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"publicKey\",\"type\":\"address\"}],\"name\":\"getUserID\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"userID\",\"type\":\"string\"},{\"internalType\":\"bytes\",\"name\":\"signature\",\"type\":\"bytes\"}],\"name\":\"saveDoc\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"userID\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"cmnd\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"dateOB\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"phone\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"gmail\",\"type\":\"string\"},{\"internalType\":\"address\",\"name\":\"publicKey\",\"type\":\"address\"}],\"name\":\"storeUser\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"userID\",\"type\":\"string\"},{\"internalType\":\"bytes32\",\"name\":\"digest\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"indexDoc\",\"type\":\"uint256\"}],\"name\":\"verifyDoc\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
+	ABI: "[{\"inputs\":[{\"internalType\":\"string\",\"name\":\"userPubkey\",\"type\":\"string\"}],\"name\":\"GetHashUserInfo\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"userID\",\"type\":\"string\"},{\"internalType\":\"bytes\",\"name\":\"signature\",\"type\":\"bytes\"}],\"name\":\"saveDoc\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"userID\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"cmnd\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"dateOB\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"phone\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"gmail\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"publicKey\",\"type\":\"string\"}],\"name\":\"storeUser\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
 	Sigs: map[string]string{
-		"d203f63c": "GetHashUserInfo(address)",
-		"bff90821": "getPublicKey(string)",
-		"0ef12aa9": "getUserID(address)",
+		"998fe24a": "GetHashUserInfo(string)",
 		"3a8fb351": "saveDoc(string,bytes)",
-		"8e16afb2": "storeUser(string,string,string,string,string,string,address)",
-		"d2de39a8": "verifyDoc(string,bytes32,uint256)",
+		"a01ef4b9": "storeUser(string,string,string,string,string,string,string)",
 	},
-	Bin: "0x608060405234801561001057600080fd5b50610bd0806100206000396000f3fe608060405234801561001057600080fd5b50600436106100625760003560e01c80630ef12aa9146100675780633a8fb351146100905780638e16afb2146100b1578063bff90821146100d4578063d203f63c146100ff578063d2de39a81461012b575b600080fd5b61007a610075366004610811565b61013e565b6040516100879190610abd565b60405180910390f35b6100a361009e3660046108b7565b6101ea565b604051908152602001610087565b6100c46100bf36600461092f565b61029e565b6040519015158152602001610087565b6100e76100e236600461082c565b610321565b6040516001600160a01b039091168152602001610087565b6100a361010d366004610811565b6001600160a01b031660009081526020819052604090206001015490565b6100c4610139366004610869565b610357565b6001600160a01b038116600090815260208190526040902080546060919061016590610b20565b80601f016020809104026020016040519081016040528092919081815260200182805461019190610b20565b80156101de5780601f106101b3576101008083540402835291602001916101de565b820191906000526020600020905b8154815290600101906020018083116101c157829003601f168201915b50505050509050919050565b6000806000600101846040516102009190610a36565b9081526020016040518091039020600301549050808061021f90610b5b565b915050600080600101856040516102369190610a36565b9081526040805160209281900383019020600085815260049091018352208651909250610268918391908801906106bf565b50835161027e90600183019060208701906106bf565b50835161029490600283019060208701906106bf565b5090949350505050565b6000806102ae888888888861058c565b6001600160a01b0384166000908152602081815260409091208b51929350916102dc918391908d01906106bf565b5060018181018390556002820180546001600160a01b0319166001600160a01b038716179055604051610310908c90610a36565b525060019998505050505050505050565b600080600101826040516103359190610a36565b908152604051908190036020019020600201546001600160a01b031692915050565b60008060006001018560405161036d9190610a36565b9081526020016040518091039020905060008160040160008581526020019081526020016000206040518060600160405290816000820180546103af90610b20565b80601f01602080910402602001604051908101604052809291908181526020018280546103db90610b20565b80156104285780601f106103fd57610100808354040283529160200191610428565b820191906000526020600020905b81548152906001019060200180831161040b57829003601f168201915b5050505050815260200160018201805461044190610b20565b80601f016020809104026020016040519081016040528092919081815260200182805461046d90610b20565b80156104ba5780601f1061048f576101008083540402835291602001916104ba565b820191906000526020600020905b81548152906001019060200180831161049d57829003601f168201915b505050505081526020016002820180546104d390610b20565b80601f01602080910402602001604051908101604052809291908181526020018280546104ff90610b20565b801561054c5780601f106105215761010080835404028352916020019161054c565b820191906000526020600020905b81548152906001019060200180831161052f57829003601f168201915b50505091909252505050600283015460208201519192506001600160a01b0316906105789087906105c8565b6001600160a01b0316149695505050505050565b600085858585856040516020016105a7959493929190610a52565b60405160208183030381529060405280519060200120905095945050505050565b6000806000806105d785610647565b6040805160008152602081018083528b905260ff8316918101919091526060810184905260808101839052929550909350915060019060a0016020604051602081039080840390855afa158015610632573d6000803e3d6000fd5b5050604051601f190151979650505050505050565b600080600083516041146106a15760405162461bcd60e51b815260206004820152601860248201527f696e76616c6964207369676e6174757265206c656e6774680000000000000000604482015260640160405180910390fd5b50505060208101516040820151606090920151909260009190911a90565b8280546106cb90610b20565b90600052602060002090601f0160209004810192826106ed5760008555610733565b82601f1061070657805160ff1916838001178555610733565b82800160010185558215610733579182015b82811115610733578251825591602001919060010190610718565b5061073f929150610743565b5090565b5b8082111561073f5760008155600101610744565b600067ffffffffffffffff8084111561077357610773610b84565b604051601f8501601f19908116603f0116810190828211818310171561079b5761079b610b84565b816040528093508581528686860111156107b457600080fd5b858560208301376000602087830101525050509392505050565b80356001600160a01b03811681146107e557600080fd5b919050565b600082601f8301126107fb57600080fd5b61080a83833560208501610758565b9392505050565b60006020828403121561082357600080fd5b61080a826107ce565b60006020828403121561083e57600080fd5b813567ffffffffffffffff81111561085557600080fd5b610861848285016107ea565b949350505050565b60008060006060848603121561087e57600080fd5b833567ffffffffffffffff81111561089557600080fd5b6108a1868287016107ea565b9660208601359650604090950135949350505050565b600080604083850312156108ca57600080fd5b823567ffffffffffffffff808211156108e257600080fd5b6108ee868387016107ea565b9350602085013591508082111561090457600080fd5b508301601f8101851361091657600080fd5b61092585823560208401610758565b9150509250929050565b600080600080600080600060e0888a03121561094a57600080fd5b873567ffffffffffffffff8082111561096257600080fd5b61096e8b838c016107ea565b985060208a013591508082111561098457600080fd5b6109908b838c016107ea565b975060408a01359150808211156109a657600080fd5b6109b28b838c016107ea565b965060608a01359150808211156109c857600080fd5b6109d48b838c016107ea565b955060808a01359150808211156109ea57600080fd5b6109f68b838c016107ea565b945060a08a0135915080821115610a0c57600080fd5b50610a198a828b016107ea565b925050610a2860c089016107ce565b905092959891949750929550565b60008251610a48818460208701610af0565b9190910192915050565b60008651610a64818460208b01610af0565b865190830190610a78818360208b01610af0565b8651910190610a8b818360208a01610af0565b8551910190610a9e818360208901610af0565b8451910190610ab1818360208801610af0565b01979650505050505050565b6020815260008251806020840152610adc816040850160208701610af0565b601f01601f19169190910160400192915050565b60005b83811015610b0b578181015183820152602001610af3565b83811115610b1a576000848401525b50505050565b600181811c90821680610b3457607f821691505b60208210811415610b5557634e487b7160e01b600052602260045260246000fd5b50919050565b6000600019821415610b7d57634e487b7160e01b600052601160045260246000fd5b5060010190565b634e487b7160e01b600052604160045260246000fdfea264697066735822122031868b000766c18e8c0c378a3809b58fa487038437c4a3621608a29fd6adc96a64736f6c63430008070033",
+	Bin: "0x608060405234801561001057600080fd5b506106d0806100206000396000f3fe608060405234801561001057600080fd5b50600436106100415760003560e01c80633a8fb35114610046578063998fe24a1461006c578063a01ef4b91461007f575b600080fd5b6100596100543660046103fb565b6100a2565b6040519081526020015b60405180910390f35b61005961007a366004610389565b610156565b61009261008d366004610473565b610189565b6040519015158152602001610063565b6000806000600101846040516100b891906105d9565b908152602001604051809103902060030154905080806100d79061065b565b915050600080600101856040516100ee91906105d9565b908152604080516020928190038301902060008581526004909101835220865190925061012091839190880190610253565b5083516101369060018301906020870190610253565b50835161014c9060028301906020870190610253565b5090949350505050565b60008060008001848460405161016d9291906105c9565b9081526040519081900360200190206001015491505092915050565b6000806101998888888888610217565b9050600080600001846040516101af91906105d9565b90815260200160405180910390209050898160000190805190602001906101d7929190610253565b506001810182905583516101f49060028301906020870190610253565b50604051600190610206908c906105d9565b525060019998505050505050505050565b600085858585856040516020016102329594939291906105e5565b60405160208183030381529060405280519060200120905095945050505050565b82805461025f90610620565b90600052602060002090601f01602090048101928261028157600085556102c7565b82601f1061029a57805160ff19168380011785556102c7565b828001600101855582156102c7579182015b828111156102c75782518255916020019190600101906102ac565b506102d39291506102d7565b5090565b5b808211156102d357600081556001016102d8565b600067ffffffffffffffff8084111561030757610307610684565b604051601f8501601f19908116603f0116810190828211818310171561032f5761032f610684565b8160405280935085815286868601111561034857600080fd5b858560208301376000602087830101525050509392505050565b600082601f83011261037357600080fd5b610382838335602085016102ec565b9392505050565b6000806020838503121561039c57600080fd5b823567ffffffffffffffff808211156103b457600080fd5b818501915085601f8301126103c857600080fd5b8135818111156103d757600080fd5b8660208285010111156103e957600080fd5b60209290920196919550909350505050565b6000806040838503121561040e57600080fd5b823567ffffffffffffffff8082111561042657600080fd5b61043286838701610362565b9350602085013591508082111561044857600080fd5b508301601f8101851361045a57600080fd5b610469858235602084016102ec565b9150509250929050565b600080600080600080600060e0888a03121561048e57600080fd5b873567ffffffffffffffff808211156104a657600080fd5b6104b28b838c01610362565b985060208a01359150808211156104c857600080fd5b6104d48b838c01610362565b975060408a01359150808211156104ea57600080fd5b6104f68b838c01610362565b965060608a013591508082111561050c57600080fd5b6105188b838c01610362565b955060808a013591508082111561052e57600080fd5b61053a8b838c01610362565b945060a08a013591508082111561055057600080fd5b61055c8b838c01610362565b935060c08a013591508082111561057257600080fd5b5061057f8a828b01610362565b91505092959891949750929550565b6000815160005b818110156105af5760208185018101518683015201610595565b818111156105be576000828601525b509290920192915050565b8183823760009101908152919050565b6000610382828461058e565b600061061561060f6106096106036105fd868c61058e565b8a61058e565b8861058e565b8661058e565b8461058e565b979650505050505050565b600181811c9082168061063457607f821691505b6020821081141561065557634e487b7160e01b600052602260045260246000fd5b50919050565b600060001982141561067d57634e487b7160e01b600052601160045260246000fd5b5060010190565b634e487b7160e01b600052604160045260246000fdfea26469706673582212201a2b5232f370abb60a71b1c9ecc0be368997e11b5d565fd6ad71df1e425aaa7864736f6c63430008070033",
 }
 
 // DocumentABI is the input ABI used to generate the binding from.
@@ -364,12 +361,12 @@ func (_Document *DocumentTransactorRaw) Transact(opts *bind.TransactOpts, method
 	return _Document.Contract.contract.Transact(opts, method, params...)
 }
 
-// GetHashUserInfo is a free data retrieval call binding the contract method 0xd203f63c.
+// GetHashUserInfo is a free data retrieval call binding the contract method 0x998fe24a.
 //
-// Solidity: function GetHashUserInfo(address userAddress) view returns(bytes32)
-func (_Document *DocumentCaller) GetHashUserInfo(opts *bind.CallOpts, userAddress common.Address) ([32]byte, error) {
+// Solidity: function GetHashUserInfo(string userPubkey) view returns(bytes32)
+func (_Document *DocumentCaller) GetHashUserInfo(opts *bind.CallOpts, userPubkey string) ([32]byte, error) {
 	var out []interface{}
-	err := _Document.contract.Call(opts, &out, "GetHashUserInfo", userAddress)
+	err := _Document.contract.Call(opts, &out, "GetHashUserInfo", userPubkey)
 
 	if err != nil {
 		return *new([32]byte), err
@@ -381,111 +378,18 @@ func (_Document *DocumentCaller) GetHashUserInfo(opts *bind.CallOpts, userAddres
 
 }
 
-// GetHashUserInfo is a free data retrieval call binding the contract method 0xd203f63c.
+// GetHashUserInfo is a free data retrieval call binding the contract method 0x998fe24a.
 //
-// Solidity: function GetHashUserInfo(address userAddress) view returns(bytes32)
-func (_Document *DocumentSession) GetHashUserInfo(userAddress common.Address) ([32]byte, error) {
-	return _Document.Contract.GetHashUserInfo(&_Document.CallOpts, userAddress)
+// Solidity: function GetHashUserInfo(string userPubkey) view returns(bytes32)
+func (_Document *DocumentSession) GetHashUserInfo(userPubkey string) ([32]byte, error) {
+	return _Document.Contract.GetHashUserInfo(&_Document.CallOpts, userPubkey)
 }
 
-// GetHashUserInfo is a free data retrieval call binding the contract method 0xd203f63c.
+// GetHashUserInfo is a free data retrieval call binding the contract method 0x998fe24a.
 //
-// Solidity: function GetHashUserInfo(address userAddress) view returns(bytes32)
-func (_Document *DocumentCallerSession) GetHashUserInfo(userAddress common.Address) ([32]byte, error) {
-	return _Document.Contract.GetHashUserInfo(&_Document.CallOpts, userAddress)
-}
-
-// GetPublicKey is a free data retrieval call binding the contract method 0xbff90821.
-//
-// Solidity: function getPublicKey(string userID) view returns(address)
-func (_Document *DocumentCaller) GetPublicKey(opts *bind.CallOpts, userID string) (common.Address, error) {
-	var out []interface{}
-	err := _Document.contract.Call(opts, &out, "getPublicKey", userID)
-
-	if err != nil {
-		return *new(common.Address), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
-
-	return out0, err
-
-}
-
-// GetPublicKey is a free data retrieval call binding the contract method 0xbff90821.
-//
-// Solidity: function getPublicKey(string userID) view returns(address)
-func (_Document *DocumentSession) GetPublicKey(userID string) (common.Address, error) {
-	return _Document.Contract.GetPublicKey(&_Document.CallOpts, userID)
-}
-
-// GetPublicKey is a free data retrieval call binding the contract method 0xbff90821.
-//
-// Solidity: function getPublicKey(string userID) view returns(address)
-func (_Document *DocumentCallerSession) GetPublicKey(userID string) (common.Address, error) {
-	return _Document.Contract.GetPublicKey(&_Document.CallOpts, userID)
-}
-
-// GetUserID is a free data retrieval call binding the contract method 0x0ef12aa9.
-//
-// Solidity: function getUserID(address publicKey) view returns(string)
-func (_Document *DocumentCaller) GetUserID(opts *bind.CallOpts, publicKey common.Address) (string, error) {
-	var out []interface{}
-	err := _Document.contract.Call(opts, &out, "getUserID", publicKey)
-
-	if err != nil {
-		return *new(string), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(string)).(*string)
-
-	return out0, err
-
-}
-
-// GetUserID is a free data retrieval call binding the contract method 0x0ef12aa9.
-//
-// Solidity: function getUserID(address publicKey) view returns(string)
-func (_Document *DocumentSession) GetUserID(publicKey common.Address) (string, error) {
-	return _Document.Contract.GetUserID(&_Document.CallOpts, publicKey)
-}
-
-// GetUserID is a free data retrieval call binding the contract method 0x0ef12aa9.
-//
-// Solidity: function getUserID(address publicKey) view returns(string)
-func (_Document *DocumentCallerSession) GetUserID(publicKey common.Address) (string, error) {
-	return _Document.Contract.GetUserID(&_Document.CallOpts, publicKey)
-}
-
-// VerifyDoc is a free data retrieval call binding the contract method 0xd2de39a8.
-//
-// Solidity: function verifyDoc(string userID, bytes32 digest, uint256 indexDoc) view returns(bool)
-func (_Document *DocumentCaller) VerifyDoc(opts *bind.CallOpts, userID string, digest [32]byte, indexDoc *big.Int) (bool, error) {
-	var out []interface{}
-	err := _Document.contract.Call(opts, &out, "verifyDoc", userID, digest, indexDoc)
-
-	if err != nil {
-		return *new(bool), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
-
-	return out0, err
-
-}
-
-// VerifyDoc is a free data retrieval call binding the contract method 0xd2de39a8.
-//
-// Solidity: function verifyDoc(string userID, bytes32 digest, uint256 indexDoc) view returns(bool)
-func (_Document *DocumentSession) VerifyDoc(userID string, digest [32]byte, indexDoc *big.Int) (bool, error) {
-	return _Document.Contract.VerifyDoc(&_Document.CallOpts, userID, digest, indexDoc)
-}
-
-// VerifyDoc is a free data retrieval call binding the contract method 0xd2de39a8.
-//
-// Solidity: function verifyDoc(string userID, bytes32 digest, uint256 indexDoc) view returns(bool)
-func (_Document *DocumentCallerSession) VerifyDoc(userID string, digest [32]byte, indexDoc *big.Int) (bool, error) {
-	return _Document.Contract.VerifyDoc(&_Document.CallOpts, userID, digest, indexDoc)
+// Solidity: function GetHashUserInfo(string userPubkey) view returns(bytes32)
+func (_Document *DocumentCallerSession) GetHashUserInfo(userPubkey string) ([32]byte, error) {
+	return _Document.Contract.GetHashUserInfo(&_Document.CallOpts, userPubkey)
 }
 
 // SaveDoc is a paid mutator transaction binding the contract method 0x3a8fb351.
@@ -509,35 +413,33 @@ func (_Document *DocumentTransactorSession) SaveDoc(userID string, signature []b
 	return _Document.Contract.SaveDoc(&_Document.TransactOpts, userID, signature)
 }
 
-// StoreUser is a paid mutator transaction binding the contract method 0x8e16afb2.
+// StoreUser is a paid mutator transaction binding the contract method 0xa01ef4b9.
 //
-// Solidity: function storeUser(string userID, string name, string cmnd, string dateOB, string phone, string gmail, address publicKey) returns(bool)
-func (_Document *DocumentTransactor) StoreUser(opts *bind.TransactOpts, userID string, name string, cmnd string, dateOB string, phone string, gmail string, publicKey common.Address) (*types.Transaction, error) {
+// Solidity: function storeUser(string userID, string name, string cmnd, string dateOB, string phone, string gmail, string publicKey) returns(bool)
+func (_Document *DocumentTransactor) StoreUser(opts *bind.TransactOpts, userID string, name string, cmnd string, dateOB string, phone string, gmail string, publicKey string) (*types.Transaction, error) {
 	return _Document.contract.Transact(opts, "storeUser", userID, name, cmnd, dateOB, phone, gmail, publicKey)
 }
 
-// StoreUser is a paid mutator transaction binding the contract method 0x8e16afb2.
+// StoreUser is a paid mutator transaction binding the contract method 0xa01ef4b9.
 //
-// Solidity: function storeUser(string userID, string name, string cmnd, string dateOB, string phone, string gmail, address publicKey) returns(bool)
-func (_Document *DocumentSession) StoreUser(userID string, name string, cmnd string, dateOB string, phone string, gmail string, publicKey common.Address) (*types.Transaction, error) {
+// Solidity: function storeUser(string userID, string name, string cmnd, string dateOB, string phone, string gmail, string publicKey) returns(bool)
+func (_Document *DocumentSession) StoreUser(userID string, name string, cmnd string, dateOB string, phone string, gmail string, publicKey string) (*types.Transaction, error) {
 	return _Document.Contract.StoreUser(&_Document.TransactOpts, userID, name, cmnd, dateOB, phone, gmail, publicKey)
 }
 
-// StoreUser is a paid mutator transaction binding the contract method 0x8e16afb2.
+// StoreUser is a paid mutator transaction binding the contract method 0xa01ef4b9.
 //
-// Solidity: function storeUser(string userID, string name, string cmnd, string dateOB, string phone, string gmail, address publicKey) returns(bool)
-func (_Document *DocumentTransactorSession) StoreUser(userID string, name string, cmnd string, dateOB string, phone string, gmail string, publicKey common.Address) (*types.Transaction, error) {
+// Solidity: function storeUser(string userID, string name, string cmnd, string dateOB, string phone, string gmail, string publicKey) returns(bool)
+func (_Document *DocumentTransactorSession) StoreUser(userID string, name string, cmnd string, dateOB string, phone string, gmail string, publicKey string) (*types.Transaction, error) {
 	return _Document.Contract.StoreUser(&_Document.TransactOpts, userID, name, cmnd, dateOB, phone, gmail, publicKey)
 }
 
 // IDCMetaData contains all meta data concerning the IDC contract.
 var IDCMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"publicKey\",\"type\":\"address\"}],\"name\":\"getUserID\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"userID\",\"type\":\"string\"},{\"internalType\":\"bytes\",\"name\":\"signature\",\"type\":\"bytes\"}],\"name\":\"saveDoc\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"userID\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"cmnd\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"dateOB\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"phone\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"gmail\",\"type\":\"string\"},{\"internalType\":\"address\",\"name\":\"publicKey\",\"type\":\"address\"}],\"name\":\"storeUser\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"userID\",\"type\":\"string\"},{\"internalType\":\"bytes32\",\"name\":\"digest\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"indexDoc\",\"type\":\"uint256\"}],\"name\":\"verifyDoc\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
+	ABI: "[{\"inputs\":[{\"internalType\":\"string\",\"name\":\"userID\",\"type\":\"string\"},{\"internalType\":\"bytes\",\"name\":\"signature\",\"type\":\"bytes\"}],\"name\":\"saveDoc\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"userID\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"cmnd\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"dateOB\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"phone\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"gmail\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"publicKey\",\"type\":\"string\"}],\"name\":\"storeUser\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
 	Sigs: map[string]string{
-		"0ef12aa9": "getUserID(address)",
 		"3a8fb351": "saveDoc(string,bytes)",
-		"8e16afb2": "storeUser(string,string,string,string,string,string,address)",
-		"d2de39a8": "verifyDoc(string,bytes32,uint256)",
+		"a01ef4b9": "storeUser(string,string,string,string,string,string,string)",
 	},
 }
 
@@ -691,27 +593,6 @@ func (_IDC *IDCTransactorRaw) Transact(opts *bind.TransactOpts, method string, p
 	return _IDC.Contract.contract.Transact(opts, method, params...)
 }
 
-// GetUserID is a paid mutator transaction binding the contract method 0x0ef12aa9.
-//
-// Solidity: function getUserID(address publicKey) returns(string)
-func (_IDC *IDCTransactor) GetUserID(opts *bind.TransactOpts, publicKey common.Address) (*types.Transaction, error) {
-	return _IDC.contract.Transact(opts, "getUserID", publicKey)
-}
-
-// GetUserID is a paid mutator transaction binding the contract method 0x0ef12aa9.
-//
-// Solidity: function getUserID(address publicKey) returns(string)
-func (_IDC *IDCSession) GetUserID(publicKey common.Address) (*types.Transaction, error) {
-	return _IDC.Contract.GetUserID(&_IDC.TransactOpts, publicKey)
-}
-
-// GetUserID is a paid mutator transaction binding the contract method 0x0ef12aa9.
-//
-// Solidity: function getUserID(address publicKey) returns(string)
-func (_IDC *IDCTransactorSession) GetUserID(publicKey common.Address) (*types.Transaction, error) {
-	return _IDC.Contract.GetUserID(&_IDC.TransactOpts, publicKey)
-}
-
 // SaveDoc is a paid mutator transaction binding the contract method 0x3a8fb351.
 //
 // Solidity: function saveDoc(string userID, bytes signature) returns(uint256)
@@ -733,155 +614,165 @@ func (_IDC *IDCTransactorSession) SaveDoc(userID string, signature []byte) (*typ
 	return _IDC.Contract.SaveDoc(&_IDC.TransactOpts, userID, signature)
 }
 
-// StoreUser is a paid mutator transaction binding the contract method 0x8e16afb2.
+// StoreUser is a paid mutator transaction binding the contract method 0xa01ef4b9.
 //
-// Solidity: function storeUser(string userID, string name, string cmnd, string dateOB, string phone, string gmail, address publicKey) returns(bool)
-func (_IDC *IDCTransactor) StoreUser(opts *bind.TransactOpts, userID string, name string, cmnd string, dateOB string, phone string, gmail string, publicKey common.Address) (*types.Transaction, error) {
+// Solidity: function storeUser(string userID, string name, string cmnd, string dateOB, string phone, string gmail, string publicKey) returns(bool)
+func (_IDC *IDCTransactor) StoreUser(opts *bind.TransactOpts, userID string, name string, cmnd string, dateOB string, phone string, gmail string, publicKey string) (*types.Transaction, error) {
 	return _IDC.contract.Transact(opts, "storeUser", userID, name, cmnd, dateOB, phone, gmail, publicKey)
 }
 
-// StoreUser is a paid mutator transaction binding the contract method 0x8e16afb2.
+// StoreUser is a paid mutator transaction binding the contract method 0xa01ef4b9.
 //
-// Solidity: function storeUser(string userID, string name, string cmnd, string dateOB, string phone, string gmail, address publicKey) returns(bool)
-func (_IDC *IDCSession) StoreUser(userID string, name string, cmnd string, dateOB string, phone string, gmail string, publicKey common.Address) (*types.Transaction, error) {
+// Solidity: function storeUser(string userID, string name, string cmnd, string dateOB, string phone, string gmail, string publicKey) returns(bool)
+func (_IDC *IDCSession) StoreUser(userID string, name string, cmnd string, dateOB string, phone string, gmail string, publicKey string) (*types.Transaction, error) {
 	return _IDC.Contract.StoreUser(&_IDC.TransactOpts, userID, name, cmnd, dateOB, phone, gmail, publicKey)
 }
 
-// StoreUser is a paid mutator transaction binding the contract method 0x8e16afb2.
+// StoreUser is a paid mutator transaction binding the contract method 0xa01ef4b9.
 //
-// Solidity: function storeUser(string userID, string name, string cmnd, string dateOB, string phone, string gmail, address publicKey) returns(bool)
-func (_IDC *IDCTransactorSession) StoreUser(userID string, name string, cmnd string, dateOB string, phone string, gmail string, publicKey common.Address) (*types.Transaction, error) {
+// Solidity: function storeUser(string userID, string name, string cmnd, string dateOB, string phone, string gmail, string publicKey) returns(bool)
+func (_IDC *IDCTransactorSession) StoreUser(userID string, name string, cmnd string, dateOB string, phone string, gmail string, publicKey string) (*types.Transaction, error) {
 	return _IDC.Contract.StoreUser(&_IDC.TransactOpts, userID, name, cmnd, dateOB, phone, gmail, publicKey)
 }
 
-// VerifyDoc is a paid mutator transaction binding the contract method 0xd2de39a8.
-//
-// Solidity: function verifyDoc(string userID, bytes32 digest, uint256 indexDoc) returns(bool)
-func (_IDC *IDCTransactor) VerifyDoc(opts *bind.TransactOpts, userID string, digest [32]byte, indexDoc *big.Int) (*types.Transaction, error) {
-	return _IDC.contract.Transact(opts, "verifyDoc", userID, digest, indexDoc)
-}
-
-// VerifyDoc is a paid mutator transaction binding the contract method 0xd2de39a8.
-//
-// Solidity: function verifyDoc(string userID, bytes32 digest, uint256 indexDoc) returns(bool)
-func (_IDC *IDCSession) VerifyDoc(userID string, digest [32]byte, indexDoc *big.Int) (*types.Transaction, error) {
-	return _IDC.Contract.VerifyDoc(&_IDC.TransactOpts, userID, digest, indexDoc)
-}
-
-// VerifyDoc is a paid mutator transaction binding the contract method 0xd2de39a8.
-//
-// Solidity: function verifyDoc(string userID, bytes32 digest, uint256 indexDoc) returns(bool)
-func (_IDC *IDCTransactorSession) VerifyDoc(userID string, digest [32]byte, indexDoc *big.Int) (*types.Transaction, error) {
-	return _IDC.Contract.VerifyDoc(&_IDC.TransactOpts, userID, digest, indexDoc)
-}
-
-// IDCMetadataMetaData contains all meta data concerning the IDCMetadata contract.
-var IDCMetadataMetaData = &bind.MetaData{
+// StringUtilsMetaData contains all meta data concerning the StringUtils contract.
+var StringUtilsMetaData = &bind.MetaData{
 	ABI: "[]",
+	Sigs: map[string]string{
+		"3a96fdd7": "compare(string,string)",
+		"46bdca9a": "equal(string,string)",
+		"8a0807b7": "indexOf(string,string)",
+	},
+	Bin: "0x61051d61003a600b82828239805160001a60731461002d57634e487b7160e01b600052600060045260246000fd5b30600052607381538281f3fe730000000000000000000000000000000000000000301460806040526004361061004b5760003560e01c80633a96fdd71461005057806346bdca9a146100835780638a0807b7146100b3575b600080fd5b81801561005c57600080fd5b5061007061006b36600461040e565b6100d3565b6040519081526020015b60405180910390f35b81801561008f57600080fd5b506100a361009e36600461040e565b6101fa565b604051901515815260200161007a565b8180156100bf57600080fd5b506100706100ce36600461040e565b61020e565b8151815160009184918491908111156100ea575080515b60005b818110156101be57828181518110610107576101076104bb565b602001015160f81c60f81b6001600160f81b03191684828151811061012e5761012e6104bb565b01602001516001600160f81b0319161015610151576000199450505050506101f4565b828181518110610163576101636104bb565b602001015160f81c60f81b6001600160f81b03191684828151811061018a5761018a6104bb565b01602001516001600160f81b03191611156101ac5760019450505050506101f4565b806101b68161048a565b9150506100ed565b508151835110156101d65760001993505050506101f4565b8151835111156101ec57600193505050506101f4565b600093505050505b92915050565b600061020683836100d3565b159392505050565b81516000908390839060011180610226575060018151105b80610232575081518151115b1561024357600019925050506101f4565b6fffffffffffffffffffffffffffffffff8251111561026857600019925050506101f4565b6000805b83518110156103735782600081518110610288576102886104bb565b602001015160f81c60f81b6001600160f81b0319168482815181106102af576102af6104bb565b01602001516001600160f81b031916141561036157600191505b8251821080156102e2575083516102e08383610472565b105b801561033657508282815181106102fb576102fb6104bb565b01602001516001600160f81b031916846103158484610472565b81518110610325576103256104bb565b01602001516001600160f81b031916145b1561034d57816103458161048a565b9250506102c9565b82518214156103615793506101f492505050565b8061036b8161048a565b91505061026c565b5060001993505050506101f4565b600082601f83011261039257600080fd5b813567ffffffffffffffff808211156103ad576103ad6104d1565b604051601f8301601f19908116603f011681019082821181831017156103d5576103d56104d1565b816040528381528660208588010111156103ee57600080fd5b836020870160208301376000602085830101528094505050505092915050565b6000806040838503121561042157600080fd5b823567ffffffffffffffff8082111561043957600080fd5b61044586838701610381565b9350602085013591508082111561045b57600080fd5b5061046885828601610381565b9150509250929050565b60008219821115610485576104856104a5565b500190565b600060001982141561049e5761049e6104a5565b5060010190565b634e487b7160e01b600052601160045260246000fd5b634e487b7160e01b600052603260045260246000fd5b634e487b7160e01b600052604160045260246000fdfea2646970667358221220c44f61b9adc7ccfb844e5bd4c738e1dcda38bb3f022fc659fec415b4c6ffcd2564736f6c63430008070033",
 }
 
-// IDCMetadataABI is the input ABI used to generate the binding from.
-// Deprecated: Use IDCMetadataMetaData.ABI instead.
-var IDCMetadataABI = IDCMetadataMetaData.ABI
+// StringUtilsABI is the input ABI used to generate the binding from.
+// Deprecated: Use StringUtilsMetaData.ABI instead.
+var StringUtilsABI = StringUtilsMetaData.ABI
 
-// IDCMetadata is an auto generated Go binding around an Ethereum contract.
-type IDCMetadata struct {
-	IDCMetadataCaller     // Read-only binding to the contract
-	IDCMetadataTransactor // Write-only binding to the contract
-	IDCMetadataFilterer   // Log filterer for contract events
+// Deprecated: Use StringUtilsMetaData.Sigs instead.
+// StringUtilsFuncSigs maps the 4-byte function signature to its string representation.
+var StringUtilsFuncSigs = StringUtilsMetaData.Sigs
+
+// StringUtilsBin is the compiled bytecode used for deploying new contracts.
+// Deprecated: Use StringUtilsMetaData.Bin instead.
+var StringUtilsBin = StringUtilsMetaData.Bin
+
+// DeployStringUtils deploys a new Ethereum contract, binding an instance of StringUtils to it.
+func DeployStringUtils(auth *bind.TransactOpts, backend bind.ContractBackend) (common.Address, *types.Transaction, *StringUtils, error) {
+	parsed, err := StringUtilsMetaData.GetAbi()
+	if err != nil {
+		return common.Address{}, nil, nil, err
+	}
+	if parsed == nil {
+		return common.Address{}, nil, nil, errors.New("GetABI returned nil")
+	}
+
+	address, tx, contract, err := bind.DeployContract(auth, *parsed, common.FromHex(StringUtilsBin), backend)
+	if err != nil {
+		return common.Address{}, nil, nil, err
+	}
+	return address, tx, &StringUtils{StringUtilsCaller: StringUtilsCaller{contract: contract}, StringUtilsTransactor: StringUtilsTransactor{contract: contract}, StringUtilsFilterer: StringUtilsFilterer{contract: contract}}, nil
 }
 
-// IDCMetadataCaller is an auto generated read-only Go binding around an Ethereum contract.
-type IDCMetadataCaller struct {
+// StringUtils is an auto generated Go binding around an Ethereum contract.
+type StringUtils struct {
+	StringUtilsCaller     // Read-only binding to the contract
+	StringUtilsTransactor // Write-only binding to the contract
+	StringUtilsFilterer   // Log filterer for contract events
+}
+
+// StringUtilsCaller is an auto generated read-only Go binding around an Ethereum contract.
+type StringUtilsCaller struct {
 	contract *bind.BoundContract // Generic contract wrapper for the low level calls
 }
 
-// IDCMetadataTransactor is an auto generated write-only Go binding around an Ethereum contract.
-type IDCMetadataTransactor struct {
+// StringUtilsTransactor is an auto generated write-only Go binding around an Ethereum contract.
+type StringUtilsTransactor struct {
 	contract *bind.BoundContract // Generic contract wrapper for the low level calls
 }
 
-// IDCMetadataFilterer is an auto generated log filtering Go binding around an Ethereum contract events.
-type IDCMetadataFilterer struct {
+// StringUtilsFilterer is an auto generated log filtering Go binding around an Ethereum contract events.
+type StringUtilsFilterer struct {
 	contract *bind.BoundContract // Generic contract wrapper for the low level calls
 }
 
-// IDCMetadataSession is an auto generated Go binding around an Ethereum contract,
+// StringUtilsSession is an auto generated Go binding around an Ethereum contract,
 // with pre-set call and transact options.
-type IDCMetadataSession struct {
-	Contract     *IDCMetadata      // Generic contract binding to set the session for
+type StringUtilsSession struct {
+	Contract     *StringUtils      // Generic contract binding to set the session for
 	CallOpts     bind.CallOpts     // Call options to use throughout this session
 	TransactOpts bind.TransactOpts // Transaction auth options to use throughout this session
 }
 
-// IDCMetadataCallerSession is an auto generated read-only Go binding around an Ethereum contract,
+// StringUtilsCallerSession is an auto generated read-only Go binding around an Ethereum contract,
 // with pre-set call options.
-type IDCMetadataCallerSession struct {
-	Contract *IDCMetadataCaller // Generic contract caller binding to set the session for
+type StringUtilsCallerSession struct {
+	Contract *StringUtilsCaller // Generic contract caller binding to set the session for
 	CallOpts bind.CallOpts      // Call options to use throughout this session
 }
 
-// IDCMetadataTransactorSession is an auto generated write-only Go binding around an Ethereum contract,
+// StringUtilsTransactorSession is an auto generated write-only Go binding around an Ethereum contract,
 // with pre-set transact options.
-type IDCMetadataTransactorSession struct {
-	Contract     *IDCMetadataTransactor // Generic contract transactor binding to set the session for
+type StringUtilsTransactorSession struct {
+	Contract     *StringUtilsTransactor // Generic contract transactor binding to set the session for
 	TransactOpts bind.TransactOpts      // Transaction auth options to use throughout this session
 }
 
-// IDCMetadataRaw is an auto generated low-level Go binding around an Ethereum contract.
-type IDCMetadataRaw struct {
-	Contract *IDCMetadata // Generic contract binding to access the raw methods on
+// StringUtilsRaw is an auto generated low-level Go binding around an Ethereum contract.
+type StringUtilsRaw struct {
+	Contract *StringUtils // Generic contract binding to access the raw methods on
 }
 
-// IDCMetadataCallerRaw is an auto generated low-level read-only Go binding around an Ethereum contract.
-type IDCMetadataCallerRaw struct {
-	Contract *IDCMetadataCaller // Generic read-only contract binding to access the raw methods on
+// StringUtilsCallerRaw is an auto generated low-level read-only Go binding around an Ethereum contract.
+type StringUtilsCallerRaw struct {
+	Contract *StringUtilsCaller // Generic read-only contract binding to access the raw methods on
 }
 
-// IDCMetadataTransactorRaw is an auto generated low-level write-only Go binding around an Ethereum contract.
-type IDCMetadataTransactorRaw struct {
-	Contract *IDCMetadataTransactor // Generic write-only contract binding to access the raw methods on
+// StringUtilsTransactorRaw is an auto generated low-level write-only Go binding around an Ethereum contract.
+type StringUtilsTransactorRaw struct {
+	Contract *StringUtilsTransactor // Generic write-only contract binding to access the raw methods on
 }
 
-// NewIDCMetadata creates a new instance of IDCMetadata, bound to a specific deployed contract.
-func NewIDCMetadata(address common.Address, backend bind.ContractBackend) (*IDCMetadata, error) {
-	contract, err := bindIDCMetadata(address, backend, backend, backend)
+// NewStringUtils creates a new instance of StringUtils, bound to a specific deployed contract.
+func NewStringUtils(address common.Address, backend bind.ContractBackend) (*StringUtils, error) {
+	contract, err := bindStringUtils(address, backend, backend, backend)
 	if err != nil {
 		return nil, err
 	}
-	return &IDCMetadata{IDCMetadataCaller: IDCMetadataCaller{contract: contract}, IDCMetadataTransactor: IDCMetadataTransactor{contract: contract}, IDCMetadataFilterer: IDCMetadataFilterer{contract: contract}}, nil
+	return &StringUtils{StringUtilsCaller: StringUtilsCaller{contract: contract}, StringUtilsTransactor: StringUtilsTransactor{contract: contract}, StringUtilsFilterer: StringUtilsFilterer{contract: contract}}, nil
 }
 
-// NewIDCMetadataCaller creates a new read-only instance of IDCMetadata, bound to a specific deployed contract.
-func NewIDCMetadataCaller(address common.Address, caller bind.ContractCaller) (*IDCMetadataCaller, error) {
-	contract, err := bindIDCMetadata(address, caller, nil, nil)
+// NewStringUtilsCaller creates a new read-only instance of StringUtils, bound to a specific deployed contract.
+func NewStringUtilsCaller(address common.Address, caller bind.ContractCaller) (*StringUtilsCaller, error) {
+	contract, err := bindStringUtils(address, caller, nil, nil)
 	if err != nil {
 		return nil, err
 	}
-	return &IDCMetadataCaller{contract: contract}, nil
+	return &StringUtilsCaller{contract: contract}, nil
 }
 
-// NewIDCMetadataTransactor creates a new write-only instance of IDCMetadata, bound to a specific deployed contract.
-func NewIDCMetadataTransactor(address common.Address, transactor bind.ContractTransactor) (*IDCMetadataTransactor, error) {
-	contract, err := bindIDCMetadata(address, nil, transactor, nil)
+// NewStringUtilsTransactor creates a new write-only instance of StringUtils, bound to a specific deployed contract.
+func NewStringUtilsTransactor(address common.Address, transactor bind.ContractTransactor) (*StringUtilsTransactor, error) {
+	contract, err := bindStringUtils(address, nil, transactor, nil)
 	if err != nil {
 		return nil, err
 	}
-	return &IDCMetadataTransactor{contract: contract}, nil
+	return &StringUtilsTransactor{contract: contract}, nil
 }
 
-// NewIDCMetadataFilterer creates a new log filterer instance of IDCMetadata, bound to a specific deployed contract.
-func NewIDCMetadataFilterer(address common.Address, filterer bind.ContractFilterer) (*IDCMetadataFilterer, error) {
-	contract, err := bindIDCMetadata(address, nil, nil, filterer)
+// NewStringUtilsFilterer creates a new log filterer instance of StringUtils, bound to a specific deployed contract.
+func NewStringUtilsFilterer(address common.Address, filterer bind.ContractFilterer) (*StringUtilsFilterer, error) {
+	contract, err := bindStringUtils(address, nil, nil, filterer)
 	if err != nil {
 		return nil, err
 	}
-	return &IDCMetadataFilterer{contract: contract}, nil
+	return &StringUtilsFilterer{contract: contract}, nil
 }
 
-// bindIDCMetadata binds a generic wrapper to an already deployed contract.
-func bindIDCMetadata(address common.Address, caller bind.ContractCaller, transactor bind.ContractTransactor, filterer bind.ContractFilterer) (*bind.BoundContract, error) {
-	parsed, err := abi.JSON(strings.NewReader(IDCMetadataABI))
+// bindStringUtils binds a generic wrapper to an already deployed contract.
+func bindStringUtils(address common.Address, caller bind.ContractCaller, transactor bind.ContractTransactor, filterer bind.ContractFilterer) (*bind.BoundContract, error) {
+	parsed, err := abi.JSON(strings.NewReader(StringUtilsABI))
 	if err != nil {
 		return nil, err
 	}
@@ -892,36 +783,36 @@ func bindIDCMetadata(address common.Address, caller bind.ContractCaller, transac
 // sets the output to result. The result type might be a single field for simple
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
-func (_IDCMetadata *IDCMetadataRaw) Call(opts *bind.CallOpts, result *[]interface{}, method string, params ...interface{}) error {
-	return _IDCMetadata.Contract.IDCMetadataCaller.contract.Call(opts, result, method, params...)
+func (_StringUtils *StringUtilsRaw) Call(opts *bind.CallOpts, result *[]interface{}, method string, params ...interface{}) error {
+	return _StringUtils.Contract.StringUtilsCaller.contract.Call(opts, result, method, params...)
 }
 
 // Transfer initiates a plain transaction to move funds to the contract, calling
 // its default method if one is available.
-func (_IDCMetadata *IDCMetadataRaw) Transfer(opts *bind.TransactOpts) (*types.Transaction, error) {
-	return _IDCMetadata.Contract.IDCMetadataTransactor.contract.Transfer(opts)
+func (_StringUtils *StringUtilsRaw) Transfer(opts *bind.TransactOpts) (*types.Transaction, error) {
+	return _StringUtils.Contract.StringUtilsTransactor.contract.Transfer(opts)
 }
 
 // Transact invokes the (paid) contract method with params as input values.
-func (_IDCMetadata *IDCMetadataRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
-	return _IDCMetadata.Contract.IDCMetadataTransactor.contract.Transact(opts, method, params...)
+func (_StringUtils *StringUtilsRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
+	return _StringUtils.Contract.StringUtilsTransactor.contract.Transact(opts, method, params...)
 }
 
 // Call invokes the (constant) contract method with params as input values and
 // sets the output to result. The result type might be a single field for simple
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
-func (_IDCMetadata *IDCMetadataCallerRaw) Call(opts *bind.CallOpts, result *[]interface{}, method string, params ...interface{}) error {
-	return _IDCMetadata.Contract.contract.Call(opts, result, method, params...)
+func (_StringUtils *StringUtilsCallerRaw) Call(opts *bind.CallOpts, result *[]interface{}, method string, params ...interface{}) error {
+	return _StringUtils.Contract.contract.Call(opts, result, method, params...)
 }
 
 // Transfer initiates a plain transaction to move funds to the contract, calling
 // its default method if one is available.
-func (_IDCMetadata *IDCMetadataTransactorRaw) Transfer(opts *bind.TransactOpts) (*types.Transaction, error) {
-	return _IDCMetadata.Contract.contract.Transfer(opts)
+func (_StringUtils *StringUtilsTransactorRaw) Transfer(opts *bind.TransactOpts) (*types.Transaction, error) {
+	return _StringUtils.Contract.contract.Transfer(opts)
 }
 
 // Transact invokes the (paid) contract method with params as input values.
-func (_IDCMetadata *IDCMetadataTransactorRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
-	return _IDCMetadata.Contract.contract.Transact(opts, method, params...)
+func (_StringUtils *StringUtilsTransactorRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
+	return _StringUtils.Contract.contract.Transact(opts, method, params...)
 }

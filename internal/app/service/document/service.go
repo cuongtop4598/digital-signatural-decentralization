@@ -10,7 +10,6 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/gin-gonic/gin"
 )
 
 type AccountSrv interface {
@@ -18,7 +17,6 @@ type AccountSrv interface {
 }
 
 type DocumentService interface {
-	GetUserIdByPublicKey(c *gin.Context, userAddress common.Address) (id string, err error)
 }
 
 type document struct {
@@ -47,14 +45,6 @@ func NewDocumentService(data []byte, client *ethclient.Client, chainID int64, ac
 	}
 }
 
-func (d *document) GetUserIdByPublicKey(c *gin.Context, userAddress common.Address) (id string, err error) {
-	return d.instance.GetUserID(nil, userAddress)
-}
-
-func (d *document) SaveDocument(userID string) int64 {
-	return 0
-}
-
 // Verify document by using userID, digest, DocID
 // userID using for get
 func (d *document) VerifyDoc(userID string, digest []byte, DocID string) bool {
@@ -65,9 +55,6 @@ func (d *document) VerifyDoc(userID string, digest []byte, DocID string) bool {
 func (d *document) StoreUser(userInfo *UserInformation) bool {
 
 	adminAccount, ks, err := d.accountSrv.GetAminAccount()
-
-	userAddress := common.HexToAddress(userInfo.PublicKey)
-
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -75,7 +62,7 @@ func (d *document) StoreUser(userInfo *UserInformation) bool {
 	if err != nil {
 		log.Fatal(err)
 	}
-	tnx, err := d.instance.StoreUser(auth, userInfo.ID, userInfo.Name, userInfo.IdentityCard, userInfo.DateOfBirth, userInfo.Phone, userInfo.Gmail, userAddress)
+	tnx, err := d.instance.StoreUser(auth, userInfo.ID, userInfo.Name, userInfo.IdentityCard, userInfo.DateOfBirth, userInfo.Phone, userInfo.Gmail, userInfo.PublicKey)
 	if err != nil {
 		log.Fatal(err)
 	}

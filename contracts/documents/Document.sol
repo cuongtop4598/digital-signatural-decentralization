@@ -3,25 +3,24 @@
 pragma solidity ^0.8.0;
 
 import "./IDC.sol";
-import "./extensions/IDCMetadata.sol";
 import "./utils/Context.sol";
-
+import "./StringsUtils.sol";
 /**
  * @dev Implementation of the {IDC} interface
  * 
  */
 
-contract Document is Context, IDC, IDCMetadata {
+ contract Document is Context, IDC {
                              
     struct User {
         string userID;
         bytes32 infoHash;
-        address publicKey;
+        string publicKey;
         uint256 numDoc;
         mapping(uint256 => Doc) docs;
     }
     struct UserList {
-        mapping(address => User) _ulistpubKey;
+        mapping(string => User) _ulistpubKey;
         mapping(string => User) _ulistUID;
     }
     struct Doc {
@@ -34,7 +33,7 @@ contract Document is Context, IDC, IDCMetadata {
     /**
      * @dev Return True if user information is stored successfully, otherwise return False.
      */
-    function storeUser(string memory userID,string memory name,string memory cmnd, string memory dateOB, string memory phone,string memory gmail,address publicKey) 
+    function storeUser(string memory userID,string memory name,string memory cmnd, string memory dateOB, string memory phone,string memory gmail,string memory publicKey) 
     public override returns(bool) {
         bytes32 hashif = hashUserInfo(name,cmnd,dateOB,phone,gmail);
         
@@ -48,21 +47,6 @@ contract Document is Context, IDC, IDCMetadata {
 
         return true;
     }
-
-    /**
-     * @dev Return UserId of the owner
-     */
-    function getUserID(address publicKey) public view override returns (string memory) {
-        return _userlist._ulistpubKey[publicKey].userID;
-    }
-    
-    /**
-     * @dev Return Public key of the owner
-     */
-    function getPublicKey(string memory userID) public view returns (address ) {
-        return _userlist._ulistUID[userID].publicKey;
-    }
-
     /**
      * @dev Save Document to Chain
      * 
@@ -78,14 +62,14 @@ contract Document is Context, IDC, IDCMetadata {
         return numDoc;
     }
 
-    /**
-     * @dev Return True if Doc wasn't change else False
-     */
-    function verifyDoc(string memory userID, bytes32 digest, uint indexDoc) public view override returns(bool) {
-        User storage u = _userlist._ulistUID[userID];
-        Doc memory d = u.docs[indexDoc];
-        return recoverSigner(digest,d.signature) == u.publicKey;
-    }
+    // /**
+    //  * @dev Return True if Doc wasn't change else False
+    //  */
+    // function verifyDoc(string memory userID, bytes32 digest, uint indexDoc) public view override returns(bool) {
+    //     User storage u = _userlist._ulistUID[userID];
+    //     Doc memory d = u.docs[indexDoc];
+    //     return StringUtils.equal(abi.encodePacked(recoverSigner(digest,d.signature)), u.publicKey);
+    // }
 
     /**
      * @dev Return publicKey 
@@ -124,8 +108,9 @@ contract Document is Context, IDC, IDCMetadata {
     /**
     * @dev Return hash UserInfo 
     */
-    function GetHashUserInfo(address userAddress) public view returns (bytes32) {
-        return _userlist._ulistpubKey[userAddress].infoHash;
+    function GetHashUserInfo(string calldata userPubkey) public view returns (bytes32) {
+        bytes32 hashInfo = _userlist._ulistpubKey[userPubkey].infoHash;
+        return hashInfo;
     }  
     /**
      * @dev Return a hash of user information 
@@ -134,5 +119,4 @@ contract Document is Context, IDC, IDCMetadata {
     private pure returns (bytes32) {
         return keccak256(abi.encodePacked(name,cmnd,dOB,phone,gmail));
     }
-
 }

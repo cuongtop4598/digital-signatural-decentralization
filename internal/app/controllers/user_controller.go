@@ -3,7 +3,6 @@ package controllers
 import (
 	"digitalsignature/internal/app/request"
 	"digitalsignature/internal/app/service"
-	"fmt"
 
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/gin-gonic/gin"
@@ -19,6 +18,7 @@ func UserRouter(userService service.UserService, r *gin.RouterGroup) {
 	}
 	ar := r.Group("/user")
 	ar.POST("/signup", uc.SignUp)
+	ar.GET("/info/:pubkey", uc.HashInfo)
 	ar.POST("/signup/:password", uc.SignUpWithPassword)
 	ar.POST("/signin", uc.SignIn)
 }
@@ -28,12 +28,14 @@ func (uc *UserController) SignUp(c *gin.Context) {
 	userInfo := request.UserInfo{}
 	err := c.BindJSON(&userInfo)
 	if err != nil {
-		fmt.Println(err)
+		log.Error(err.Error())
+		c.JSON(404, gin.H{"status": "false"})
 	}
 	log.Info("User register request", userInfo)
 	err = uc.userService.Create(c, userInfo)
 	if err != nil {
-		fmt.Println(err)
+		log.Error(err.Error())
+		c.JSON(404, gin.H{"status": "false"})
 	}
 	c.JSON(200, gin.H{"status": "true"})
 }
@@ -44,4 +46,13 @@ func (uc *UserController) SignUpWithPassword(c *gin.Context) {
 
 func (uc *UserController) SignIn(c *gin.Context) {
 
+}
+func (uc *UserController) HashInfo(c *gin.Context) {
+	pubkey := c.Param("pubkey")
+	err := uc.userService.GetHashUserInfo(c, pubkey)
+	if err != nil {
+		log.Error(err.Error())
+		c.JSON(404, gin.H{"status": "false"})
+	}
+	c.JSON(200, gin.H{"status": "true"})
 }

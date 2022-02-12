@@ -5,6 +5,7 @@ import (
 	"digitalsignature/internal/app/migration"
 	"digitalsignature/internal/pkg/database"
 	"digitalsignature/internal/pkg/ethereum"
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -59,7 +60,7 @@ func (server *Server) Run(env string) error {
 			tracer.WithService(""),
 		)
 	}
-
+	fmt.Println(configuration.Database)
 	db, err := database.GetConnection(configuration.Database)
 	if err != nil {
 		log.Sugar().Errorf("Connect to database fail ", err)

@@ -8,7 +8,7 @@ pragma solidity ^0.8.0;
 interface IDC {
     /**
      */
-    function storeUser(string memory userID,string memory name,string memory cmnd, string memory dateOB, string memory phone,string memory gmail,address publicKey) external returns (bool);
+    function storeUser(string memory userID,string memory name,string memory cmnd, string memory dateOB, string memory phone,string memory gmail,string memory publicKey) external returns (bool);
 
     /**
      */
@@ -16,9 +16,8 @@ interface IDC {
 
     /**
      */
-    function verifyDoc(string memory userID, bytes32 digest, uint256 indexDoc) external returns (bool);
+    //function verifyDoc(string memory userID, bytes32 digest, uint256 indexDoc) external returns (bool);
 
     /**
      */
-    function getUserID(address publicKey) external returns (string memory);
 }

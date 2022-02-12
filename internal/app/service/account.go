@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"crypto/ecdsa"
 	"errors"
 	"log"
 	"math/big"
@@ -11,9 +10,6 @@ import (
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
@@ -46,42 +42,18 @@ func (s *AccountService) GetAminAccount() (*accounts.Account, *keystore.KeyStore
 
 func (s *AccountService) BindTransactionOption(account accounts.Account, password string, ks *keystore.KeyStore, client *ethclient.Client) *bind.TransactOpts {
 	ks.Unlock(account, password)
-	keyJson, err := ks.Export(account, password, password)
-	if err != nil {
-		log.Fatal(err)
-	}
-	key, err := keystore.DecryptKey(keyJson, password)
-	if err != nil {
-		log.Fatal(err)
-	}
 	fromAddress := account.Address
 	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
 	if err != nil {
 		log.Fatal(err)
 	}
-	// gasPrice, err := client.SuggestGasPrice(context.Background())
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	return &bind.TransactOpts{
-		From:     fromAddress,
-		Nonce:    big.NewInt(int64(nonce)),
-		Signer:   keySigner(big.NewInt(451998), key.PrivateKey),
-		GasPrice: big.NewInt(200),
-		GasLimit: uint64(100000000),
-		Context:  context.TODO(),
-		NoSend:   true,
+	auth, err := bind.NewKeyStoreTransactorWithChainID(ks, account, big.NewInt(451998))
+	if err != nil {
+		log.Fatal(err)
 	}
-
-}
-
-func keySigner(chainID *big.Int, key *ecdsa.PrivateKey) (signerfn bind.SignerFn) {
-	signerfn = func(address common.Address, tx *types.Transaction) (*types.Transaction, error) {
-		keyAddr := crypto.PubkeyToAddress(key.PublicKey)
-		if address != keyAddr {
-			return nil, errors.New("not authorized to sign this account")
-		}
-		return types.SignTx(tx, types.NewEIP155Signer(chainID), key)
-	}
-	return
+	auth.From = fromAddress
+	auth.Nonce = big.NewInt(int64(nonce))
+	auth.GasPrice = big.NewInt(300)
+	auth.GasLimit = uint64(100000000)
+	return auth
 }

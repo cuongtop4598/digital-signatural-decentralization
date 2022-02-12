@@ -12,5 +12,6 @@ database:
   user: "root"
   password: "local"
   database: "digital_signatural"
-  port: 5433
+  port: "5433"
   env: "development"
+contract: "0x34cB857974f136169f94054914B84fCAf6dd7e37"

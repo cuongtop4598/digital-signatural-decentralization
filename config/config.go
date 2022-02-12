@@ -35,16 +35,17 @@ func NewConfig(path, stage string) (config *Configuration, err error) {
 
 // Configuration holds data necessery for configuring application
 type Configuration struct {
-	Server   *Server                         `yaml:"server"`
-	Ethereum *ethereum.EthereumNetworkConfig `yaml:"ethereum"`
-	Database *database.DBConfig              `yaml:"database"`
+	Server          *Server                         `mapstructure:"server"`
+	Ethereum        *ethereum.EthereumNetworkConfig `mapstructure:"ethereum"`
+	Database        *database.DBConfig              `mapstructure:"database"`
+	ContractAddress string                          `mapstructure:"contract"`
 }
 
 // Server holds data necessary for server configuration
 type Server struct {
-	Mode string `yaml:"mode"`
-	Host string `yaml:"host"`
-	Port string `yaml:"port"`
+	Mode string `mapstructure:"mode"`
+	Host string `mapstructure:"host"`
+	Port string `mapstructure:"port"`
 }
 
 func setGinMode(mode string) {
