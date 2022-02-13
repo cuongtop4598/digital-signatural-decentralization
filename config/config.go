@@ -38,14 +38,14 @@ type Configuration struct {
 	Server          *Server                         `mapstructure:"server"`
 	Ethereum        *ethereum.EthereumNetworkConfig `mapstructure:"ethereum"`
 	Database        *database.DBConfig              `mapstructure:"database"`
-	ContractAddress string                          `mapstructure:"contract"`
+	ContractAddress *ethereum.ContractAddress       `mapstructure:"address"`
 }
 
 // Server holds data necessary for server configuration
 type Server struct {
-	Mode string `mapstructure:"mode"`
-	Host string `mapstructure:"host"`
-	Port string `mapstructure:"port"`
+	Mode string `yaml:"mode"`
+	Host string `yaml:"host"`
+	Port string `yaml:"port"`
 }
 
 func setGinMode(mode string) {

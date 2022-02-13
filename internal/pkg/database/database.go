@@ -9,12 +9,12 @@ import (
 
 // PostgresConfig persists the config for our PostgreSQL database connection
 type DBConfig struct {
-	Host        string `mapstructure:"host"`
-	Port        string `mapstructure:"port"`
-	User        string `mapstructure:"user"`
-	Password    string `mapstructure:"password"`
-	Database    string `mapstructure:"database"`
-	Environment string `mapstructure:"env"`
+	Host        string `yaml:"host"`
+	Port        string `yaml:"port"`
+	User        string `yaml:"user"`
+	Password    string `yaml:"password"`
+	Database    string `yaml:"database"`
+	Environment string `yaml:"env"`
 }
 
 func GetConnection(c *DBConfig) (*gorm.DB, error) {

@@ -17,7 +17,7 @@ const (
 )
 
 func main() {
-	client, err := ethclient.Dial("http://27.72.105.169:10199")
+	client, err := ethclient.Dial("http://27.72.105.169:10198")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -43,9 +43,9 @@ func main() {
 	// }
 	auth.From = account.Address
 	auth.Nonce = big.NewInt(int64(nonce))
-	auth.Value = big.NewInt(1)        // in wei
-	auth.GasLimit = uint64(100000000) // in units gas limit: 134217728
-	auth.GasPrice = big.NewInt(100)
+	auth.Value = big.NewInt(0)
+	auth.GasLimit = uint64(0x47b760) // in units gas limit: 134217728
+	auth.GasPrice = big.NewInt(10000)
 	contractAddress, _, _, err := document.DeployDocument(auth, client)
 	if err != nil {
 		log.Fatal(err)

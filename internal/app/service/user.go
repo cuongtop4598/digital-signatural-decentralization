@@ -7,7 +7,6 @@ import (
 	"digitalsignature/internal/app/service/document"
 	"fmt"
 	"log"
-	"sync"
 	"time"
 
 	"github.com/ethereum/go-ethereum/accounts"
@@ -71,56 +70,34 @@ func (s *UserService) Create(c *gin.Context, userInfo request.UserInfo) error {
 		log.Fatal(err)
 	}
 	tnxOption := s.accountSrv.BindTransactionOption(*adminAccount, "123456", ks, s.ethclient)
-	txn, err := documentIntance.StoreUser(tnxOption, user.ID.String(), user.Name, user.CardID, user.DateOfBirth, user.Phone, user.Gmail, user.PublicKey)
+	_, err = documentIntance.StoreUser(tnxOption, user.ID.String(), user.Name, user.CardID, user.DateOfBirth, user.Phone, user.Gmail, user.PublicKey)
 	if err != nil {
 		log.Fatal(err)
 	}
-	var wg1 sync.WaitGroup
-	wg1.Add(1)
-	go func() {
-		for {
-			receipt, err := s.ethclient.TransactionReceipt(c, txn.Hash())
-			if err != nil {
-				log.Fatal(err)
-			}
-			if receipt.Status == 1 || receipt.Status == 0 {
-				wg1.Done()
-				if receipt.Status == 1 {
-					s.logger.Info("Transaction Success")
-				}
-				if receipt.Status == 0 {
-					s.logger.Info("Transaction Failt")
-				}
-				break
-			}
-		}
-	}()
-	wg1.Wait()
-	s.logger.Info("transaction hash", zap.String("hash", txn.Hash().String()))
-	time.Sleep(3 * time.Second)
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		for {
-			receipt, err := s.ethclient.TransactionReceipt(c, txn.Hash())
-			if err != nil {
-				fmt.Println("transaction not found")
-				log.Fatal(err)
-			}
-			if receipt.Status == 1 || receipt.Status == 0 {
-				wg.Done()
-				if receipt.Status == 1 {
-					s.logger.Info("Transaction Success")
-				}
-				if receipt.Status == 0 {
-					s.logger.Info("Transaction Failt")
-				}
-				break
-			}
-		}
-	}()
-	wg.Wait()
-	s.logger.Info(txn.Hash().String())
+	// var wg1 sync.WaitGroup
+	// time.Sleep(5 * time.Second)
+	// wg1.Add(1)
+	// go func() {
+	// 	for {
+	// 		receipt, err := s.ethclient.TransactionReceipt(context.Background(), txn.Hash())
+	// 		if err != nil {
+	// 			log.Println("transaction store user: ", txn.Hash(), ":", err)
+	// 		} else {
+	// 			if receipt.Status == 1 || receipt.Status == 0 {
+	// 				defer wg1.Done()
+	// 				if receipt.Status == 1 {
+	// 					s.logger.Info("Transaction Success")
+	// 				}
+	// 				if receipt.Status == 0 {
+	// 					s.logger.Info("Transaction Failt")
+	// 				}
+	// 				break
+	// 			}
+	// 		}
+	// 		time.Sleep(2 * time.Second)
+	// 	}
+	// }()
+	// wg1.Wait()
 	s.logger.Info("created user", zap.String("publickey", userInfo.PublicKey))
 	return nil
 }
@@ -128,6 +105,7 @@ func (s *UserService) Create(c *gin.Context, userInfo request.UserInfo) error {
 func (s *UserService) GetHashUserInfo(c *gin.Context, pubkey string) error {
 	contractAddress := common.HexToAddress(s.documentContract)
 	// store hash user info to blockchain
+	log.Println(contractAddress)
 	documentIntance, err := document.NewDocument(contractAddress, s.ethclient)
 	if err != nil {
 		log.Fatal(err)

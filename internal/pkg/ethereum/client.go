@@ -13,6 +13,11 @@ type EthereumNetworkConfig struct {
 	ChainID      int64  `mapstructure:"chain_id"`
 }
 
+type ContractAddress struct {
+	Document string   `mapstructure:"document"`
+	Accounts []string `mapstructure:"accounts"`
+}
+
 func NewClient(cfg *EthereumNetworkConfig) (*ethclient.Client, error) {
 	client, err := ethclient.Dial(cfg.Endpoint)
 	if err != nil {
