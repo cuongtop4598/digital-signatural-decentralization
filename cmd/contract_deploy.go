@@ -13,17 +13,18 @@ import (
 )
 
 const (
-	chainID = int64(451998)
+	endpoint = "http://27.72.105.169:10198"
+	chainID  = int64(451998)
+	keystore = "../wallets/keystore/"
+	password = "123456"
 )
 
 func main() {
-	client, err := ethclient.Dial("http://27.72.105.169:10198")
+	client, err := ethclient.Dial(endpoint)
 	if err != nil {
 		log.Fatal(err)
 	}
-	// TODO: deploy contract
-	// get admin account
-	accountSrv := service.NewAccountService("../wallets/keystore/", "123456")
+	accountSrv := service.NewAccountService(keystore, password)
 	account, ks, err := accountSrv.GetAminAccount()
 	if err != nil {
 		log.Fatal(err)
@@ -37,15 +38,13 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// gasPrice, err := client.SuggestGasPrice(context.Background())
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+
 	auth.From = account.Address
 	auth.Nonce = big.NewInt(int64(nonce))
 	auth.Value = big.NewInt(0)
-	auth.GasLimit = uint64(0x47b760) // in units gas limit: 134217728
-	auth.GasPrice = big.NewInt(10000)
+	auth.GasLimit = uint64(0x47b760)
+	auth.GasPrice = big.NewInt(1000)
+
 	contractAddress, _, _, err := document.DeployDocument(auth, client)
 	if err != nil {
 		log.Fatal(err)

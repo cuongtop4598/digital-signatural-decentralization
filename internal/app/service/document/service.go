@@ -51,25 +51,6 @@ func (d *document) VerifyDoc(userID string, digest []byte, DocID string) bool {
 	return true
 }
 
-// Store user info
-func (d *document) StoreUser(userInfo *UserInformation) bool {
-
-	adminAccount, ks, err := d.accountSrv.GetAminAccount()
-	if err != nil {
-		log.Fatal(err)
-	}
-	auth, err := createAuthForSigning(*adminAccount, d.Network.Client, ks, d.Network.ChainID)
-	if err != nil {
-		log.Fatal(err)
-	}
-	tnx, err := d.instance.StoreUser(auth, userInfo.ID, userInfo.Name, userInfo.IdentityCard, userInfo.DateOfBirth, userInfo.Phone, userInfo.Gmail, userInfo.PublicKey)
-	if err != nil {
-		log.Fatal(err)
-	}
-	_ = tnx
-	return true
-}
-
 func createAuthForSigning(account accounts.Account, client *ethclient.Client, ks *keystore.KeyStore, chainID int64) (auth *bind.TransactOpts, err error) {
 
 	fromAddress := account.Address
