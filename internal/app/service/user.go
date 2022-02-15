@@ -6,7 +6,6 @@ import (
 	"digitalsignature/internal/app/request"
 	"digitalsignature/internal/app/service/document"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/ethereum/go-ethereum/accounts"
@@ -61,18 +60,18 @@ func (s *UserService) Create(c *gin.Context, userInfo request.UserInfo) error {
 	// make transaction with admin account
 	adminAccount, ks, err := s.accountSrv.GetAminAccount()
 	if err != nil {
-		log.Fatal(err)
+		s.logger.Sugar().Error(err)
 	}
 	contractAddress := common.HexToAddress(s.documentContract)
 	// store hash user info to blockchain
 	documentIntance, err := document.NewDocument(contractAddress, s.ethclient)
 	if err != nil {
-		log.Fatal(err)
+		s.logger.Sugar().Error(err)
 	}
 	tnxOption := s.accountSrv.BindTransactionOption(*adminAccount, "123456", ks, s.ethclient)
 	_, err = documentIntance.StoreUser(tnxOption, user.ID.String(), user.Name, user.CardID, user.DateOfBirth, user.Phone, user.Gmail, user.PublicKey)
 	if err != nil {
-		log.Fatal(err)
+		s.logger.Sugar().Error(err)
 	}
 	// var wg1 sync.WaitGroup
 	// time.Sleep(5 * time.Second)
@@ -105,14 +104,14 @@ func (s *UserService) Create(c *gin.Context, userInfo request.UserInfo) error {
 func (s *UserService) GetHashUserInfo(c *gin.Context, pubkey string) error {
 	contractAddress := common.HexToAddress(s.documentContract)
 	// store hash user info to blockchain
-	log.Println(contractAddress)
+	s.logger.Sugar().Info(contractAddress)
 	documentIntance, err := document.NewDocument(contractAddress, s.ethclient)
 	if err != nil {
-		log.Fatal(err)
+		s.logger.Sugar().Error(err)
 	}
 	hash, err := documentIntance.GetHashUserInfo(&bind.CallOpts{}, pubkey)
 	if err != nil {
-		log.Fatal(err)
+		s.logger.Sugar().Error(err)
 	}
 	fmt.Println(hash)
 	return nil
