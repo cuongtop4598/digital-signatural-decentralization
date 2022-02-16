@@ -48,6 +48,18 @@ import "./StringsUtils.sol";
         return true;
     }
     /**
+     * @dev Verify user information
+    */
+    function verifyUser(string memory name,string memory cmnd, string memory dateOB, string memory phone,string memory gmail,string memory publicKey)
+    public override view returns(bool) {
+         bytes32 hashInfo = hashUserInfo(name,cmnd,dateOB,phone,gmail);
+         if (compareBytes(_userlist._ulistpubKey[publicKey].infoHash, hashInfo)){
+             return true;
+         } else {
+             return false;
+         }
+    }                            
+    /**
      * @dev Save Document to Chain
      * 
      * Return index of Document in the document list of the owner
@@ -62,14 +74,14 @@ import "./StringsUtils.sol";
         return numDoc;
     }
 
-    // /**
-    //  * @dev Return True if Doc wasn't change else False
-    //  */
-    // function verifyDoc(string memory userID, bytes32 digest, uint indexDoc) public view override returns(bool) {
-    //     User storage u = _userlist._ulistUID[userID];
-    //     Doc memory d = u.docs[indexDoc];
-    //     return StringUtils.equal(abi.encodePacked(recoverSigner(digest,d.signature)), u.publicKey);
-    // }
+    /**
+     * @dev Return True if Doc wasn't change else False
+     */
+    function verifyDoc(string memory userID, bytes32 digest, uint indexDoc) public view override returns(bool) {
+        User storage u = _userlist._ulistUID[userID];
+        Doc memory d = u.docs[indexDoc];
+        return keccak256(abi.encodePacked(recoverSigner(digest,d.signature))) == keccak256(abi.encodePacked(u.publicKey));
+    }
 
     /**
      * @dev Return publicKey 
@@ -119,4 +131,9 @@ import "./StringsUtils.sol";
     private pure returns (bytes32) {
         return keccak256(abi.encodePacked(name,cmnd,dOB,phone,gmail));
     }
+
+    function compareBytes(bytes32 a, bytes32 b) public pure returns (bool) {
+        return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
+    }
+    
 }

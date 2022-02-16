@@ -9,7 +9,7 @@ import (
 type User struct {
 	ID          uuid.UUID `gorm:"primaryKey;type:uuid;"`
 	Name        string
-	PublicKey   string `gorm:"not null"`
+	PublicKey   string `gorm:"not null, unique"`
 	CardID      string
 	Phone       string
 	Gmail       string

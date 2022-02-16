@@ -5,8 +5,8 @@ import (
 	"digitalsignature/internal/app/model"
 	"digitalsignature/internal/app/repository"
 	"digitalsignature/internal/app/request"
+	"digitalsignature/internal/app/response"
 	"digitalsignature/internal/app/service/document"
-	"fmt"
 	"log"
 	"sync"
 	"time"
@@ -104,18 +104,44 @@ func (s *UserService) Create(c *gin.Context, userInfo request.UserInfo) error {
 	return nil
 }
 
-func (s *UserService) GetHashUserInfo(c *gin.Context, pubkey string) error {
+func (s *UserService) GetUserInfo(c *gin.Context, pubkey string) (*response.User, error) {
 	contractAddress := common.HexToAddress(s.documentContract)
-	// store hash user info to blockchain
-	s.logger.Sugar().Info(contractAddress)
+	// get hash user from onchain
 	documentIntance, err := document.NewDocument(contractAddress, s.ethclient)
 	if err != nil {
 		s.logger.Sugar().Error(err)
+		return nil, err
 	}
 	hash, err := documentIntance.GetHashUserInfo(&bind.CallOpts{}, pubkey)
 	if err != nil {
 		s.logger.Sugar().Error(err)
+		return nil, err
 	}
-	fmt.Println(hash)
-	return nil
+	// get user info from offchain
+	user, err := s.userRepo.GetUserByPubkey(pubkey)
+	if err != nil {
+		s.logger.Sugar().Error(err)
+		return nil, err
+	}
+	return &response.User{
+		ID:          user.ID,
+		Name:        user.Name,
+		PublicKey:   pubkey,
+		CardID:      user.CardID,
+		Phone:       user.Phone,
+		Gmail:       user.Gmail,
+		DateOfBirth: user.DateOfBirth,
+		Hash:        string(hash[:]),
+	}, nil
 }
+
+// func (s *UserService) VerifyUser(user request.UserInfo) (bool, error) {
+// 	contractAddress := common.HexToAddress(s.documentContract)
+// 	// get hash user from onchain
+// 	documentIntance, err := document.NewDocument(contractAddress, s.ethclient)
+// 	if err != nil {
+// 		s.logger.Sugar().Error(err)
+// 		return false, err
+// 	}
+// 	documentIntance.
+// }

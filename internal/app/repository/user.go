@@ -24,6 +24,15 @@ func (repo *UserRepo) Create(user model.User) error {
 	return nil
 }
 
+func (repo *UserRepo) GetUserByPubkey(pubkey string) (*model.User, error) {
+	user := model.User{}
+	result := repo.DB.Where("public_key = ?", pubkey).First(&user)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &user, nil
+}
+
 func (repo *UserRepo) GetUserById(id string) (*model.User, error) {
 	user := model.User{}
 	result := repo.DB.Where("id = ?", id).First(&user)

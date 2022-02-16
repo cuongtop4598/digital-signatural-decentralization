@@ -181,13 +181,16 @@ func (_Context *ContextTransactorRaw) Transact(opts *bind.TransactOpts, method s
 
 // DocumentMetaData contains all meta data concerning the Document contract.
 var DocumentMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[{\"internalType\":\"string\",\"name\":\"userPubkey\",\"type\":\"string\"}],\"name\":\"GetHashUserInfo\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"userID\",\"type\":\"string\"},{\"internalType\":\"bytes\",\"name\":\"signature\",\"type\":\"bytes\"}],\"name\":\"saveDoc\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"userID\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"cmnd\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"dateOB\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"phone\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"gmail\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"publicKey\",\"type\":\"string\"}],\"name\":\"storeUser\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
+	ABI: "[{\"inputs\":[{\"internalType\":\"string\",\"name\":\"userPubkey\",\"type\":\"string\"}],\"name\":\"GetHashUserInfo\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"a\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"b\",\"type\":\"bytes32\"}],\"name\":\"compareBytes\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"userID\",\"type\":\"string\"},{\"internalType\":\"bytes\",\"name\":\"signature\",\"type\":\"bytes\"}],\"name\":\"saveDoc\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"userID\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"cmnd\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"dateOB\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"phone\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"gmail\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"publicKey\",\"type\":\"string\"}],\"name\":\"storeUser\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"userID\",\"type\":\"string\"},{\"internalType\":\"bytes32\",\"name\":\"digest\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"indexDoc\",\"type\":\"uint256\"}],\"name\":\"verifyDoc\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"cmnd\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"dateOB\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"phone\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"gmail\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"publicKey\",\"type\":\"string\"}],\"name\":\"verifyUser\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
 	Sigs: map[string]string{
 		"998fe24a": "GetHashUserInfo(string)",
+		"ef1bade3": "compareBytes(bytes32,bytes32)",
 		"3a8fb351": "saveDoc(string,bytes)",
 		"a01ef4b9": "storeUser(string,string,string,string,string,string,string)",
+		"d2de39a8": "verifyDoc(string,bytes32,uint256)",
+		"7ecde66f": "verifyUser(string,string,string,string,string,string)",
 	},
-	Bin: "0x608060405234801561001057600080fd5b506106d0806100206000396000f3fe608060405234801561001057600080fd5b50600436106100415760003560e01c80633a8fb35114610046578063998fe24a1461006c578063a01ef4b91461007f575b600080fd5b6100596100543660046103fb565b6100a2565b6040519081526020015b60405180910390f35b61005961007a366004610389565b610156565b61009261008d366004610473565b610189565b6040519015158152602001610063565b6000806000600101846040516100b891906105d9565b908152602001604051809103902060030154905080806100d79061065b565b915050600080600101856040516100ee91906105d9565b908152604080516020928190038301902060008581526004909101835220865190925061012091839190880190610253565b5083516101369060018301906020870190610253565b50835161014c9060028301906020870190610253565b5090949350505050565b60008060008001848460405161016d9291906105c9565b9081526040519081900360200190206001015491505092915050565b6000806101998888888888610217565b9050600080600001846040516101af91906105d9565b90815260200160405180910390209050898160000190805190602001906101d7929190610253565b506001810182905583516101f49060028301906020870190610253565b50604051600190610206908c906105d9565b525060019998505050505050505050565b600085858585856040516020016102329594939291906105e5565b60405160208183030381529060405280519060200120905095945050505050565b82805461025f90610620565b90600052602060002090601f01602090048101928261028157600085556102c7565b82601f1061029a57805160ff19168380011785556102c7565b828001600101855582156102c7579182015b828111156102c75782518255916020019190600101906102ac565b506102d39291506102d7565b5090565b5b808211156102d357600081556001016102d8565b600067ffffffffffffffff8084111561030757610307610684565b604051601f8501601f19908116603f0116810190828211818310171561032f5761032f610684565b8160405280935085815286868601111561034857600080fd5b858560208301376000602087830101525050509392505050565b600082601f83011261037357600080fd5b610382838335602085016102ec565b9392505050565b6000806020838503121561039c57600080fd5b823567ffffffffffffffff808211156103b457600080fd5b818501915085601f8301126103c857600080fd5b8135818111156103d757600080fd5b8660208285010111156103e957600080fd5b60209290920196919550909350505050565b6000806040838503121561040e57600080fd5b823567ffffffffffffffff8082111561042657600080fd5b61043286838701610362565b9350602085013591508082111561044857600080fd5b508301601f8101851361045a57600080fd5b610469858235602084016102ec565b9150509250929050565b600080600080600080600060e0888a03121561048e57600080fd5b873567ffffffffffffffff808211156104a657600080fd5b6104b28b838c01610362565b985060208a01359150808211156104c857600080fd5b6104d48b838c01610362565b975060408a01359150808211156104ea57600080fd5b6104f68b838c01610362565b965060608a013591508082111561050c57600080fd5b6105188b838c01610362565b955060808a013591508082111561052e57600080fd5b61053a8b838c01610362565b945060a08a013591508082111561055057600080fd5b61055c8b838c01610362565b935060c08a013591508082111561057257600080fd5b5061057f8a828b01610362565b91505092959891949750929550565b6000815160005b818110156105af5760208185018101518683015201610595565b818111156105be576000828601525b509290920192915050565b8183823760009101908152919050565b6000610382828461058e565b600061061561060f6106096106036105fd868c61058e565b8a61058e565b8861058e565b8661058e565b8461058e565b979650505050505050565b600181811c9082168061063457607f821691505b6020821081141561065557634e487b7160e01b600052602260045260246000fd5b50919050565b600060001982141561067d57634e487b7160e01b600052601160045260246000fd5b5060010190565b634e487b7160e01b600052604160045260246000fdfea26469706673582212201a2b5232f370abb60a71b1c9ecc0be368997e11b5d565fd6ad71df1e425aaa7864736f6c63430008070033",
+	Bin: "0x608060405234801561001057600080fd5b50610d56806100206000396000f3fe608060405234801561001057600080fd5b50600436106100625760003560e01c80633a8fb351146100675780637ecde66f1461008d578063998fe24a146100b0578063a01ef4b9146100c3578063d2de39a8146100d6578063ef1bade3146100e9575b600080fd5b61007a6100753660046108f0565b6100fc565b6040519081526020015b60405180910390f35b6100a061009b366004610968565b6101b0565b6040519015158152602001610084565b61007a6100be366004610830565b61020e565b6100a06100d1366004610a5d565b610241565b6100a06100e43660046108a2565b6102cf565b6100a06100f736600461080e565b610551565b6000806000600101846040516101129190610bc3565b9081526020016040518091039020600301549050808061013190610ce1565b915050600080600101856040516101489190610bc3565b908152604080516020928190038301902060008581526004909101835220865190925061017a918391908801906106d8565b50835161019090600183019060208701906106d8565b5083516101a690600283019060208701906106d8565b5090949350505050565b6000806101c088888888886105a5565b90506101ef60008001846040516101d79190610bc3565b90815260200160405180910390206001015482610551565b156101fe576001915050610204565b60009150505b9695505050505050565b600080600080018484604051610225929190610bb3565b9081526040519081900360200190206001015491505092915050565b60008061025188888888886105a5565b9050600080600001846040516102679190610bc3565b908152602001604051809103902090508981600001908051906020019061028f9291906106d8565b506001810182905583516102ac90600283019060208701906106d8565b506040516001906102be908c90610bc3565b525060019998505050505050505050565b6000806000600101856040516102e59190610bc3565b90815260200160405180910390209050600081600401600085815260200190815260200160002060405180606001604052908160008201805461032790610ca6565b80601f016020809104026020016040519081016040528092919081815260200182805461035390610ca6565b80156103a05780601f10610375576101008083540402835291602001916103a0565b820191906000526020600020905b81548152906001019060200180831161038357829003601f168201915b505050505081526020016001820180546103b990610ca6565b80601f01602080910402602001604051908101604052809291908181526020018280546103e590610ca6565b80156104325780601f1061040757610100808354040283529160200191610432565b820191906000526020600020905b81548152906001019060200180831161041557829003601f168201915b5050505050815260200160028201805461044b90610ca6565b80601f016020809104026020016040519081016040528092919081815260200182805461047790610ca6565b80156104c45780601f10610499576101008083540402835291602001916104c4565b820191906000526020600020905b8154815290600101906020018083116104a757829003601f168201915b5050505050815250509050816002016040516020016104e39190610c0a565b604051602081830303815290604052805190602001206105078683602001516105e1565b60405160200161052f919060609190911b6bffffffffffffffffffffffff1916815260140190565b6040516020818303038152906040528051906020012014925050509392505050565b60008160405160200161056691815260200190565b60408051601f19818403018152828252805160209182012090830186905291016040516020818303038152906040528051906020012014905092915050565b600085858585856040516020016105c0959493929190610bcf565b60405160208183030381529060405280519060200120905095945050505050565b6000806000806105f085610660565b6040805160008152602081018083528b905260ff8316918101919091526060810184905260808101839052929550909350915060019060a0016020604051602081039080840390855afa15801561064b573d6000803e3d6000fd5b5050604051601f190151979650505050505050565b600080600083516041146106ba5760405162461bcd60e51b815260206004820152601860248201527f696e76616c6964207369676e6174757265206c656e6774680000000000000000604482015260640160405180910390fd5b50505060208101516040820151606090920151909260009190911a90565b8280546106e490610ca6565b90600052602060002090601f016020900481019282610706576000855561074c565b82601f1061071f57805160ff191683800117855561074c565b8280016001018555821561074c579182015b8281111561074c578251825591602001919060010190610731565b5061075892915061075c565b5090565b5b80821115610758576000815560010161075d565b600067ffffffffffffffff8084111561078c5761078c610d0a565b604051601f8501601f19908116603f011681019082821181831017156107b4576107b4610d0a565b816040528093508581528686860111156107cd57600080fd5b858560208301376000602087830101525050509392505050565b600082601f8301126107f857600080fd5b61080783833560208501610771565b9392505050565b6000806040838503121561082157600080fd5b50508035926020909101359150565b6000806020838503121561084357600080fd5b823567ffffffffffffffff8082111561085b57600080fd5b818501915085601f83011261086f57600080fd5b81358181111561087e57600080fd5b86602082850101111561089057600080fd5b60209290920196919550909350505050565b6000806000606084860312156108b757600080fd5b833567ffffffffffffffff8111156108ce57600080fd5b6108da868287016107e7565b9660208601359650604090950135949350505050565b6000806040838503121561090357600080fd5b823567ffffffffffffffff8082111561091b57600080fd5b610927868387016107e7565b9350602085013591508082111561093d57600080fd5b508301601f8101851361094f57600080fd5b61095e85823560208401610771565b9150509250929050565b60008060008060008060c0878903121561098157600080fd5b863567ffffffffffffffff8082111561099957600080fd5b6109a58a838b016107e7565b975060208901359150808211156109bb57600080fd5b6109c78a838b016107e7565b965060408901359150808211156109dd57600080fd5b6109e98a838b016107e7565b955060608901359150808211156109ff57600080fd5b610a0b8a838b016107e7565b94506080890135915080821115610a2157600080fd5b610a2d8a838b016107e7565b935060a0890135915080821115610a4357600080fd5b50610a5089828a016107e7565b9150509295509295509295565b600080600080600080600060e0888a031215610a7857600080fd5b873567ffffffffffffffff80821115610a9057600080fd5b610a9c8b838c016107e7565b985060208a0135915080821115610ab257600080fd5b610abe8b838c016107e7565b975060408a0135915080821115610ad457600080fd5b610ae08b838c016107e7565b965060608a0135915080821115610af657600080fd5b610b028b838c016107e7565b955060808a0135915080821115610b1857600080fd5b610b248b838c016107e7565b945060a08a0135915080821115610b3a57600080fd5b610b468b838c016107e7565b935060c08a0135915080821115610b5c57600080fd5b50610b698a828b016107e7565b91505092959891949750929550565b6000815160005b81811015610b995760208185018101518683015201610b7f565b81811115610ba8576000828601525b509290920192915050565b8183823760009101908152919050565b60006108078284610b78565b6000610bff610bf9610bf3610bed610be7868c610b78565b8a610b78565b88610b78565b86610b78565b84610b78565b979650505050505050565b600080835481600182811c915080831680610c2657607f831692505b6020808410821415610c4657634e487b7160e01b86526022600452602486fd5b818015610c5a5760018114610c6b57610c98565b60ff19861689528489019650610c98565b60008a81526020902060005b86811015610c905781548b820152908501908301610c77565b505084890196505b509498975050505050505050565b600181811c90821680610cba57607f821691505b60208210811415610cdb57634e487b7160e01b600052602260045260246000fd5b50919050565b6000600019821415610d0357634e487b7160e01b600052601160045260246000fd5b5060010190565b634e487b7160e01b600052604160045260246000fdfea26469706673582212202ece48a2b8ed18d6a6263214418b17a7da4eaa839e7e2a364a058df52c18727664736f6c63430008070033",
 }
 
 // DocumentABI is the input ABI used to generate the binding from.
@@ -392,6 +395,99 @@ func (_Document *DocumentCallerSession) GetHashUserInfo(userPubkey string) ([32]
 	return _Document.Contract.GetHashUserInfo(&_Document.CallOpts, userPubkey)
 }
 
+// CompareBytes is a free data retrieval call binding the contract method 0xef1bade3.
+//
+// Solidity: function compareBytes(bytes32 a, bytes32 b) pure returns(bool)
+func (_Document *DocumentCaller) CompareBytes(opts *bind.CallOpts, a [32]byte, b [32]byte) (bool, error) {
+	var out []interface{}
+	err := _Document.contract.Call(opts, &out, "compareBytes", a, b)
+
+	if err != nil {
+		return *new(bool), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
+
+	return out0, err
+
+}
+
+// CompareBytes is a free data retrieval call binding the contract method 0xef1bade3.
+//
+// Solidity: function compareBytes(bytes32 a, bytes32 b) pure returns(bool)
+func (_Document *DocumentSession) CompareBytes(a [32]byte, b [32]byte) (bool, error) {
+	return _Document.Contract.CompareBytes(&_Document.CallOpts, a, b)
+}
+
+// CompareBytes is a free data retrieval call binding the contract method 0xef1bade3.
+//
+// Solidity: function compareBytes(bytes32 a, bytes32 b) pure returns(bool)
+func (_Document *DocumentCallerSession) CompareBytes(a [32]byte, b [32]byte) (bool, error) {
+	return _Document.Contract.CompareBytes(&_Document.CallOpts, a, b)
+}
+
+// VerifyDoc is a free data retrieval call binding the contract method 0xd2de39a8.
+//
+// Solidity: function verifyDoc(string userID, bytes32 digest, uint256 indexDoc) view returns(bool)
+func (_Document *DocumentCaller) VerifyDoc(opts *bind.CallOpts, userID string, digest [32]byte, indexDoc *big.Int) (bool, error) {
+	var out []interface{}
+	err := _Document.contract.Call(opts, &out, "verifyDoc", userID, digest, indexDoc)
+
+	if err != nil {
+		return *new(bool), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
+
+	return out0, err
+
+}
+
+// VerifyDoc is a free data retrieval call binding the contract method 0xd2de39a8.
+//
+// Solidity: function verifyDoc(string userID, bytes32 digest, uint256 indexDoc) view returns(bool)
+func (_Document *DocumentSession) VerifyDoc(userID string, digest [32]byte, indexDoc *big.Int) (bool, error) {
+	return _Document.Contract.VerifyDoc(&_Document.CallOpts, userID, digest, indexDoc)
+}
+
+// VerifyDoc is a free data retrieval call binding the contract method 0xd2de39a8.
+//
+// Solidity: function verifyDoc(string userID, bytes32 digest, uint256 indexDoc) view returns(bool)
+func (_Document *DocumentCallerSession) VerifyDoc(userID string, digest [32]byte, indexDoc *big.Int) (bool, error) {
+	return _Document.Contract.VerifyDoc(&_Document.CallOpts, userID, digest, indexDoc)
+}
+
+// VerifyUser is a free data retrieval call binding the contract method 0x7ecde66f.
+//
+// Solidity: function verifyUser(string name, string cmnd, string dateOB, string phone, string gmail, string publicKey) view returns(bool)
+func (_Document *DocumentCaller) VerifyUser(opts *bind.CallOpts, name string, cmnd string, dateOB string, phone string, gmail string, publicKey string) (bool, error) {
+	var out []interface{}
+	err := _Document.contract.Call(opts, &out, "verifyUser", name, cmnd, dateOB, phone, gmail, publicKey)
+
+	if err != nil {
+		return *new(bool), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
+
+	return out0, err
+
+}
+
+// VerifyUser is a free data retrieval call binding the contract method 0x7ecde66f.
+//
+// Solidity: function verifyUser(string name, string cmnd, string dateOB, string phone, string gmail, string publicKey) view returns(bool)
+func (_Document *DocumentSession) VerifyUser(name string, cmnd string, dateOB string, phone string, gmail string, publicKey string) (bool, error) {
+	return _Document.Contract.VerifyUser(&_Document.CallOpts, name, cmnd, dateOB, phone, gmail, publicKey)
+}
+
+// VerifyUser is a free data retrieval call binding the contract method 0x7ecde66f.
+//
+// Solidity: function verifyUser(string name, string cmnd, string dateOB, string phone, string gmail, string publicKey) view returns(bool)
+func (_Document *DocumentCallerSession) VerifyUser(name string, cmnd string, dateOB string, phone string, gmail string, publicKey string) (bool, error) {
+	return _Document.Contract.VerifyUser(&_Document.CallOpts, name, cmnd, dateOB, phone, gmail, publicKey)
+}
+
 // SaveDoc is a paid mutator transaction binding the contract method 0x3a8fb351.
 //
 // Solidity: function saveDoc(string userID, bytes signature) returns(uint256)
@@ -436,10 +532,12 @@ func (_Document *DocumentTransactorSession) StoreUser(userID string, name string
 
 // IDCMetaData contains all meta data concerning the IDC contract.
 var IDCMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[{\"internalType\":\"string\",\"name\":\"userID\",\"type\":\"string\"},{\"internalType\":\"bytes\",\"name\":\"signature\",\"type\":\"bytes\"}],\"name\":\"saveDoc\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"userID\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"cmnd\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"dateOB\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"phone\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"gmail\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"publicKey\",\"type\":\"string\"}],\"name\":\"storeUser\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
+	ABI: "[{\"inputs\":[{\"internalType\":\"string\",\"name\":\"userID\",\"type\":\"string\"},{\"internalType\":\"bytes\",\"name\":\"signature\",\"type\":\"bytes\"}],\"name\":\"saveDoc\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"userID\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"cmnd\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"dateOB\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"phone\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"gmail\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"publicKey\",\"type\":\"string\"}],\"name\":\"storeUser\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"userID\",\"type\":\"string\"},{\"internalType\":\"bytes32\",\"name\":\"digest\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"indexDoc\",\"type\":\"uint256\"}],\"name\":\"verifyDoc\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"cmnd\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"dateOB\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"phone\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"gmail\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"publicKey\",\"type\":\"string\"}],\"name\":\"verifyUser\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
 	Sigs: map[string]string{
 		"3a8fb351": "saveDoc(string,bytes)",
 		"a01ef4b9": "storeUser(string,string,string,string,string,string,string)",
+		"d2de39a8": "verifyDoc(string,bytes32,uint256)",
+		"7ecde66f": "verifyUser(string,string,string,string,string,string)",
 	},
 }
 
@@ -633,6 +731,48 @@ func (_IDC *IDCSession) StoreUser(userID string, name string, cmnd string, dateO
 // Solidity: function storeUser(string userID, string name, string cmnd, string dateOB, string phone, string gmail, string publicKey) returns(bool)
 func (_IDC *IDCTransactorSession) StoreUser(userID string, name string, cmnd string, dateOB string, phone string, gmail string, publicKey string) (*types.Transaction, error) {
 	return _IDC.Contract.StoreUser(&_IDC.TransactOpts, userID, name, cmnd, dateOB, phone, gmail, publicKey)
+}
+
+// VerifyDoc is a paid mutator transaction binding the contract method 0xd2de39a8.
+//
+// Solidity: function verifyDoc(string userID, bytes32 digest, uint256 indexDoc) returns(bool)
+func (_IDC *IDCTransactor) VerifyDoc(opts *bind.TransactOpts, userID string, digest [32]byte, indexDoc *big.Int) (*types.Transaction, error) {
+	return _IDC.contract.Transact(opts, "verifyDoc", userID, digest, indexDoc)
+}
+
+// VerifyDoc is a paid mutator transaction binding the contract method 0xd2de39a8.
+//
+// Solidity: function verifyDoc(string userID, bytes32 digest, uint256 indexDoc) returns(bool)
+func (_IDC *IDCSession) VerifyDoc(userID string, digest [32]byte, indexDoc *big.Int) (*types.Transaction, error) {
+	return _IDC.Contract.VerifyDoc(&_IDC.TransactOpts, userID, digest, indexDoc)
+}
+
+// VerifyDoc is a paid mutator transaction binding the contract method 0xd2de39a8.
+//
+// Solidity: function verifyDoc(string userID, bytes32 digest, uint256 indexDoc) returns(bool)
+func (_IDC *IDCTransactorSession) VerifyDoc(userID string, digest [32]byte, indexDoc *big.Int) (*types.Transaction, error) {
+	return _IDC.Contract.VerifyDoc(&_IDC.TransactOpts, userID, digest, indexDoc)
+}
+
+// VerifyUser is a paid mutator transaction binding the contract method 0x7ecde66f.
+//
+// Solidity: function verifyUser(string name, string cmnd, string dateOB, string phone, string gmail, string publicKey) returns(bool)
+func (_IDC *IDCTransactor) VerifyUser(opts *bind.TransactOpts, name string, cmnd string, dateOB string, phone string, gmail string, publicKey string) (*types.Transaction, error) {
+	return _IDC.contract.Transact(opts, "verifyUser", name, cmnd, dateOB, phone, gmail, publicKey)
+}
+
+// VerifyUser is a paid mutator transaction binding the contract method 0x7ecde66f.
+//
+// Solidity: function verifyUser(string name, string cmnd, string dateOB, string phone, string gmail, string publicKey) returns(bool)
+func (_IDC *IDCSession) VerifyUser(name string, cmnd string, dateOB string, phone string, gmail string, publicKey string) (*types.Transaction, error) {
+	return _IDC.Contract.VerifyUser(&_IDC.TransactOpts, name, cmnd, dateOB, phone, gmail, publicKey)
+}
+
+// VerifyUser is a paid mutator transaction binding the contract method 0x7ecde66f.
+//
+// Solidity: function verifyUser(string name, string cmnd, string dateOB, string phone, string gmail, string publicKey) returns(bool)
+func (_IDC *IDCTransactorSession) VerifyUser(name string, cmnd string, dateOB string, phone string, gmail string, publicKey string) (*types.Transaction, error) {
+	return _IDC.Contract.VerifyUser(&_IDC.TransactOpts, name, cmnd, dateOB, phone, gmail, publicKey)
 }
 
 // StringUtilsMetaData contains all meta data concerning the StringUtils contract.
