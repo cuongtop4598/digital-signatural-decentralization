@@ -19,6 +19,7 @@ func DocumentRouter(docService document.DocumentService, r *gin.RouterGroup) {
 	}
 	ar := r.Group("/document")
 	ar.POST("/upload", dc.Upload)
+	ar.GET("/download/:filename", dc.Download)
 }
 
 func (dc *DocumentController) Upload(c *gin.Context) {
@@ -45,4 +46,9 @@ func (dc *DocumentController) Upload(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "update load file success"})
+}
+
+func (dc *DocumentController) Download(c *gin.Context) {
+	name := c.Param("filename")
+	c.File("static/" + name)
 }
