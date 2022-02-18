@@ -4,7 +4,9 @@ import (
 	"digitalsignature/internal/app/controllers"
 	"digitalsignature/internal/app/repository"
 	"digitalsignature/internal/app/service"
+	"digitalsignature/internal/app/service/document"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
@@ -32,7 +34,7 @@ func (s *Services) SetupRoutes() {
 	s.Log.Info("Config", zap.Any("", s.Config))
 	// Create services handle
 	accountSrv := service.NewAccountService(s.Config.Ethereum.KeystorePath, s.Config.Ethereum.Password)
-
+	documentSrv := document.NewDocumentService(s.EthClient, common.Address{})
 	controllers.HomeRouter(s.R)
 	rg := s.R.Group("/v1")
 
@@ -40,4 +42,5 @@ func (s *Services) SetupRoutes() {
 	userRepo := repository.NewUserRepository(s.DB)
 	userService := service.NewUserService(s.EthClient, userRepo, accountSrv, s.Config.ContractAddress.Document, s.Log)
 	controllers.UserRouter(*userService, rg)
+	controllers.DocumentRouter(documentSrv, rg)
 }
