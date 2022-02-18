@@ -3,6 +3,7 @@ package controllers
 import (
 	"digitalsignature/internal/app/request"
 	"digitalsignature/internal/app/service"
+	"net/http"
 
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/gin-gonic/gin"
@@ -20,7 +21,7 @@ func UserRouter(userService service.UserService, r *gin.RouterGroup) {
 	ar.POST("/signup", uc.SignUp)
 	ar.GET("/info/:pubkey", uc.GetInfo)
 	ar.POST("/verify", uc.Verify)
-	ar.POST("/signin", uc.SignIn)
+	ar.POST("/signin/:pubkey", uc.SignIn)
 }
 
 func (uc *UserController) SignUp(c *gin.Context) {
@@ -41,6 +42,8 @@ func (uc *UserController) SignUp(c *gin.Context) {
 }
 
 func (uc *UserController) SignIn(c *gin.Context) {
+	// pubkey := c.Param("pubkey")
+	// password := c.Param("password")
 
 }
 
@@ -59,6 +62,7 @@ func (uc *UserController) Verify(c *gin.Context) {
 	err := c.BindJSON(&userInfo)
 	if err != nil {
 		log.Error(err.Error())
-		c.JSON(100, gin.H{"msg": "can't decode user info request"})
+		c.JSON(http.StatusBadRequest, gin.H{"msg": "can't decode user info request"})
 	}
+	c.JSON(http.StatusOK, gin.H{"msg": "user information is correct"})
 }

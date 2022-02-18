@@ -7,13 +7,14 @@ import (
 )
 
 type User struct {
-	ID          uuid.UUID `gorm:"primaryKey;type:uuid;"`
-	Name        string
-	PublicKey   string `gorm:"not null, unique"`
-	CardID      string
-	Phone       string
-	Gmail       string
+	ID          uuid.UUID `json:"id" gorm:"primaryKey;type:uuid;"`
+	Name        string    `json:"name"`
+	PublicKey   string    `json:"publickey" gorm:"not null, unique"`
+	CardID      string    `json:"card_id"`
+	Phone       string    `json:"phone"`
+	Gmail       string    `json:"gmail"`
 	DateOfBirth string    `json:"dateo_of_birth,omitempty"`
+	Password    string    `json:"password"`
 	CreateAt    time.Time `json:"creat_at,omitempty"`
 	UpdateAt    time.Time `json:"update_at,omitempty"`
 	DeleteAt    time.Time `json:"dalete_at,omitempty"`

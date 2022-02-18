@@ -135,13 +135,14 @@ func (s *UserService) GetUserInfo(c *gin.Context, pubkey string) (*response.User
 	}, nil
 }
 
-// func (s *UserService) VerifyUser(user request.UserInfo) (bool, error) {
-// 	contractAddress := common.HexToAddress(s.documentContract)
-// 	// get hash user from onchain
-// 	documentIntance, err := document.NewDocument(contractAddress, s.ethclient)
-// 	if err != nil {
-// 		s.logger.Sugar().Error(err)
-// 		return false, err
-// 	}
-// 	documentIntance.
-// }
+func (s *UserService) VerifyUser(user request.UserInfo) (bool, error) {
+	contractAddress := common.HexToAddress(s.documentContract)
+	// get hash user from onchain
+	documentIntance, err := document.NewDocument(contractAddress, s.ethclient)
+	if err != nil {
+		s.logger.Sugar().Error(err)
+		return false, err
+	}
+	isVerify, err := documentIntance.VerifyUser(&bind.CallOpts{}, user.Name, user.CardID, user.DateOfBirth, user.Phone, user.Email, user.PublicKey)
+	return isVerify, err
+}
