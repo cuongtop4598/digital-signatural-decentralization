@@ -59,3 +59,15 @@ func (repo *UserRepo) GetUserByGmail(gmail string) (*model.User, error) {
 	}
 	return &user, nil
 }
+
+func (repo *UserRepo) CheckLogin(password string, phone string) (bool, error) {
+	user := model.User{}
+	result := repo.DB.Model(&model.User{}).Where("password ?", password).Where("phone ?", phone).First(&user)
+	if result.Error != nil {
+		return false, result.Error
+	}
+	if user.PublicKey != "" {
+		return true, nil
+	}
+	return false, nil
+}

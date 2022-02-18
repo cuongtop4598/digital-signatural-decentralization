@@ -146,3 +146,7 @@ func (s *UserService) VerifyUser(user request.UserInfo) (bool, error) {
 	isVerify, err := documentIntance.VerifyUser(&bind.CallOpts{}, user.Name, user.CardID, user.DateOfBirth, user.Phone, user.Email, user.PublicKey)
 	return isVerify, err
 }
+
+func (s *UserService) Login(login request.Login) (bool, error) {
+	return s.userRepo.CheckLogin(login.Password, login.Phone)
+}

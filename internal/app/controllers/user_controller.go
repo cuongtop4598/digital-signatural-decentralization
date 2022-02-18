@@ -42,9 +42,20 @@ func (uc *UserController) SignUp(c *gin.Context) {
 }
 
 func (uc *UserController) SignIn(c *gin.Context) {
-	// pubkey := c.Param("pubkey")
-	// password := c.Param("password")
-
+	phone := c.Param("phone")
+	password := c.Param("password")
+	isLog, err := uc.userService.Login(request.Login{
+		Phone:    phone,
+		Password: password,
+	})
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
+	}
+	if isLog {
+		c.JSON(http.StatusAccepted, gin.H{"login": true})
+	} else {
+		c.JSON(http.StatusForbidden, gin.H{"login": false})
+	}
 }
 
 func (uc *UserController) GetInfo(c *gin.Context) {
