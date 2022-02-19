@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -30,8 +31,8 @@ func DocumentRouter(docService document.DocumentService, documentRepo repository
 }
 
 func (dc *DocumentController) Upload(c *gin.Context) {
-	userID := c.Param("user_id")
-	public := c.Param("public")
+	userID := c.Query("user_id")
+	public := c.Query("public")
 	err := c.Request.ParseMultipartForm(32 << 20) // maxMemory 32MB
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -53,11 +54,13 @@ func (dc *DocumentController) Upload(c *gin.Context) {
 
 	if public == "true" {
 		doc = model.Document{
-			Owner:  uuid.MustParse(userID),
-			Name:   h.Filename,
-			Type:   "pdf",
-			Path:   "static/",
-			Public: true,
+			DocID:    uuid.New(),
+			Owner:    uuid.MustParse(userID),
+			Name:     h.Filename,
+			Type:     "pdf",
+			Path:     "static/",
+			Public:   true,
+			CreateAt: time.Now(),
 		}
 	} else {
 		doc = model.Document{
@@ -68,12 +71,12 @@ func (dc *DocumentController) Upload(c *gin.Context) {
 			Public: false,
 		}
 	}
-	_, err = io.Copy(tmpFile, file)
+	err = dc.documentRepo.Create(&doc)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	err = dc.documentRepo.Create(&doc)
+	_, err = io.Copy(tmpFile, file)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
