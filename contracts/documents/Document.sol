@@ -15,21 +15,22 @@ import "./StringsUtils.sol";
     struct User {
         string userID;
         bytes32 infoHash;
+        string phoneHash;
         string publicKey;
         uint256 numDoc;
         mapping(uint256 => Doc) docs;
     }
     struct UserList {
-        mapping(string => User) _ulistpubKey;
-        mapping(string => User) _ulistUID;
+        mapping(string => User) _uListPubKey;
+        mapping(string => User) _uListUID;
+        mapping(string => User) _uListPhoneHash;
     }
     struct Doc {
-        string userID;
         bytes signature;
-        bytes finDocument;
     }
     UserList _userlist;
 
+    event IndexDocument(string publickey, uint256 numdoc, bytes signature);
     /**
      * @dev Return True if user information is stored successfully, otherwise return False.
      */
@@ -37,14 +38,14 @@ import "./StringsUtils.sol";
     public override returns(bool) {
         bytes32 hashif = hashUserInfo(name,cmnd,dateOB,phone,gmail);
         
-        User storage u = _userlist._ulistpubKey[publicKey];
+        User storage u = _userlist._uListPubKey[publicKey];
         
         u.userID = userID;
         u.infoHash = hashif;
         u.publicKey = publicKey;
-
-        u = _userlist._ulistUID[userID];
-
+        u.phoneHash = bytes32ToString(keccak256(abi.encodePacked(phone)));
+        u = _userlist._uListUID[userID];
+        u = _userlist._uListPhoneHash[u.phoneHash];
         return true;
     }
     /**
@@ -53,7 +54,7 @@ import "./StringsUtils.sol";
     function verifyUser(string memory name,string memory cmnd, string memory dateOB, string memory phone,string memory gmail,string memory publicKey)
     public override view returns(bool) {
          bytes32 hashInfo = hashUserInfo(name,cmnd,dateOB,phone,gmail);
-         if (compareBytes(_userlist._ulistpubKey[publicKey].infoHash, hashInfo)){
+         if (compareBytes(_userlist._uListPubKey[publicKey].infoHash, hashInfo)){
              return true;
          } else {
              return false;
@@ -64,21 +65,21 @@ import "./StringsUtils.sol";
      * 
      * Return index of Document in the document list of the owner
      */
-    function saveDoc(string memory userID,bytes memory signature) public override returns (uint256) {
-        uint256 numDoc = _userlist._ulistUID[userID].numDoc;
+    function saveDoc(string memory phone,bytes memory signature) public override returns (uint256) {
+        string memory hashphone = bytes32ToString(keccak256(abi.encodePacked(phone)));
+        uint256 numDoc = _userlist._uListPhoneHash[hashphone].numDoc;
         numDoc++;
-        Doc storage doc = _userlist._ulistUID[userID].docs[numDoc];
-        doc.userID = userID;
+        Doc storage doc = _userlist._uListPhoneHash[hashphone].docs[numDoc];
         doc.signature = signature;
-        doc.finDocument = signature;
+        emit IndexDocument( _userlist._uListPhoneHash[hashphone].publicKey ,numDoc,signature);
         return numDoc;
     }
 
     /**
      * @dev Return True if Doc wasn't change else False
      */
-    function verifyDoc(string memory userID, bytes32 digest, uint indexDoc) public view override returns(bool) {
-        User storage u = _userlist._ulistUID[userID];
+    function verifyDoc(string memory phone, bytes32 digest, uint indexDoc) public view override returns(bool) {
+        User storage u = _userlist._uListPhoneHash[phone];
         Doc memory d = u.docs[indexDoc];
         return keccak256(abi.encodePacked(recoverSigner(digest,d.signature))) == keccak256(abi.encodePacked(u.publicKey));
     }
@@ -121,7 +122,7 @@ import "./StringsUtils.sol";
     * @dev Return hash UserInfo 
     */
     function GetHashUserInfo(string calldata userPubkey) public view returns (bytes32) {
-        bytes32 hashInfo = _userlist._ulistpubKey[userPubkey].infoHash;
+        bytes32 hashInfo = _userlist._uListPubKey[userPubkey].infoHash;
         return hashInfo;
     }  
     /**
@@ -135,5 +136,15 @@ import "./StringsUtils.sol";
     function compareBytes(bytes32 a, bytes32 b) public pure returns (bool) {
         return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
     }
-    
+    function bytes32ToString(bytes32 _bytes32) public pure returns (string memory) {
+        uint8 i = 0;
+        while(i < 32 && _bytes32[i] != 0) {
+            i++;
+        }
+        bytes memory bytesArray = new bytes(i);
+        for (i = 0; i < 32 && _bytes32[i] != 0; i++) {
+            bytesArray[i] = _bytes32[i];
+        }
+        return string(bytesArray);
+    }
 }

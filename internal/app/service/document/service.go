@@ -30,8 +30,8 @@ func NewDocumentService(client *ethclient.Client, userAddress common.Address) Do
 	}
 }
 
-// Verify document by using userID, digest, DocID
-// userID using for get
-func (d *document) VerifyDoc(userID string, digest []byte, DocID string) bool {
+// Verify document by using phone, digest, DocID
+// phone using for get public key
+func (d *document) VerifyDoc(phone string, digest []byte, DocID string) bool {
 	return true
 }
