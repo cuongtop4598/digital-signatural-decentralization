@@ -1,37 +1,135 @@
 package document
 
 import (
+	"context"
 	"log"
+	"math/big"
+	"strings"
+	"sync"
+	"time"
 
+	ethereum "github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts"
+	"github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"go.uber.org/zap"
 )
 
 type AccountSrv interface {
 	GetAminAccount() (*accounts.Account, *keystore.KeyStore, error)
+	BindTransactionOption(account accounts.Account, password string, ks *keystore.KeyStore, client *ethclient.Client) *bind.TransactOpts
 }
 
 type DocumentService interface {
+	VerifyDocument(phone string, digest [32]byte, docNum *big.Int) (bool, error)
+	SaveSignaturalDocument(phone string, signatural []byte) []Event
 }
 
 type document struct {
-	instance *Document
+	accountSrv AccountSrv
+	client     *ethclient.Client
+	instance   *Document
+	log        *zap.Logger
+	address    string
 }
 
-func NewDocumentService(client *ethclient.Client, userAddress common.Address) DocumentService {
+type Event struct {
+	Publickey string `json:"publickey"`
+	Numdoc    uint   `json:"numdoc"`
+	Signature []byte `json:"signature"`
+}
+
+func NewDocumentService(client *ethclient.Client, userAddress common.Address, accountSrv AccountSrv, address string, log *zap.Logger) DocumentService {
 	doc, err := NewDocument(userAddress, client)
 	if err != nil {
-		log.Fatal(err)
+		log.Sugar().Error(err)
 	}
 	return &document{
-		instance: doc,
+		accountSrv: accountSrv,
+		client:     client,
+		instance:   doc,
+		log:        log,
+		address:    address,
 	}
 }
 
 // Verify document by using phone, digest, DocID
 // phone using for get public key
-func (d *document) VerifyDoc(phone string, digest []byte, DocID string) bool {
-	return true
+func (d *document) VerifyDocument(phone string, digest [32]byte, docNum *big.Int) (bool, error) {
+	isCorrect, err := d.instance.VerifyDoc(&bind.CallOpts{}, phone, digest, docNum)
+	return isCorrect, err
+}
+
+func (d *document) SaveSignaturalDocument(phone string, signatural []byte) []Event {
+	account, ks, err := d.accountSrv.GetAminAccount()
+	if err != nil {
+		d.log.Sugar().Error(err)
+	}
+	opts := d.accountSrv.BindTransactionOption(*account, "123456", ks, d.client)
+
+	txn, err := d.instance.SaveDoc(opts, phone, signatural)
+	if err != nil {
+		d.log.Sugar().Error(err)
+	}
+	var wg1 sync.WaitGroup
+	time.Sleep(3 * time.Second)
+
+	wg1.Add(1)
+	go func() {
+		for {
+			receipt, err := d.client.TransactionReceipt(context.Background(), txn.Hash())
+			if err != nil {
+				log.Println("transaction store user: ", txn.Hash(), ":", err)
+			} else {
+				if receipt.Status == 1 || receipt.Status == 0 {
+					defer wg1.Done()
+					if receipt.Status == 1 {
+						d.log.Info("Transaction Success")
+					}
+					if receipt.Status == 0 {
+						d.log.Info("Transaction Failt")
+					}
+					break
+				}
+			}
+			time.Sleep(2 * time.Second)
+		}
+	}()
+	wg1.Wait()
+	// check event get document number
+	header, err := d.client.HeaderByNumber(context.Background(), nil)
+	if err != nil {
+		d.log.Sugar().Error(err)
+	}
+	currentBlock := header.Number
+
+	address := common.HexToAddress(d.address)
+	query := ethereum.FilterQuery{
+		FromBlock: big.NewInt(0),
+		ToBlock:   currentBlock,
+		Addresses: []common.Address{
+			address,
+		},
+	}
+	logs, err := d.client.FilterLogs(context.Background(), query)
+	if err != nil {
+		d.log.Sugar().Error(err)
+	}
+	contractAbi, err := abi.JSON(strings.NewReader(string(DocumentABI)))
+	if err != nil {
+		d.log.Sugar().Error(err)
+	}
+	events := []Event{}
+	for _, vLog := range logs {
+		event := Event{}
+		err = contractAbi.UnpackIntoInterface(&event, "IndexDocument", vLog.Data)
+		if err != nil {
+			d.log.Sugar().Error(err)
+		}
+		events = append(events, event)
+	}
+	return events
 }

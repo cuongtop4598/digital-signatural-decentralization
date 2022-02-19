@@ -3,6 +3,7 @@ package controllers
 import (
 	"digitalsignature/internal/app/model"
 	"digitalsignature/internal/app/repository"
+	"digitalsignature/internal/app/request"
 	"digitalsignature/internal/app/service/document"
 	"digitalsignature/internal/app/utils"
 	"io"
@@ -25,6 +26,7 @@ func DocumentRouter(docService document.DocumentService, documentRepo repository
 		documentRepo: documentRepo,
 	}
 	ar := r.Group("/document")
+	ar.POST("/sign", dc.Sign)
 	ar.POST("/upload", dc.Upload)
 	ar.GET("/download/:filename", dc.Download)
 	ar.POST("/verify/:filename", dc.Verify)
@@ -103,4 +105,15 @@ func (dc *DocumentController) Download(c *gin.Context) {
 }
 
 func (dc *DocumentController) Verify(c *gin.Context) {
+}
+
+func (dc *DocumentController) Sign(c *gin.Context) {
+	save := request.SaveSignatural{}
+	err := c.BindJSON(&save)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	events := dc.documentSrv.SaveSignaturalDocument(save.Phone, save.Signatural)
+	c.JSON(http.StatusOK, events)
 }

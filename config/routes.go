@@ -34,7 +34,7 @@ func (s *Services) SetupRoutes() {
 	s.Log.Info("Config", zap.Any("", s.Config))
 	// Create services handle
 	accountSrv := service.NewAccountService(s.Config.Ethereum.KeystorePath, s.Config.Ethereum.Password)
-	documentSrv := document.NewDocumentService(s.EthClient, common.Address{})
+	documentSrv := document.NewDocumentService(s.EthClient, common.Address{}, accountSrv, s.Config.ContractAddress.Document, s.Log)
 	controllers.HomeRouter(s.R)
 	rg := s.R.Group("/v1")
 
