@@ -5,7 +5,6 @@ import (
 	"digitalsignature/internal/app/repository"
 	"digitalsignature/internal/app/service/document"
 	"digitalsignature/internal/app/utils"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -85,13 +84,18 @@ func (dc *DocumentController) Upload(c *gin.Context) {
 func (dc *DocumentController) Download(c *gin.Context) {
 	name := c.Param("filename")
 	files := utils.SearchFileInPath("static/")
-	fmt.Println(files)
 	for _, file := range files {
 		if file == ("static/" + name) {
-			c.File(file)
+			isPublic := dc.documentRepo.IsPublic(name)
+			if isPublic {
+				c.File(file)
+				return
+			}
+			c.JSON(http.StatusOK, gin.H{"message": "file's not public"})
 			return
 		}
 	}
+
 	c.JSON(http.StatusOK, gin.H{"message": "file not found"})
 }
 
