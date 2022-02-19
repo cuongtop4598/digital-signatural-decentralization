@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 func main() {
@@ -36,7 +38,7 @@ func call(urlPath, method string) error {
 		return err
 	}
 	writer.Close()
-	req, err := http.NewRequest(method, urlPath, bytes.NewReader(body.Bytes()))
+	req, err := http.NewRequest(method, urlPath+"?public=true&&user_id="+uuid.New().String(), bytes.NewReader(body.Bytes()))
 	if err != nil {
 		return err
 	}
