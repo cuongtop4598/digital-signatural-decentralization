@@ -40,7 +40,8 @@ func (s *Services) SetupRoutes() {
 
 	// Create repo
 	userRepo := repository.NewUserRepository(s.DB)
+	docRepo := repository.NewDocumentRepo(s.DB)
 	userService := service.NewUserService(s.EthClient, userRepo, accountSrv, s.Config.ContractAddress.Document, s.Log)
 	controllers.UserRouter(*userService, rg)
-	controllers.DocumentRouter(documentSrv, rg)
+	controllers.DocumentRouter(documentSrv, *docRepo, rg)
 }
