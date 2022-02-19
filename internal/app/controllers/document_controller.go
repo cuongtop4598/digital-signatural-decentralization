@@ -52,3 +52,8 @@ func (dc *DocumentController) Download(c *gin.Context) {
 	name := c.Param("filename")
 	c.File("static/" + name)
 }
+
+func (dc *DocumentController) Verify(c *gin.Context) {
+	name := c.Param("filename")
+	c.File("static/" + name)
+}
