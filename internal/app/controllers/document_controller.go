@@ -1,28 +1,36 @@
 package controllers
 
 import (
+	"digitalsignature/internal/app/model"
+	"digitalsignature/internal/app/repository"
 	"digitalsignature/internal/app/service/document"
 	"io"
 	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type DocumentController struct {
-	documentSrv document.DocumentService
+	documentSrv  document.DocumentService
+	documentRepo repository.DocumentRepository
 }
 
-func DocumentRouter(docService document.DocumentService, r *gin.RouterGroup) {
+func DocumentRouter(docService document.DocumentService, documentRepo repository.DocumentRepository, r *gin.RouterGroup) {
 	dc := DocumentController{
-		documentSrv: docService,
+		documentSrv:  docService,
+		documentRepo: documentRepo,
 	}
 	ar := r.Group("/document")
 	ar.POST("/upload", dc.Upload)
 	ar.GET("/download/:filename", dc.Download)
+	ar.POST("/verify/:filename", dc.Verify)
 }
 
 func (dc *DocumentController) Upload(c *gin.Context) {
+	userID := c.Param("user_id")
+	public := c.Param("public")
 	err := c.Request.ParseMultipartForm(32 << 20) // maxMemory 32MB
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -40,7 +48,31 @@ func (dc *DocumentController) Upload(c *gin.Context) {
 	}
 	defer tmpFile.Close()
 
+	var doc model.Document
+
+	if public == "true" {
+		doc = model.Document{
+			Owner:  uuid.MustParse(userID),
+			Name:   h.Filename,
+			Type:   "pdf",
+			Path:   "static/",
+			Public: true,
+		}
+	} else {
+		doc = model.Document{
+			Owner:  uuid.MustParse(userID),
+			Name:   h.Filename,
+			Type:   "pdf",
+			Path:   "static/",
+			Public: false,
+		}
+	}
 	_, err = io.Copy(tmpFile, file)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	err = dc.documentRepo.Create(&doc)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
