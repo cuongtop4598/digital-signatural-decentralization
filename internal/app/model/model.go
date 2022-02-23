@@ -7,7 +7,7 @@ import (
 )
 
 type User struct {
-	ID          uuid.UUID `json:"id" gorm:"primaryKey;type:uuid;"`
+	ID          uuid.UUID `json:"id" gorm:"primaryKey"`
 	Name        string    `json:"name"`
 	PublicKey   string    `json:"publickey" gorm:"not null, unique"`
 	CardID      string    `json:"card_id"`
@@ -21,35 +21,36 @@ type User struct {
 }
 
 type Document struct {
-	DocID    uuid.UUID `gorm:"type:uuid;primaryKey"`
-	Owner    uuid.UUID `gorm:"type:uuid;"`
-	Name     string
-	Type     string
-	Path     string
-	Public   bool
-	CreateAt time.Time `json:"create_at,omitempty"`
-	UpdateAt time.Time `json:"update_at,omitempty"`
-	DeleteAt time.Time `json:"delete_at,omitempty"`
+	DocID     uuid.UUID `gorm:"primaryKey"`
+	Owner     string
+	Name      string
+	Type      string
+	Signature string
+	Path      string
+	Public    bool
+	CreateAt  time.Time `json:"create_at,omitempty"`
+	UpdateAt  time.Time `json:"update_at,omitempty"`
+	DeleteAt  time.Time `json:"delete_at,omitempty"`
 }
 
 type UserAllow struct {
-	UserID uuid.UUID `gorm:"type:uuid"`
-	DocID  uuid.UUID `gorm:"type:uuid"`
+	UserID uuid.UUID
+	DocID  uuid.UUID
 }
 
 type Transaction struct {
-	ID        uuid.UUID `gorm:"type:uuid;primaryKey"`
+	ID        uuid.UUID `gorm:"primaryKey"`
 	Timestamp time.Time `json:"time"`
 	Type      string
 }
 
 type Role struct {
-	ID   uuid.UUID `gorm:"type:uuid;primaryKey"`
+	ID   uuid.UUID `gorm:"primaryKey"`
 	Name string
 	Type string
 }
 
 type UserRole struct {
-	UserID uuid.UUID `gorm:"type:uuid;"`
-	RoleID uuid.UUID `gorm:"type:uuid;"`
+	UserID uuid.UUID
+	RoleID uuid.UUID
 }

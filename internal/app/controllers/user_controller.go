@@ -21,7 +21,7 @@ func UserRouter(userService service.UserService, r *gin.RouterGroup) {
 	ar.POST("/signup", uc.SignUp)
 	ar.GET("/info/:pubkey", uc.GetInfo)
 	ar.POST("/verify", uc.Verify)
-	ar.POST("/signin/:pubkey", uc.SignIn)
+	ar.POST("/signin", uc.SignIn)
 }
 
 func (uc *UserController) SignUp(c *gin.Context) {
@@ -42,8 +42,8 @@ func (uc *UserController) SignUp(c *gin.Context) {
 }
 
 func (uc *UserController) SignIn(c *gin.Context) {
-	phone := c.Param("phone")
-	password := c.Param("password")
+	phone := c.Query("phone")
+	password := c.Query("password")
 	isLog, err := uc.userService.Login(request.Login{
 		Phone:    phone,
 		Password: password,

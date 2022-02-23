@@ -6,7 +6,9 @@ import (
 	"digitalsignature/internal/app/request"
 	"digitalsignature/internal/app/service/document"
 	"digitalsignature/internal/app/utils"
+	"fmt"
 	"io"
+	"math/big"
 	"net/http"
 	"os"
 	"time"
@@ -26,15 +28,14 @@ func DocumentRouter(docService document.DocumentService, documentRepo repository
 		documentRepo: documentRepo,
 	}
 	ar := r.Group("/document")
-	ar.POST("/sign", dc.Sign)
+	ar.POST("/savesign", dc.Sign)
 	ar.POST("/upload", dc.Upload)
 	ar.GET("/download/:filename", dc.Download)
-	ar.POST("/verify/:filename", dc.Verify)
+	ar.POST("/verify", dc.Verify)
 }
 
 func (dc *DocumentController) Upload(c *gin.Context) {
-	userID := c.Query("user_id")
-	public := c.Query("public")
+
 	err := c.Request.ParseMultipartForm(32 << 20) // maxMemory 32MB
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -45,6 +46,9 @@ func (dc *DocumentController) Upload(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	publickey := c.Request.FormValue("publickey")
+	signature := c.Request.FormValue("signature")
+
 	tmpFile, err := os.Create("./static/" + h.Filename)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -52,34 +56,27 @@ func (dc *DocumentController) Upload(c *gin.Context) {
 	}
 	defer tmpFile.Close()
 
-	var doc model.Document
-
-	if public == "true" {
-		doc = model.Document{
-			DocID:    uuid.New(),
-			Owner:    uuid.MustParse(userID),
-			Name:     h.Filename,
-			Type:     "pdf",
-			Path:     "static/",
-			Public:   true,
-			CreateAt: time.Now(),
-		}
-	} else {
-		doc = model.Document{
-			Owner:  uuid.MustParse(userID),
-			Name:   h.Filename,
-			Type:   "pdf",
-			Path:   "static/",
-			Public: false,
-		}
+	doc := model.Document{
+		DocID:     uuid.New(),
+		Owner:     publickey,
+		Name:      h.Filename,
+		Type:      "pdf",
+		Signature: signature,
+		Path:      "static/",
+		Public:    true,
+		CreateAt:  time.Now(),
+		UpdateAt:  time.Time{},
+		DeleteAt:  time.Time{},
 	}
 	err = dc.documentRepo.Create(&doc)
 	if err != nil {
+		fmt.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	_, err = io.Copy(tmpFile, file)
 	if err != nil {
+		fmt.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -104,7 +101,28 @@ func (dc *DocumentController) Download(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "file not found"})
 }
 
+type VerifyDocRequest struct {
+	Phone  string   `json:"phone"`
+	Digest [32]byte `json:"digest"`
+	DocNum int64    `json:"doc_number"`
+}
+
 func (dc *DocumentController) Verify(c *gin.Context) {
+	verify := VerifyDocRequest{}
+	err := c.BindJSON(&verify)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	isTrue, err := dc.documentSrv.VerifyDocument(verify.Phone, verify.Digest, big.NewInt(verify.DocNum))
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"error": err.Error()})
+		return
+	}
+	if isTrue {
+		c.JSON(http.StatusOK, gin.H{"message": "true"})
+		return
+	}
 }
 
 func (dc *DocumentController) Sign(c *gin.Context) {
