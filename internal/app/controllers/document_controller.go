@@ -3,7 +3,6 @@ package controllers
 import (
 	"digitalsignature/internal/app/model"
 	"digitalsignature/internal/app/repository"
-	"digitalsignature/internal/app/request"
 	"digitalsignature/internal/app/service/document"
 	"digitalsignature/internal/app/utils"
 	"fmt"
@@ -20,12 +19,14 @@ import (
 type DocumentController struct {
 	documentSrv  document.DocumentService
 	documentRepo repository.DocumentRepository
+	userRepo     repository.UserRepo
 }
 
-func DocumentRouter(docService document.DocumentService, documentRepo repository.DocumentRepository, r *gin.RouterGroup) {
+func DocumentRouter(docService document.DocumentService, documentRepo repository.DocumentRepository, userRepo repository.UserRepo, r *gin.RouterGroup) {
 	dc := DocumentController{
 		documentSrv:  docService,
 		documentRepo: documentRepo,
+		userRepo:     userRepo,
 	}
 	ar := r.Group("/document")
 	ar.POST("/savesign", dc.Sign)
@@ -126,12 +127,56 @@ func (dc *DocumentController) Verify(c *gin.Context) {
 }
 
 func (dc *DocumentController) Sign(c *gin.Context) {
-	save := request.SaveSignatural{}
-	err := c.BindJSON(&save)
+	err := c.Request.ParseMultipartForm(32 << 20) // maxMemory 32MB
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	events := dc.documentSrv.SaveSignaturalDocument(save.Phone, save.Signatural)
+	file, h, err := c.Request.FormFile("doc")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	publickey := c.Request.FormValue("publickey")
+	signature := c.Request.FormValue("signature")
+
+	tmpFile, err := os.Create("./static/" + h.Filename + ".pdf")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	defer tmpFile.Close()
+
+	doc := model.Document{
+		DocID:     uuid.New(),
+		Owner:     publickey,
+		Name:      h.Filename,
+		Type:      "pdf",
+		Signature: signature,
+		Path:      "static/",
+		Public:    true,
+		CreateAt:  time.Now(),
+		UpdateAt:  time.Time{},
+		DeleteAt:  time.Time{},
+	}
+	err = dc.documentRepo.Create(&doc)
+	if err != nil {
+		fmt.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	_, err = io.Copy(tmpFile, file)
+	if err != nil {
+		fmt.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "update load file success"})
+	phone, err := dc.userRepo.GetPhoneByPublickey(publickey)
+	if err != nil {
+		fmt.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	}
+	events := dc.documentSrv.SaveSignaturalDocument(phone, []byte(signature))
 	c.JSON(http.StatusOK, events)
 }

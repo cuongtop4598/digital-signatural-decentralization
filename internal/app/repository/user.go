@@ -62,7 +62,7 @@ func (repo *UserRepo) GetUserByGmail(gmail string) (*model.User, error) {
 
 func (repo *UserRepo) CheckLogin(password string, phone string) (bool, error) {
 	user := model.User{}
-	result := repo.DB.Model(&model.User{}).Where("password ?", password).Where("phone ?", phone).First(&user)
+	result := repo.DB.Model(&model.User{}).Where("password = ?", password).Where("phone = ?", phone).First(&user)
 	if result.Error != nil {
 		return false, result.Error
 	}
@@ -70,4 +70,14 @@ func (repo *UserRepo) CheckLogin(password string, phone string) (bool, error) {
 		return true, nil
 	}
 	return false, nil
+}
+
+func (repo *UserRepo) GetPhoneByPublickey(phone string) (string, error) {
+	user := model.User{}
+	result := repo.DB.Model(&model.User{}).Where("phone = ? ", phone).First(&user)
+	if result.Error != nil {
+		return "", result.Error
+	} else {
+		return user.PublicKey, nil
+	}
 }
