@@ -7,6 +7,7 @@ import (
 	"digitalsignature/internal/app/utils"
 	"fmt"
 	"io"
+	"log"
 	"math/big"
 	"net/http"
 	"os"
@@ -66,8 +67,6 @@ func (dc *DocumentController) Upload(c *gin.Context) {
 		Path:      "static/",
 		Public:    true,
 		CreateAt:  time.Now(),
-		UpdateAt:  time.Time{},
-		DeleteAt:  time.Time{},
 	}
 	err = dc.documentRepo.Create(&doc)
 	if err != nil {
@@ -123,17 +122,22 @@ func (dc *DocumentController) Verify(c *gin.Context) {
 	if isTrue {
 		c.JSON(http.StatusOK, gin.H{"message": "true"})
 		return
+	} else {
+		c.JSON(http.StatusOK, gin.H{"message": "false"})
+		return
 	}
 }
 
 func (dc *DocumentController) Sign(c *gin.Context) {
 	err := c.Request.ParseMultipartForm(32 << 20) // maxMemory 32MB
 	if err != nil {
+		log.Println("parse multi part form", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	file, h, err := c.Request.FormFile("doc")
 	if err != nil {
+		log.Println("get file error:", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -142,6 +146,7 @@ func (dc *DocumentController) Sign(c *gin.Context) {
 
 	tmpFile, err := os.Create("./static/" + h.Filename + ".pdf")
 	if err != nil {
+		log.Println("create file error: ", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -161,22 +166,27 @@ func (dc *DocumentController) Sign(c *gin.Context) {
 	}
 	err = dc.documentRepo.Create(&doc)
 	if err != nil {
-		fmt.Println(err)
+		log.Println("create document error:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	_, err = io.Copy(tmpFile, file)
 	if err != nil {
-		fmt.Println(err)
+		log.Println("copy file error:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "update load file success"})
 	phone, err := dc.userRepo.GetPhoneByPublickey(publickey)
 	if err != nil {
-		fmt.Println(err)
+		log.Println("get phone error:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
-	events := dc.documentSrv.SaveSignaturalDocument(phone, []byte(signature))
-	c.JSON(http.StatusOK, events)
+	event, err := dc.documentSrv.SaveSignaturalDocument(phone, []byte(signature))
+	if err != nil {
+		log.Println("save signatural error:", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"doc_info": event})
 }

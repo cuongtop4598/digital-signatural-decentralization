@@ -25,7 +25,7 @@ type AccountSrv interface {
 
 type DocumentService interface {
 	VerifyDocument(phone string, digest [32]byte, docNum *big.Int) (bool, error)
-	SaveSignaturalDocument(phone string, signatural []byte) []Event
+	SaveSignaturalDocument(phone string, signatural []byte) (Event, error)
 }
 
 type document struct {
@@ -63,7 +63,7 @@ func (d *document) VerifyDocument(phone string, digest [32]byte, docNum *big.Int
 	return isCorrect, err
 }
 
-func (d *document) SaveSignaturalDocument(phone string, signatural []byte) []Event {
+func (d *document) SaveSignaturalDocument(phone string, signatural []byte) (Event, error) {
 	account, ks, err := d.accountSrv.GetAminAccount()
 	if err != nil {
 		d.log.Sugar().Error(err)
@@ -73,16 +73,18 @@ func (d *document) SaveSignaturalDocument(phone string, signatural []byte) []Eve
 	txn, err := d.instance.SaveDoc(opts, phone, signatural)
 	if err != nil {
 		d.log.Sugar().Error(err)
+		return Event{}, err
 	}
 	var wg1 sync.WaitGroup
-	time.Sleep(3 * time.Second)
+	time.Sleep(5 * time.Second)
 
 	wg1.Add(1)
 	go func() {
 		for {
 			receipt, err := d.client.TransactionReceipt(context.Background(), txn.Hash())
 			if err != nil {
-				log.Println("transaction store user: ", txn.Hash(), ":", err)
+				log.Println("transaction save document: ", txn.Hash(), ":", err)
+				break
 			} else {
 				if receipt.Status == 1 || receipt.Status == 0 {
 					defer wg1.Done()
@@ -103,6 +105,7 @@ func (d *document) SaveSignaturalDocument(phone string, signatural []byte) []Eve
 	header, err := d.client.HeaderByNumber(context.Background(), nil)
 	if err != nil {
 		d.log.Sugar().Error(err)
+
 	}
 	currentBlock := header.Number
 
@@ -117,10 +120,12 @@ func (d *document) SaveSignaturalDocument(phone string, signatural []byte) []Eve
 	logs, err := d.client.FilterLogs(context.Background(), query)
 	if err != nil {
 		d.log.Sugar().Error(err)
+		return Event{}, err
 	}
 	contractAbi, err := abi.JSON(strings.NewReader(string(DocumentABI)))
 	if err != nil {
 		d.log.Sugar().Error(err)
+		return Event{}, err
 	}
 	events := []Event{}
 	for _, vLog := range logs {
@@ -131,5 +136,8 @@ func (d *document) SaveSignaturalDocument(phone string, signatural []byte) []Eve
 		}
 		events = append(events, event)
 	}
-	return events
+	if len(events) > 0 {
+		return events[len(events)-1], nil
+	}
+	return Event{}, nil
 }
