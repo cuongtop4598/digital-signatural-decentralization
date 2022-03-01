@@ -37,7 +37,7 @@ type DocumentService interface {
 
 type document struct {
 	accountSrv   AccountSrv
-	documentRepo repository.DocumentRepository
+	documentRepo *repository.DocumentRepository
 	client       *ethclient.Client
 	instance     *Document
 	log          *zap.Logger
@@ -54,7 +54,7 @@ func NewDocumentService(
 	client *ethclient.Client,
 	userAddress common.Address,
 	accountSrv AccountSrv,
-	documentRepo repository.DocumentRepository,
+	documentRepo *repository.DocumentRepository,
 	address string,
 	log *zap.Logger) DocumentService {
 

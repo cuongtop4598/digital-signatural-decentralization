@@ -33,14 +33,13 @@ type Services struct {
 func (s *Services) SetupRoutes() {
 	s.Log.Info("Config", zap.Any("", s.Config))
 	// Create services handle
+	userRepo := repository.NewUserRepository(s.DB)
+	docRepo := repository.NewDocumentRepo(s.DB, s.Log)
 	accountSrv := service.NewAccountService(s.Config.Ethereum.KeystorePath, s.Config.Ethereum.Password)
-	documentSrv := document.NewDocumentService(s.EthClient, common.Address{}, accountSrv, s.Config.ContractAddress.Document, s.Log)
+	documentSrv := document.NewDocumentService(s.EthClient, common.Address{}, accountSrv, *docRepo, s.Config.ContractAddress.Document, s.Log)
 	controllers.HomeRouter(s.R)
 	rg := s.R.Group("/v1")
 
-	// Create repo
-	userRepo := repository.NewUserRepository(s.DB)
-	docRepo := repository.NewDocumentRepo(s.DB, s.Log)
 	userService := service.NewUserService(s.EthClient, userRepo, accountSrv, s.Config.ContractAddress.Document, s.Log)
 	controllers.UserRouter(*userService, rg)
 	controllers.DocumentRouter(documentSrv, *docRepo, *userRepo, rg)
