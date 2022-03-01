@@ -1,7 +1,7 @@
 server:
   mode: "development"
-  host: "localhost"
-  port: "8081"
+  host: "27.72.105.169"
+  port: "10115"
 ethereum:
   endpoint: "http://27.72.105.169:10198"
   keystore_path: "./wallets/keystore/"
