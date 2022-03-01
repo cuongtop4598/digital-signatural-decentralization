@@ -2,6 +2,8 @@ package document
 
 import (
 	"context"
+	"digitalsignature/internal/app/model"
+	"digitalsignature/internal/app/repository"
 	"log"
 	"math/big"
 	"strings"
@@ -20,20 +22,26 @@ import (
 
 type AccountSrv interface {
 	GetAminAccount() (*accounts.Account, *keystore.KeyStore, error)
-	BindTransactionOption(account accounts.Account, password string, ks *keystore.KeyStore, client *ethclient.Client) *bind.TransactOpts
+	BindTransactionOption(
+		account accounts.Account,
+		password string,
+		ks *keystore.KeyStore,
+		client *ethclient.Client) *bind.TransactOpts
 }
 
 type DocumentService interface {
 	VerifyDocument(phone string, digest [32]byte, docNum *big.Int) (bool, error)
 	SaveSignaturalDocument(phone string, signatural []byte) (Event, error)
+	GetDocumentByPublickey(publickey string) ([]model.Document, error)
 }
 
 type document struct {
-	accountSrv AccountSrv
-	client     *ethclient.Client
-	instance   *Document
-	log        *zap.Logger
-	address    string
+	accountSrv   AccountSrv
+	documentRepo repository.DocumentRepository
+	client       *ethclient.Client
+	instance     *Document
+	log          *zap.Logger
+	address      string
 }
 
 type Event struct {
@@ -42,18 +50,35 @@ type Event struct {
 	Signature []byte `json:"signature"`
 }
 
-func NewDocumentService(client *ethclient.Client, userAddress common.Address, accountSrv AccountSrv, address string, log *zap.Logger) DocumentService {
+func NewDocumentService(
+	client *ethclient.Client,
+	userAddress common.Address,
+	accountSrv AccountSrv,
+	documentRepo repository.DocumentRepository,
+	address string,
+	log *zap.Logger) DocumentService {
+
 	doc, err := NewDocument(userAddress, client)
 	if err != nil {
 		log.Sugar().Error(err)
 	}
+
 	return &document{
-		accountSrv: accountSrv,
-		client:     client,
-		instance:   doc,
-		log:        log,
-		address:    address,
+		accountSrv:   accountSrv,
+		documentRepo: documentRepo,
+		client:       client,
+		instance:     doc,
+		log:          log,
+		address:      address,
 	}
+}
+
+func (d *document) GetDocumentByPublickey(publickey string) ([]model.Document, error) {
+	docs, err := d.documentRepo.AllByOwner(publickey)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return docs, nil
 }
 
 // Verify document by using phone, digest, DocID

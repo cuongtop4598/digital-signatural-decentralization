@@ -34,6 +34,7 @@ func DocumentRouter(docService document.DocumentService, documentRepo repository
 	ar.POST("/upload", dc.Upload)
 	ar.GET("/download/:filename", dc.Download)
 	ar.POST("/verify", dc.Verify)
+	ar.GET("/list", dc.GetDocs)
 }
 
 func (dc *DocumentController) Upload(c *gin.Context) {
@@ -88,7 +89,11 @@ func (dc *DocumentController) Download(c *gin.Context) {
 	files := utils.SearchFileInPath("static/")
 	for _, file := range files {
 		if file == ("static/" + name) {
-			isPublic := dc.documentRepo.IsPublic(name)
+			isPublic, err := dc.documentRepo.IsPublic(name)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+				return
+			}
 			if isPublic {
 				c.File(file)
 				return
@@ -189,4 +194,15 @@ func (dc *DocumentController) Sign(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"doc_info": event})
+}
+
+func (dc *DocumentController) GetDocs(c *gin.Context) {
+	publickey := c.Request.Header.Get("publickey")
+	docs, err := dc.documentSrv.GetDocumentByPublickey(publickey)
+	if err != nil {
+		log.Println("get list document error:", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"documents": docs})
 }

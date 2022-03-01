@@ -24,16 +24,25 @@ func (repo *DocumentRepository) Create(doc *model.Document) error {
 	return result.Error
 }
 
-func (repo *DocumentRepository) IsPublic(name string) bool {
+func (repo *DocumentRepository) AllByOwner(publickey string) ([]model.Document, error) {
+	docs := []model.Document{}
+	result := repo.DB.Model(&model.Document{}).Where("owner = ? ", publickey).Find(&docs)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return docs, nil
+}
+
+func (repo *DocumentRepository) IsPublic(name string) (bool, error) {
 	var count int64
 	var doc model.Document
 	result := repo.DB.Model(&doc).Where("public = ?", true).Where("name = ?", doc.Name).Count(&count)
 	if result.Error != nil {
-		repo.log.Sugar().Error(result.Error)
+		return false, result.Error
 	}
 	if count > 0 {
-		return true
+		return true, nil
 	} else {
-		return false
+		return false, nil
 	}
 }
