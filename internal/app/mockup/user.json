@@ -5,9 +5,9 @@
     "IDCard": "036099004321",
     "Phone": "0120990034",
     "Gmail": "cuongtop4598@gmail.com",
-    "DateOfBirth": "2006-01-02T15:04:05",
-    "CreateAt": "2006-01-02T15:04:05",
-    "UpdateAt": "2006-01-02T15:04:05",
+    "DateOfBirth": "2022-01-02",
+    "CreateAt": "2022-01-02T15:04:05",
+    "UpdateAt": "",
     "DeleteAt": ""
 },
 {
@@ -17,8 +17,9 @@
     "IDCard": "036099004321",
     "Phone": "0120990034",
     "Gmail": "cuongtop4598@gmail.com",
-    "DateOfBirth": "2006-01-02T15:04:05",
-    "CreateAt": "2006-01-02T15:04:05",
-    "UpdateAt": "2006-01-02T15:04:05",
+    "DateOfBirth": "2022-01-02",
+    "CreateAt": "2022-01-02T15:04:05",
+    "UpdateAt": "",
     "DeleteAt": ""
-}]
+}
+]
