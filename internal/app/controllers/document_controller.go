@@ -197,8 +197,11 @@ func (dc *DocumentController) Sign(c *gin.Context) {
 }
 
 func (dc *DocumentController) GetDocs(c *gin.Context) {
-	publickey := c.Request.Header.Get("publickey")
-	docs, err := dc.documentSrv.GetDocumentByPublickey(publickey)
+	publickey, err := c.Request.Cookie("publickey")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+	}
+	docs, err := dc.documentSrv.GetDocumentByPublickey(publickey.Value)
 	if err != nil {
 		log.Println("get list document error:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
