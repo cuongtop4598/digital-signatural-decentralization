@@ -147,6 +147,6 @@ func (s *UserService) VerifyUser(user request.UserInfo) (bool, error) {
 	return isVerify, err
 }
 
-func (s *UserService) Login(login request.Login) (bool, error) {
+func (s *UserService) Login(login request.Login) (bool, *model.User, error) {
 	return s.userRepo.CheckLogin(login.Password, login.Phone)
 }

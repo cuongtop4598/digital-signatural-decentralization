@@ -38,13 +38,15 @@ func (uc *UserController) SignUp(c *gin.Context) {
 		log.Error(err.Error())
 		c.JSON(404, gin.H{"status": "false"})
 	}
+	c.SetCookie("publickey", userInfo.PublicKey, 10000000, "", "", false, false)
+	c.SetCookie("phone", userInfo.Phone, 10000000, "", "", false, false)
 	c.JSON(200, gin.H{"status": "true"})
 }
 
 func (uc *UserController) SignIn(c *gin.Context) {
 	phone := c.Query("phone")
 	password := c.Query("password")
-	isLog, err := uc.userService.Login(request.Login{
+	isLog, userInfo, err := uc.userService.Login(request.Login{
 		Phone:    phone,
 		Password: password,
 	})
@@ -52,6 +54,8 @@ func (uc *UserController) SignIn(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
 	}
 	if isLog {
+		c.SetCookie("publickey", userInfo.PublicKey, 10000000, "", "", false, false)
+		c.SetCookie("phone", userInfo.Phone, 10000000, "", "", false, false)
 		c.JSON(http.StatusAccepted, gin.H{"login": true})
 	} else {
 		c.JSON(http.StatusForbidden, gin.H{"login": false})
