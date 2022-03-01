@@ -36,7 +36,7 @@ func (s *Services) SetupRoutes() {
 	userRepo := repository.NewUserRepository(s.DB)
 	docRepo := repository.NewDocumentRepo(s.DB, s.Log)
 	accountSrv := service.NewAccountService(s.Config.Ethereum.KeystorePath, s.Config.Ethereum.Password)
-	documentSrv := document.NewDocumentService(s.EthClient, common.Address{}, accountSrv, *docRepo, s.Config.ContractAddress.Document, s.Log)
+	documentSrv := document.NewDocumentService(s.EthClient, common.Address{}, accountSrv, docRepo, s.Config.ContractAddress.Document, s.Log)
 	controllers.HomeRouter(s.R)
 	rg := s.R.Group("/v1")
 
