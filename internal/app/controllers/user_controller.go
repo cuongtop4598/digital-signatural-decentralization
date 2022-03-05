@@ -31,12 +31,14 @@ func (uc *UserController) SignUp(c *gin.Context) {
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(404, gin.H{"status": "false"})
+		return
 	}
 	log.Info("User register request", userInfo)
 	err = uc.userService.Create(c, userInfo)
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(404, gin.H{"status": "false"})
+		return
 	}
 	c.SetCookie("publickey", userInfo.PublicKey, 10000000, "", "", false, false)
 	c.SetCookie("phone", userInfo.Phone, 10000000, "", "", false, false)
@@ -52,6 +54,7 @@ func (uc *UserController) SignIn(c *gin.Context) {
 	})
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
+		return
 	}
 	if isLog {
 		c.SetCookie("publickey", userInfo.PublicKey, 10000000, "", "", false, false)
@@ -68,6 +71,7 @@ func (uc *UserController) GetInfo(c *gin.Context) {
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(404, gin.H{"status": "false"})
+		return
 	}
 	c.JSON(200, response)
 }
@@ -78,6 +82,7 @@ func (uc *UserController) Verify(c *gin.Context) {
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"msg": "can't decode user info request"})
+		return
 	}
 	c.JSON(http.StatusOK, gin.H{"msg": "user information is correct"})
 }

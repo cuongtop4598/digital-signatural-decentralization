@@ -1,6 +1,6 @@
 server:
   mode: "development"
-  host: "27.72.105.169"
+  host: "0.0.0.0"
   port: "10115"
 ethereum:
   endpoint: "http://27.72.105.169:10198"
