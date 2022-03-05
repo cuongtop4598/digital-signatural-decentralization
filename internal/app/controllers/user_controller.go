@@ -30,7 +30,7 @@ func (uc *UserController) SignUp(c *gin.Context) {
 	err := c.BindJSON(&userInfo)
 	if err != nil {
 		log.Error(err.Error())
-		c.JSON(404, gin.H{"status": "false"})
+		c.JSON(http.StatusBadRequest, gin.H{"status": "false"})
 		return
 	}
 	log.Info("User register request", userInfo)
@@ -46,14 +46,25 @@ func (uc *UserController) SignUp(c *gin.Context) {
 }
 
 func (uc *UserController) SignIn(c *gin.Context) {
-	phone := c.Query("phone")
-	password := c.Query("password")
-	isLog, userInfo, err := uc.userService.Login(request.Login{
-		Phone:    phone,
-		Password: password,
-	})
+	loginInfo := request.Login{}
+	err := c.BindJSON(&loginInfo)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
+		log.Error(err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"status": "false"})
+		return
+	}
+
+	// bad security, i will change this verify later
+	if loginInfo.Phone == "" || loginInfo.Password == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"status": "false"})
+		return
+	}
+
+	isLog, userInfo, err := uc.userService.Login(loginInfo)
+
+	if err != nil {
+		log.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
 		return
 	}
 	if isLog {

@@ -2,12 +2,15 @@ package repository
 
 import (
 	"digitalsignature/internal/app/model"
+	"strings"
 
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
 type UserRepo struct {
-	DB *gorm.DB
+	DB  *gorm.DB
+	log *zap.Logger
 }
 
 func NewUserRepository(db *gorm.DB) *UserRepo {
@@ -21,6 +24,7 @@ func (repo *UserRepo) Create(user model.User) error {
 	if result.Error != nil {
 		return result.Error
 	}
+	repo.log.Info("Create user:", zap.String("Info", strings.Join([]string{user.Phone, user.Password}, "-")))
 	return nil
 }
 
@@ -62,8 +66,9 @@ func (repo *UserRepo) GetUserByGmail(gmail string) (*model.User, error) {
 
 func (repo *UserRepo) CheckLogin(password string, phone string) (bool, *model.User, error) {
 	user := model.User{}
-	result := repo.DB.Model(&model.User{}).Where("password = ?", password).Where("phone = ?", phone).First(&user)
+	result := repo.DB.Model(&model.User{}).Where("password = ? and phone = ?", password, phone).First(&user)
 	if result.Error != nil {
+		repo.log.Sugar().Error(result.Error)
 		return false, nil, result.Error
 	}
 	if user.PublicKey != "" {
