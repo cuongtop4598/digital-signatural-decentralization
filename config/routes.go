@@ -33,7 +33,7 @@ type Services struct {
 func (s *Services) SetupRoutes() {
 	s.Log.Info("Config", zap.Any("", s.Config))
 	// Create services handle
-	userRepo := repository.NewUserRepository(s.DB)
+	userRepo := repository.NewUserRepository(s.DB, s.Log)
 	docRepo := repository.NewDocumentRepo(s.DB, s.Log)
 	accountSrv := service.NewAccountService(s.Config.Ethereum.KeystorePath, s.Config.Ethereum.Password)
 	documentSrv := document.NewDocumentService(s.EthClient, common.Address{}, accountSrv, docRepo, s.Config.ContractAddress.Document, s.Log)

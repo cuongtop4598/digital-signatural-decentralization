@@ -13,9 +13,10 @@ type UserRepo struct {
 	log *zap.Logger
 }
 
-func NewUserRepository(db *gorm.DB) *UserRepo {
+func NewUserRepository(db *gorm.DB, log *zap.Logger) *UserRepo {
 	return &UserRepo{
-		DB: db,
+		DB:  db,
+		log: log,
 	}
 }
 
