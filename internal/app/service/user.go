@@ -54,6 +54,7 @@ func (s *UserService) Create(c *gin.Context, userInfo request.UserInfo) error {
 		Phone:       userInfo.Phone,
 		Gmail:       userInfo.Email,
 		DateOfBirth: userInfo.DateOfBirth,
+		Password:    userInfo.Password,
 		CreateAt:    time.Now(),
 	}
 	err := s.userRepo.Create(user)

@@ -33,6 +33,11 @@ func (uc *UserController) SignUp(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"status": "false"})
 		return
 	}
+	if userInfo.Phone == "" || userInfo.PublicKey == "" || userInfo.Password == "" {
+		log.Error(err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"status": "false"})
+		return
+	}
 	log.Info("User register request", userInfo)
 	err = uc.userService.Create(c, userInfo)
 	if err != nil {
