@@ -41,7 +41,7 @@ func (server *Server) Run(env string) error {
 		"Authorization",
 		"Access-Control-Allow-Origin",
 	}
-	headerPolicies.AllowCredentials = false
+	headerPolicies.AllowCredentials = true
 	headerPolicies.MaxAge = (24 * time.Hour)
 
 	headerPolicies.AllowAllOrigins = true
