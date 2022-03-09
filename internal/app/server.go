@@ -32,9 +32,6 @@ func (server *Server) Run(env string) error {
 
 	headerPolicies := cors.DefaultConfig()
 
-	headerPolicies.AllowOrigins = []string{
-		"*",
-	}
 	headerPolicies.AllowHeaders = []string{
 		"Access-Control-Allow-Credentials",
 		"Access-Control-Allow-Headers",
