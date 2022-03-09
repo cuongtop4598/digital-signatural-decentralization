@@ -34,7 +34,6 @@ func (server *Server) Run(env string) error {
 
 	headerPolicies.AllowOrigins = []string{
 		"*",
-		"http://localhost:3000",
 	}
 
 	headerPolicies.AllowHeaders = []string{
