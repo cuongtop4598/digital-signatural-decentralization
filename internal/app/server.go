@@ -33,6 +33,7 @@ func (server *Server) Run(env string) error {
 	headerPolicies := cors.DefaultConfig()
 	headerPolicies.AllowOrigins = []string{
 		"http://localhost:3000",
+		"*",
 	}
 	headerPolicies.AllowHeaders = []string{
 		"Access-Control-Allow-Credentials",
