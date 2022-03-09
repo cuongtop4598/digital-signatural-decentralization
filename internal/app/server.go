@@ -32,6 +32,11 @@ func (server *Server) Run(env string) error {
 
 	headerPolicies := cors.DefaultConfig()
 
+	headerPolicies.AllowOrigins = []string{
+		"*",
+		"http://localhost:3000",
+	}
+
 	headerPolicies.AllowHeaders = []string{
 		"Access-Control-Allow-Credentials",
 		"Access-Control-Allow-Headers",
@@ -41,10 +46,10 @@ func (server *Server) Run(env string) error {
 		"Authorization",
 		"Access-Control-Allow-Origin",
 	}
+
 	headerPolicies.AllowCredentials = true
 	headerPolicies.MaxAge = (24 * time.Hour)
 
-	headerPolicies.AllowAllOrigins = true
 	r.Use(cors.New(headerPolicies))
 	r.Use(gintrace.Middleware(""))
 
