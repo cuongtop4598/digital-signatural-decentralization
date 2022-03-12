@@ -54,3 +54,7 @@ type UserRole struct {
 	UserID uuid.UUID
 	RoleID uuid.UUID
 }
+
+func (u *User) SantisizePassword() {
+	u.Password = ""
+}

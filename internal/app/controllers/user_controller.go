@@ -42,12 +42,21 @@ func (uc *UserController) SignUp(c *gin.Context) {
 	err = uc.userService.Create(c, userInfo)
 	if err != nil {
 		log.Error(err.Error())
-		c.JSON(404, gin.H{"status": "false"})
+		c.JSON(400, gin.H{
+			"code":    400,
+			"message": "Fail",
+			"data":    "",
+		})
 		return
 	}
-	c.SetCookie("publickey", userInfo.PublicKey, 10000000, "", "", false, false)
-	c.SetCookie("phone", userInfo.Phone, 10000000, "", "", false, false)
-	c.JSON(200, gin.H{"status": "true"})
+	// c.SetCookie("publickey", userInfo.PublicKey, 10000000, "", "", false, false)
+	// c.SetCookie("phone", userInfo.Phone, 10000000, "", "", false, false)
+	userInfo.SantisizePassword()
+	c.JSON(200, gin.H{
+		"code":    200,
+		"message": "OK",
+		"data":    userInfo,
+	})
 }
 
 func (uc *UserController) SignIn(c *gin.Context) {
@@ -69,15 +78,28 @@ func (uc *UserController) SignIn(c *gin.Context) {
 
 	if err != nil {
 		log.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    http.StatusInternalServerError,
+			"message": err.Error(),
+			"data":    "",
+		})
 		return
 	}
 	if isLog {
-		c.SetCookie("publickey", userInfo.PublicKey, 10000000, "", "", false, false)
-		c.SetCookie("phone", userInfo.Phone, 10000000, "", "", false, false)
-		c.JSON(http.StatusAccepted, gin.H{"login": true})
+		// c.SetCookie("publickey", userInfo.PublicKey, 10000000, "", "", false, false)
+		// c.SetCookie("phone", userInfo.Phone, 10000000, "", "", false, false)
+		userInfo.SantisizePassword()
+		c.JSON(http.StatusOK, gin.H{
+			"code":    http.StatusOK,
+			"message": "OK",
+			"data":    userInfo,
+		})
 	} else {
-		c.JSON(http.StatusForbidden, gin.H{"login": false})
+		c.JSON(http.StatusForbidden, gin.H{
+			"code":    http.StatusForbidden,
+			"message": "Forbidden",
+			"data":    "",
+		})
 	}
 }
 

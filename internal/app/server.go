@@ -36,20 +36,24 @@ func (server *Server) Run(env string) error {
 		"*",
 	}
 
+	headerPolicies.AllowMethods = []string{
+		"GET",
+		"POST",
+		"PUT",
+		"DELETE",
+		"OPTIONS",
+		"HEAD",
+	}
+
 	headerPolicies.AllowHeaders = []string{
-		"Access-Control-Allow-Credentials",
-		"Access-Control-Allow-Headers",
+		"Accept",
 		"Content-Type",
-		"Content-Length",
-		"Accept-Encoding",
-		"Authorization",
-		"Access-Control-Allow-Origin",
 	}
 
 	headerPolicies.AllowCredentials = true
 	headerPolicies.MaxAge = (24 * time.Hour)
 
-	r.Use(cors.New(headerPolicies))
+	r.Use(cors.Default())
 	r.Use(gintrace.Middleware(""))
 
 	log, _ := zap.NewDevelopment()

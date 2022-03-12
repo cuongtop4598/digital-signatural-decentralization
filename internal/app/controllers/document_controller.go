@@ -116,19 +116,35 @@ func (dc *DocumentController) Verify(c *gin.Context) {
 	verify := VerifyDocRequest{}
 	err := c.BindJSON(&verify)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": err.Error(),
+			"data":    "",
+		})
 		return
 	}
 	isTrue, err := dc.documentSrv.VerifyDocument(verify.Phone, verify.Digest, big.NewInt(verify.DocNum))
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"error": err.Error()})
+		c.JSON(http.StatusOK, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": err.Error(),
+			"data":    "",
+		})
 		return
 	}
 	if isTrue {
-		c.JSON(http.StatusOK, gin.H{"message": "true"})
+		c.JSON(http.StatusOK, gin.H{
+			"code":    http.StatusOK,
+			"message": "OK",
+			"data":    "True",
+		})
 		return
 	} else {
-		c.JSON(http.StatusOK, gin.H{"message": "false"})
+		c.JSON(http.StatusOK, gin.H{
+			"code":    http.StatusOK,
+			"message": "OK",
+			"data":    "False",
+		})
 		return
 	}
 }
@@ -137,13 +153,21 @@ func (dc *DocumentController) Sign(c *gin.Context) {
 	err := c.Request.ParseMultipartForm(32 << 20) // maxMemory 32MB
 	if err != nil {
 		log.Println("parse multi part form", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": err.Error(),
+			"data":    "",
+		})
 		return
 	}
 	file, h, err := c.Request.FormFile("doc")
 	if err != nil {
 		log.Println("get file error:", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": err.Error(),
+			"data":    "",
+		})
 		return
 	}
 	publickey := c.Request.FormValue("publickey")
@@ -152,7 +176,11 @@ func (dc *DocumentController) Sign(c *gin.Context) {
 	tmpFile, err := os.Create("./static/" + h.Filename + ".pdf")
 	if err != nil {
 		log.Println("create file error: ", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": err.Error(),
+			"data":    "",
+		})
 		return
 	}
 	defer tmpFile.Close()
@@ -172,40 +200,72 @@ func (dc *DocumentController) Sign(c *gin.Context) {
 	err = dc.documentRepo.Create(&doc)
 	if err != nil {
 		log.Println("create document error:", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    http.StatusInternalServerError,
+			"message": err.Error(),
+			"data":    "",
+		})
 		return
 	}
 	_, err = io.Copy(tmpFile, file)
 	if err != nil {
 		log.Println("copy file error:", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    http.StatusInternalServerError,
+			"message": err.Error(),
+			"data":    "",
+		})
 		return
 	}
 	phone, err := dc.userRepo.GetPhoneByPublickey(publickey)
 	if err != nil {
 		log.Println("get phone error:", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    http.StatusInternalServerError,
+			"message": err.Error(),
+			"data":    "",
+		})
 		return
 	}
 	event, err := dc.documentSrv.SaveSignaturalDocument(phone, []byte(signature))
 	if err != nil {
 		log.Println("save signatural error:", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    http.StatusInternalServerError,
+			"message": err.Error(),
+			"data":    "",
+		})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"doc_info": event})
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "OK",
+		"data":    event,
+	})
 }
 
 func (dc *DocumentController) GetDocs(c *gin.Context) {
 	publickey, err := c.Request.Cookie("publickey")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": err,
+			"data":    "",
+		})
 	}
 	docs, err := dc.documentSrv.GetDocumentByPublickey(publickey.Value)
 	if err != nil {
 		log.Println("get list document error:", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    http.StatusInternalServerError,
+			"message": err.Error(),
+			"data":    "",
+		})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"documents": docs})
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "OK",
+		"data":    docs,
+	})
 }
