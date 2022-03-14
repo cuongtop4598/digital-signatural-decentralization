@@ -80,7 +80,7 @@ func (repo *UserRepo) CheckLogin(password string, phone string) (bool, *model.Us
 
 func (repo *UserRepo) GetPhoneByPublickey(publickey string) (string, error) {
 	user := model.User{}
-	result := repo.DB.Model(&model.User{}).Where("publickey = ? ", publickey).First(&user)
+	result := repo.DB.Model(&model.User{}).Where("public_key = ? ", publickey).First(&user)
 	if result.Error != nil {
 		return "", result.Error
 	} else {
