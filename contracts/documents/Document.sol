@@ -68,11 +68,11 @@ import "./StringsUtils.sol";
     function saveDoc(string memory phone,bytes memory signature) public override returns (uint256) {
         string memory hashphone = bytes32ToString(keccak256(abi.encodePacked(phone)));
         uint256 numDoc = _userlist._uListPhoneHash[hashphone].numDoc;
-        numDoc++;
+         _userlist._uListPhoneHash[hashphone].numDoc = numDoc + 1;
         Doc storage doc = _userlist._uListPhoneHash[hashphone].docs[numDoc];
         doc.signature = signature;
         emit IndexDocument( _userlist._uListPhoneHash[hashphone].publicKey ,numDoc,signature);
-        return numDoc;
+        return  _userlist._uListPhoneHash[hashphone].numDoc;
     }
 
     /**
