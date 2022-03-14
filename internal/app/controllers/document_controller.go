@@ -52,7 +52,7 @@ func (dc *DocumentController) Upload(c *gin.Context) {
 	publickey := c.Request.FormValue("publickey")
 	signature := c.Request.FormValue("signature")
 
-	tmpFile, err := os.Create("./static/" + h.Filename + ".pdf")
+	tmpFile, err := os.Create("static/" + h.Filename + ".pdf")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
