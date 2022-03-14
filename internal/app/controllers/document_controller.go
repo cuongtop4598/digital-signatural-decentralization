@@ -172,6 +172,7 @@ func (dc *DocumentController) SaveSign(c *gin.Context) {
 	}
 	publickey := c.Request.FormValue("publickey")
 	signature := c.Request.FormValue("signature")
+
 	os.Chdir(".")
 	tmpFile, err := os.Create("./static/" + h.Filename + ".pdf")
 	if err != nil {
@@ -183,31 +184,10 @@ func (dc *DocumentController) SaveSign(c *gin.Context) {
 		})
 		return
 	}
-	defer tmpFile.Close()
 
-	doc := model.Document{
-		DocID:     uuid.New(),
-		Owner:     publickey,
-		Name:      h.Filename,
-		Type:      "pdf",
-		Signature: signature,
-		Path:      "static/",
-		Public:    true,
-		CreateAt:  time.Now(),
-		UpdateAt:  time.Time{},
-		DeleteAt:  time.Time{},
-	}
-	err = dc.documentRepo.Create(&doc)
-	if err != nil {
-		log.Println("create document error:", err)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code":    http.StatusInternalServerError,
-			"message": err.Error(),
-			"data":    "",
-		})
-		return
-	}
+	defer tmpFile.Close()
 	_, err = io.Copy(tmpFile, file)
+
 	if err != nil {
 		log.Println("copy file error:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -230,6 +210,29 @@ func (dc *DocumentController) SaveSign(c *gin.Context) {
 	event, err := dc.documentSrv.SaveSignaturalDocument(phone, []byte(signature))
 	if err != nil {
 		log.Println("save signatural error:", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    http.StatusInternalServerError,
+			"message": err.Error(),
+			"data":    "",
+		})
+		return
+	}
+
+	doc := model.Document{
+		DocID:     uuid.New(),
+		Owner:     publickey,
+		Name:      h.Filename,
+		Type:      "pdf",
+		Signature: signature,
+		Path:      "static/",
+		Public:    true,
+		CreateAt:  time.Now(),
+		UpdateAt:  time.Time{},
+		DeleteAt:  time.Time{},
+	}
+	err = dc.documentRepo.Create(&doc)
+	if err != nil {
+		log.Println("create document error:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    http.StatusInternalServerError,
 			"message": err.Error(),

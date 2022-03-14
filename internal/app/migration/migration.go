@@ -57,25 +57,26 @@ func InsertData(db *gorm.DB) error {
 		return err
 	}
 	db.Create(&user)
-	document := []model.Document{}
-	if err := utils.Json2struct("./internal/app/mockup/document.json", &document); err != nil {
-		return err
-	}
-	db.Create(&document)
-	userallow := []model.UserAllow{}
-	if err := utils.Json2struct("./internal/app/mockup/userallow.json", &userallow); err != nil {
-		return err
-	}
-	db.Create(&userallow)
-	role := []model.Role{}
-	if err := utils.Json2struct("./internal/app/mockup/role.json", &role); err != nil {
-		return err
-	}
-	db.Create(&role)
-	userrole := []model.UserRole{}
-	if err := utils.Json2struct("./internal/app/mockup/userrole.json", &userrole); err != nil {
-		return err
-	}
-	db.Create(&userrole)
+
+	// document := []model.Document{}
+	// if err := utils.Json2struct("./internal/app/mockup/document.json", &document); err != nil {
+	// 	return err
+	// }
+	// db.Create(&document)
+	// userallow := []model.UserAllow{}
+	// if err := utils.Json2struct("./internal/app/mockup/userallow.json", &userallow); err != nil {
+	// 	return err
+	// }
+	// db.Create(&userallow)
+	// role := []model.Role{}
+	// if err := utils.Json2struct("./internal/app/mockup/role.json", &role); err != nil {
+	// 	return err
+	// }
+	// db.Create(&role)
+	// userrole := []model.UserRole{}
+	// if err := utils.Json2struct("./internal/app/mockup/userrole.json", &userrole); err != nil {
+	// 	return err
+	// }
+	// db.Create(&userrole)
 	return nil
 }

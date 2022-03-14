@@ -22,6 +22,7 @@ type User struct {
 
 type Document struct {
 	DocID     uuid.UUID `gorm:"primaryKey"`
+	Number    int
 	Owner     string
 	Name      string
 	Type      string
