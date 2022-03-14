@@ -4,6 +4,7 @@ import (
 	"context"
 	"digitalsignature/internal/app/model"
 	"digitalsignature/internal/app/repository"
+	"fmt"
 	"log"
 	"math/big"
 	"strings"
@@ -135,6 +136,7 @@ func (d *document) SaveSignaturalDocument(phone string, signatural []byte) (Even
 	currentBlock := header.Number
 
 	address := common.HexToAddress(d.address)
+	d.log.Info("contract address: " + address.String())
 	query := ethereum.FilterQuery{
 		FromBlock: big.NewInt(0),
 		ToBlock:   currentBlock,
@@ -162,6 +164,7 @@ func (d *document) SaveSignaturalDocument(phone string, signatural []byte) (Even
 		events = append(events, event)
 	}
 	if len(events) > 0 {
+		fmt.Println(events)
 		return events[len(events)-1], nil
 	}
 	return Event{}, nil

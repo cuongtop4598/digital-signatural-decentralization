@@ -217,9 +217,9 @@ func (dc *DocumentController) SaveSign(c *gin.Context) {
 		})
 		return
 	}
-
 	doc := model.Document{
 		DocID:     uuid.New(),
+		Number:    int(event.Numdoc),
 		Owner:     publickey,
 		Name:      h.Filename,
 		Type:      "pdf",
