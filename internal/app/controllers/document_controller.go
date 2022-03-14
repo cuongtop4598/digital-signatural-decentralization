@@ -30,7 +30,7 @@ func DocumentRouter(docService document.DocumentService, documentRepo repository
 		userRepo:     userRepo,
 	}
 	ar := r.Group("/document")
-	ar.POST("/savesign", dc.Sign)
+	ar.POST("/savesign", dc.SaveSign)
 	ar.POST("/upload", dc.Upload)
 	ar.GET("/download/:filename", dc.Download)
 	ar.POST("/verify", dc.Verify)
@@ -149,7 +149,7 @@ func (dc *DocumentController) Verify(c *gin.Context) {
 	}
 }
 
-func (dc *DocumentController) Sign(c *gin.Context) {
+func (dc *DocumentController) SaveSign(c *gin.Context) {
 	err := c.Request.ParseMultipartForm(32 << 20) // maxMemory 32MB
 	if err != nil {
 		log.Println("parse multi part form", err)
@@ -172,7 +172,7 @@ func (dc *DocumentController) Sign(c *gin.Context) {
 	}
 	publickey := c.Request.FormValue("publickey")
 	signature := c.Request.FormValue("signature")
-
+	os.Chdir(".")
 	tmpFile, err := os.Create("./static/" + h.Filename + ".pdf")
 	if err != nil {
 		log.Println("create file error: ", err)
@@ -244,8 +244,13 @@ func (dc *DocumentController) Sign(c *gin.Context) {
 	})
 }
 
+type GetDocsRequest struct {
+	PublicKey string `json:"public_key"`
+}
+
 func (dc *DocumentController) GetDocs(c *gin.Context) {
-	publickey, err := c.Request.Cookie("publickey")
+	request := GetDocsRequest{}
+	err := c.BindJSON(&request)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":    http.StatusBadRequest,
@@ -253,7 +258,7 @@ func (dc *DocumentController) GetDocs(c *gin.Context) {
 			"data":    "",
 		})
 	}
-	docs, err := dc.documentSrv.GetDocumentByPublickey(publickey.Value)
+	docs, err := dc.documentSrv.GetDocumentByPublickey(request.PublicKey)
 	if err != nil {
 		log.Println("get list document error:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{

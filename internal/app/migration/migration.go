@@ -3,12 +3,19 @@ package migration
 import (
 	"digitalsignature/internal/app/model"
 	"digitalsignature/internal/app/utils"
-	"fmt"
 
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
-func Migrate(db *gorm.DB) error {
+func Migrate(db *gorm.DB, log *zap.Logger) error {
+	tx := db.Migrator()
+	if tx.HasTable("documents") {
+		tx.DropTable("documents")
+	}
+	if tx.HasTable("users") {
+		tx.DropTable("users")
+	}
 	err := db.Migrator().AutoMigrate(
 		&model.User{},
 		&model.Document{},
@@ -17,6 +24,10 @@ func Migrate(db *gorm.DB) error {
 		&model.Role{},
 		&model.UserRole{},
 	)
+	if err != nil {
+		log.Sugar().Error(err)
+		return err
+	}
 	db.Exec(
 		"alter table documents add constraint fk_user_documents foreign key (owner) references users(id)",
 	)
@@ -34,7 +45,7 @@ func Migrate(db *gorm.DB) error {
 	)
 	err = InsertData(db)
 	if err != nil {
-		fmt.Printf("Error %s", err.Error())
+		log.Sugar().Error(err)
 		return err
 	}
 	return nil

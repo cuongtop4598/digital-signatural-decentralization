@@ -73,7 +73,7 @@ func (server *Server) Run(env string) error {
 		log.Sugar().Errorf("Connect to database fail ", err)
 	}
 
-	err = migration.Migrate(db)
+	err = migration.Migrate(db, log)
 	if err != nil {
 		log.Sugar().Errorf("Migrate fail ", err)
 	}
