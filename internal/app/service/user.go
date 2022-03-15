@@ -90,6 +90,7 @@ func (s *UserService) Create(c *gin.Context, userInfo request.UserInfo) error {
 					defer wg1.Done()
 					if receipt.Status == 1 {
 						s.logger.Info("Transaction Success")
+						s.logger.Info("Hash user info:", zap.String("data", string(txn.Data())))
 					}
 					if receipt.Status == 0 {
 						s.logger.Info("Transaction Failt")
