@@ -14,5 +14,5 @@ database:
   password: "local"
   database: "digital_signatural"
 address: 
-  document: "0xEc65Eb957399108e4dBD2ACf7889A90487ADBa90"
+  document: "0x95481245c08279cAEBE33117E975E1CB3f35D332"
   accounts: []
