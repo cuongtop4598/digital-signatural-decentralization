@@ -46,9 +46,9 @@ type document struct {
 }
 
 type Event struct {
-	Publickey string `json:"publickey"`
-	Numdoc    uint   `json:"numdoc"`
-	Signature []byte `json:"signature"`
+	Publickey string
+	Numdoc    uint
+	Signature []byte
 }
 
 func NewDocumentService(
@@ -133,12 +133,18 @@ func (d *document) SaveSignaturalDocument(phone string, signatural []byte) (Even
 		d.log.Sugar().Error(err)
 
 	}
+
 	currentBlock := header.Number
+	fromBlock := big.NewInt(currentBlock.Int64() - int64(20))
+
+	d.log.Info("from block", zap.Int("block", int(fromBlock.Int64())))
+
+	d.log.Info("current block", zap.Int("block", int(currentBlock.Int64())))
 
 	address := common.HexToAddress(d.address)
 	d.log.Info("contract address: " + address.String())
 	query := ethereum.FilterQuery{
-		FromBlock: big.NewInt(0),
+		FromBlock: fromBlock,
 		ToBlock:   currentBlock,
 		Addresses: []common.Address{
 			address,
@@ -149,6 +155,8 @@ func (d *document) SaveSignaturalDocument(phone string, signatural []byte) (Even
 		d.log.Sugar().Error(err)
 		return Event{}, err
 	}
+	d.log.Info("logs length ", zap.Int("length", len(logs)))
+
 	contractAbi, err := abi.JSON(strings.NewReader(string(DocumentABI)))
 	if err != nil {
 		d.log.Sugar().Error(err)
