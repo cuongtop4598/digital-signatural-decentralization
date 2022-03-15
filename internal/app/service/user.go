@@ -52,7 +52,7 @@ func (s *UserService) Create(c *gin.Context, userInfo request.UserInfo) error {
 		PublicKey:   userInfo.PublicKey,
 		CardID:      userInfo.CardID,
 		Phone:       userInfo.Phone,
-		Gmail:       userInfo.Email,
+		Gmail:       userInfo.Gmail,
 		DateOfBirth: userInfo.DateOfBirth,
 		Password:    userInfo.Password,
 		CreateAt:    time.Now(),
@@ -144,7 +144,7 @@ func (s *UserService) VerifyUser(user request.UserInfo) (bool, error) {
 		s.logger.Sugar().Error(err)
 		return false, err
 	}
-	isVerify, err := documentIntance.VerifyUser(&bind.CallOpts{}, user.Name, user.CardID, user.DateOfBirth, user.Phone, user.Email, user.PublicKey)
+	isVerify, err := documentIntance.VerifyUser(&bind.CallOpts{}, user.Name, user.CardID, user.DateOfBirth, user.Phone, user.Gmail, user.PublicKey)
 	return isVerify, err
 }
 
