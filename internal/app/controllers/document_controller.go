@@ -5,6 +5,7 @@ import (
 	"digitalsignature/internal/app/repository"
 	"digitalsignature/internal/app/service/document"
 	"digitalsignature/internal/app/utils"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"log"
@@ -107,14 +108,30 @@ func (dc *DocumentController) Download(c *gin.Context) {
 }
 
 type VerifyDocRequest struct {
-	Phone  string   `json:"phone"`
-	Digest [32]byte `json:"digest"`
-	DocNum int64    `json:"doc_number"`
+	Phone  string `json:"phone"`
+	Digest string `json:"digest"`
+	DocNum int64  `json:"doc_number"`
 }
 
 func (dc *DocumentController) Verify(c *gin.Context) {
 	verify := VerifyDocRequest{}
 	err := c.BindJSON(&verify)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": err.Error(),
+			"data":    "",
+		})
+		return
+	}
+	digest, err := hex.DecodeString(verify.Digest)
+	fmt.Println("length digest byte : ", len(digest))
+	if err != nil {
+		log.Println(err)
+	}
+	digest32 := [32]byte{}
+	copy(digest32[:], digest)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":    http.StatusBadRequest,
@@ -123,7 +140,7 @@ func (dc *DocumentController) Verify(c *gin.Context) {
 		})
 		return
 	}
-	isTrue, err := dc.documentSrv.VerifyDocument(verify.Phone, verify.Digest, big.NewInt(verify.DocNum))
+	isTrue, err := dc.documentSrv.VerifyDocument(verify.Phone, digest32, big.NewInt(verify.DocNum))
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"code":    http.StatusBadRequest,
