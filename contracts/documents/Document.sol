@@ -25,6 +25,7 @@ import "./StringsUtils.sol";
 
     event IndexDocument(string publickey, uint256 numdoc, bytes signature);
     event StoreUserStatus(bytes32 infoHash, string publickey);
+    event Status(bool);
     /**
      * @dev Return True if user information is stored successfully, otherwise return False.
      */
@@ -74,12 +75,15 @@ import "./StringsUtils.sol";
      */
     function saveDoc(string memory phone,bytes memory signature) public override returns (uint256) {
         string memory hashPhone = bytes32ToString(keccak256(abi.encodePacked(phone)));
-        uint index;
+        emit Status(true);
+        uint index = 100000000000;
         for (uint i = 0;  i < users.length; i++ ) {
             if(keccak256(abi.encodePacked(users[i].phoneHash)) == keccak256(abi.encodePacked(hashPhone))){
+                emit Status(true);
                 index = i;
             }
         }
+        require(index != 100000000000);
         users[index].doc[users[index].documentSize].signature = signature;
         users[index].documentSize = users[index].documentSize + 1;
         emit IndexDocument( users[index].publicKey ,users[index].documentSize - 1, users[index].doc[users[index].documentSize-1].signature);
