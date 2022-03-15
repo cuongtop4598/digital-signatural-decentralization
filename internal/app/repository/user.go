@@ -31,7 +31,7 @@ func (repo *UserRepo) Create(user model.User) error {
 
 func (repo *UserRepo) GetUserByPubkey(pubkey string) (*model.User, error) {
 	user := model.User{}
-	result := repo.DB.Where("public_key = ?", pubkey).First(&user)
+	result := repo.DB.Where("phone = ?", pubkey).First(&user)
 	if result.Error != nil {
 		return nil, result.Error
 	}

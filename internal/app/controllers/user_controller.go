@@ -19,7 +19,7 @@ func UserRouter(userService service.UserService, r *gin.RouterGroup) {
 	}
 	ar := r.Group("/user")
 	ar.POST("/signup", uc.SignUp)
-	ar.GET("/info/:pubkey", uc.GetInfo)
+	ar.GET("/info/:phone", uc.GetInfo)
 	ar.POST("/verify", uc.Verify)
 	ar.POST("/signin", uc.SignIn)
 }
@@ -104,8 +104,8 @@ func (uc *UserController) SignIn(c *gin.Context) {
 }
 
 func (uc *UserController) GetInfo(c *gin.Context) {
-	pubkey := c.Param("pubkey")
-	response, err := uc.userService.GetUserInfo(c, pubkey)
+	phone := c.Param("phone")
+	response, err := uc.userService.GetUserInfo(c, phone)
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(404, gin.H{"status": "false"})

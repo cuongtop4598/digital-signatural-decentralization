@@ -89,8 +89,9 @@ func (s *UserService) Create(c *gin.Context, userInfo request.UserInfo) error {
 				if receipt.Status == 1 || receipt.Status == 0 {
 					defer wg1.Done()
 					if receipt.Status == 1 {
+						out, _ := txn.MarshalJSON()
 						s.logger.Info("Transaction Success")
-						s.logger.Info("Hash user info:", zap.String("data", string(txn.Data())))
+						s.logger.Info("Hash user info:", zap.String("data", string(out)))
 					}
 					if receipt.Status == 0 {
 						s.logger.Info("Transaction Failt")
@@ -106,7 +107,7 @@ func (s *UserService) Create(c *gin.Context, userInfo request.UserInfo) error {
 	return nil
 }
 
-func (s *UserService) GetUserInfo(c *gin.Context, pubkey string) (*response.User, error) {
+func (s *UserService) GetUserInfo(c *gin.Context, phone string) (*response.User, error) {
 	contractAddress := common.HexToAddress(s.documentContract)
 	// get hash user from onchain
 	documentIntance, err := document.NewDocument(contractAddress, s.ethclient)
@@ -114,13 +115,13 @@ func (s *UserService) GetUserInfo(c *gin.Context, pubkey string) (*response.User
 		s.logger.Sugar().Error(err)
 		return nil, err
 	}
-	hash, err := documentIntance.GetHashUserInfo(&bind.CallOpts{}, pubkey)
+	hash, err := documentIntance.GetHashUserInfo(&bind.CallOpts{}, phone)
 	if err != nil {
 		s.logger.Sugar().Error(err)
 		return nil, err
 	}
 	// get user info from offchain
-	user, err := s.userRepo.GetUserByPubkey(pubkey)
+	user, err := s.userRepo.GetUserByPhone(phone)
 	if err != nil {
 		s.logger.Sugar().Error(err)
 		return nil, err
@@ -128,7 +129,7 @@ func (s *UserService) GetUserInfo(c *gin.Context, pubkey string) (*response.User
 	return &response.User{
 		ID:          user.ID,
 		Name:        user.Name,
-		PublicKey:   pubkey,
+		PublicKey:   user.PublicKey,
 		CardID:      user.CardID,
 		Phone:       user.Phone,
 		Gmail:       user.Gmail,
