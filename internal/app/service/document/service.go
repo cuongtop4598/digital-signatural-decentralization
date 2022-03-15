@@ -90,6 +90,8 @@ func (d *document) VerifyDocument(phone string, digest [32]byte, docNum *big.Int
 }
 
 func (d *document) SaveSignaturalDocument(phone string, signatural []byte) (Event, error) {
+	fmt.Println("phone:", phone)
+	fmt.Println("signatural:", signatural)
 	account, ks, err := d.accountSrv.GetAminAccount()
 	if err != nil {
 		d.log.Sugar().Error(err)
