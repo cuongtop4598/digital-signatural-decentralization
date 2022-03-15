@@ -12,7 +12,7 @@ contract Document is Context, IDC {
         string userID;
         bytes32 infoHash;
         bytes32 phoneHash;
-        string publicKey;
+        address publicKey;
         uint documentSize;
         mapping(uint => Doc) doc;
     }
@@ -23,13 +23,13 @@ contract Document is Context, IDC {
         bytes signature;
     }
 
-    event IndexDocument(string publickey, uint256 numdoc, bytes signature);
+    event IndexDocument(address publickey, uint256 numdoc, bytes signature);
     event StoreUserStatus(bytes32 infoHash, string publickey);
     event Status(string);
     /**
      * @dev Return True if user information is stored successfully, otherwise return False.
      */
-    function storeUser(string memory userID,string memory name,string memory cmnd, string memory dateOB, string memory phone,string memory gmail,string memory publicKey) 
+    function storeUser(string memory userID,string memory name,string memory cmnd, string memory dateOB, string memory phone,string memory gmail,address publicKey) 
     public override returns(bytes32) {
         bytes32 hashInfo = hashUserInfo(name,cmnd,dateOB,phone,gmail,publicKey);
         uint256 idx = users.length;
@@ -45,7 +45,7 @@ contract Document is Context, IDC {
     /**
      * @dev Verify user information
     */
-    function verifyUser(string memory name,string memory cmnd, string memory dateOB, string memory phone,string memory gmail,string memory publicKey)
+    function verifyUser(string memory name,string memory cmnd, string memory dateOB, string memory phone,string memory gmail, address publicKey)
     public override view returns(bool) {
          bytes32 hashInfo = hashUserInfo(name,cmnd,dateOB,phone,gmail,publicKey);
          uint i = 0;
@@ -87,22 +87,43 @@ contract Document is Context, IDC {
        revert("not found");
     }
 
+    function getEthSignedMessageHash(bytes32 _messageHash)
+            public
+            pure
+            returns (bytes32)
+        {
+            /*
+            Signature is produced by signing a keccak256 hash with the following format:
+            "\x19Ethereum Signed Message\n" + len(msg) + msg
+            */
+            return
+                keccak256(
+                    abi.encodePacked("\x19Ethereum Signed Message:\n32", _messageHash)
+                );
+        }
     /**
      * @dev Return True if Doc wasn't change else False
      */
     function verifyDoc(string memory phone, bytes32 digest, uint indexDoc) public view override returns(bool) {
-        bytes32 phoneHash = hashPhoneNumber(phone);
-        uint index = 100000000000;
-        for (uint i = 0;  i <= users.length; i++ ) {
-           if(compareBytes(users[i].phoneHash, phoneHash)){
-                index = i;
-            }
-        }
-        require(index != 100000000000);
-        return keccak256(abi.encodePacked(recoverSigner(digest,users[index].doc[indexDoc].signature))) == keccak256(abi.encodePacked(users[index].publicKey));
+        bytes memory signature;
+        address publicKey;
+        (signature, publicKey) = getSignature(phone, indexDoc);
+        bytes32 ethMessageHash = getEthSignedMessageHash(digest);
+        address signer = recoverSigner(ethMessageHash,signature);
+        return signer == publicKey;
+    }
+
+
+    function getSinger(string memory phone, bytes32 digest, uint indexDoc) public view  returns(bytes memory) {
+        bytes memory signature;
+        address publicKey;
+        (signature, publicKey) = getSignature(phone, indexDoc);
+        bytes32 ethMessageHash = getEthSignedMessageHash(digest);
+        bytes memory signer = abi.encodePacked(recoverSigner(ethMessageHash,signature));
+        return signer;
     }
     
-    function getSignature(string memory phone, uint indexDoc) public view returns (bytes memory) {
+    function getSignature(string memory phone, uint indexDoc) public view returns (bytes memory, address ) {
         string memory hashPhone = bytes32ToString(keccak256(abi.encodePacked(phone)));
        uint index;
         for (uint i = 0;  i < users.length; i++ ) {
@@ -111,29 +132,37 @@ contract Document is Context, IDC {
             }
         }
         Doc memory d = users[index].doc[indexDoc];
-        return d.signature;
+        return (d.signature,  users[index].publicKey);
     }
 
-    /**
-     * @dev Return publicKey 
-     * references to ERC1271 Standard Signature Validation Method
-     */
-    function recoverSigner(bytes32 _hash, bytes memory _signature) private pure returns(address) {
+   function recoverSigner(bytes32 _ethSignedMessageHash, bytes memory _signature)
+        public
+        pure
+        returns (address)
+    {
         (bytes32 r, bytes32 s, uint8 v) = splitSignature(_signature);
-        return ecrecover(_hash, v, r, s);
+
+        return ecrecover(_ethSignedMessageHash, v, r, s);
     }
 
-    /**
-     * @dev Return r,s,v in order is ...
-     */
-    function splitSignature(bytes memory sig) private pure returns(bytes32 r,bytes32 s, uint8 v) {
+    function splitSignature(bytes memory sig)
+        public
+        pure
+        returns (
+            bytes32 r,
+            bytes32 s,
+            uint8 v
+        )
+    {
         require(sig.length == 65, "invalid signature length");
 
         assembly {
             /*
             First 32 bytes stores the length of the signature
+
             add(sig, 32) = pointer of sig + 32
             effectively, skips first 32 bytes of signature
+
             mload(p) loads next 32 bytes starting at the memory address p into memory
             */
 
@@ -150,7 +179,7 @@ contract Document is Context, IDC {
     /**
      * @dev Return a hash of user information 
      */
-    function hashUserInfo(string memory name, string memory cmnd, string memory dOB, string memory phone, string memory gmail, string memory publickey) 
+    function hashUserInfo(string memory name, string memory cmnd, string memory dOB, string memory phone, string memory gmail, address publickey) 
     private pure returns (bytes32) {
         return keccak256(abi.encodePacked(name,cmnd,dOB,phone,gmail,publickey));
     }
@@ -174,5 +203,11 @@ contract Document is Context, IDC {
         }
         return string(bytesArray);
     }
+    function compareString(string memory a, string memory b) public pure returns (bool) {
+        if(bytes(a).length != bytes(b).length) {
+        return false;
+        } else {
+        return keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b));
+        }
+    }
 }
-

@@ -73,7 +73,8 @@ func (s *UserService) Create(c *gin.Context, userInfo request.UserInfo) error {
 		s.logger.Sugar().Error(err)
 	}
 	tnxOption := s.accountSrv.BindTransactionOption(*adminAccount, "123456", ks, s.ethclient)
-	txn, err := documentIntance.StoreUser(tnxOption, user.ID.String(), user.Name, user.CardID, user.DateOfBirth, user.Phone, user.Gmail, user.PublicKey)
+	address := common.HexToAddress(user.PublicKey)
+	txn, err := documentIntance.StoreUser(tnxOption, user.ID.String(), user.Name, user.CardID, user.DateOfBirth, user.Phone, user.Gmail, address)
 	if err != nil {
 		s.logger.Sugar().Error(err)
 	}
@@ -146,7 +147,8 @@ func (s *UserService) VerifyUser(user request.UserInfo) (bool, error) {
 		s.logger.Sugar().Error(err)
 		return false, err
 	}
-	isVerify, err := documentIntance.VerifyUser(&bind.CallOpts{}, user.Name, user.CardID, user.DateOfBirth, user.Phone, user.Gmail, user.PublicKey)
+	address := common.HexToAddress(user.PublicKey)
+	isVerify, err := documentIntance.VerifyUser(&bind.CallOpts{}, user.Name, user.CardID, user.DateOfBirth, user.Phone, user.Gmail, address)
 	return isVerify, err
 }
 
