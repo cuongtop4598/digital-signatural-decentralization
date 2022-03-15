@@ -56,14 +56,14 @@ contract Document is Context, IDC {
          return false;
     }       
 
-    function getHashUserInfo(string memory publickey) public view returns(bytes32) {
-        uint index;
-        for (uint i = 0;  i <= users.length; i++ ) {
-            if(keccak256(abi.encodePacked(users[i].publicKey)) == keccak256(abi.encodePacked(publickey))){
-                index = i;
-                return users[index].infoHash;
+    function getHashUserInfo(string memory phone) public view returns(bytes32) {
+        bytes32 phoneHash = hashPhoneNumber(phone);
+        uint i = 0;
+         for (i = 0;  i <= users.length; i++ ) {
+            if(compareBytes(users[i].infoHash, phoneHash)){
+                return users[i].infoHash;
             }
-        }
+         }
         revert("not found");
     }
 
@@ -74,14 +74,13 @@ contract Document is Context, IDC {
      */
     function saveDoc(string memory phone,bytes memory signature) public override returns (uint256) {
         bytes32 phoneHash = hashPhoneNumber(phone);
-        uint index = 100000000000;
+        uint index = 1000;
         for (uint i = 0;  i <= users.length; i++ ) {
            if(compareBytes(users[i].phoneHash, phoneHash)){
-                emit Status("found user by phone");
                 index = i;
             }
         }
-        require(index != 100000000000);
+        require(index < 1000);
         users[index].doc[users[index].documentSize].signature = signature;
         users[index].documentSize = users[index].documentSize + 1;
         emit IndexDocument( users[index].publicKey ,users[index].documentSize - 1, users[index].doc[users[index].documentSize-1].signature);

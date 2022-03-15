@@ -119,8 +119,18 @@ func (uc *UserController) Verify(c *gin.Context) {
 	err := c.BindJSON(&userInfo)
 	if err != nil {
 		log.Error(err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"msg": "can't decode user info request"})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "can't decode user info request"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"msg": "user information is correct"})
+	isTrue, err := uc.userService.VerifyUser(userInfo)
+	if err != nil {
+		log.Error(err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if isTrue {
+		c.JSON(http.StatusOK, gin.H{"message": "user information is correct"})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"message": "user information is wrong"})
+	}
 }
