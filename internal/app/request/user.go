@@ -3,7 +3,7 @@ package request
 // Todo: add middleware to validate request model or add validate tag to struct => google search
 type UserInfo struct {
 	Name        string `json:"name"`
-	Email       string `json:"email"`
+	Gmail       string `json:"gmail"`
 	CardID      string `json:"card_id"`
 	Password    string `json:"password"`
 	Phone       string `json:"phone"`
