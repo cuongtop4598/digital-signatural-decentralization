@@ -6,11 +6,6 @@ import "./IDC.sol";
 import "./utils/Context.sol";
 import "./StringsUtils.sol";
 
-/**
- * @dev Implementation of the {IDC} interface
- * 
- */
-
  contract Document is Context, IDC {
                              
     struct User {
@@ -29,6 +24,7 @@ import "./StringsUtils.sol";
     }
 
     event IndexDocument(string publickey, uint256 numdoc, bytes signature);
+    event StoreUserStatus(bytes32 infoHash, string publickey);
     /**
      * @dev Return True if user information is stored successfully, otherwise return False.
      */
@@ -42,6 +38,7 @@ import "./StringsUtils.sol";
         u.infoHash = hashInfo;
         u.publicKey = publicKey;
         u.phoneHash = bytes32ToString(keccak256(abi.encodePacked(phone)));
+        emit StoreUserStatus(u.infoHash, u.publicKey);
         return true;
     }
     /**
@@ -59,7 +56,17 @@ import "./StringsUtils.sol";
          return false;
     }       
 
-                       
+    function getHashUserInfo(string memory publickey) public view returns(bytes32) {
+        uint index;
+        for (uint i = 0;  i < users.length; i++ ) {
+            if(keccak256(abi.encodePacked(users[i].publicKey)) == keccak256(abi.encodePacked(publickey))){
+                index = i;
+                return users[index].infoHash;
+            }
+        }
+        revert("not found");
+    }
+
     /**
      * @dev Save Document to Chain
      * 
