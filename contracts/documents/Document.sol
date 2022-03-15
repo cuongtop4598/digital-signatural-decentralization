@@ -39,6 +39,7 @@ contract Document is Context, IDC {
         u.infoHash = hashInfo;
         u.publicKey = publicKey;
         u.phoneHash = hashPhoneNumber(phone);
+        u.documentSize = 0;
         return u.phoneHash;
     }
     /**
@@ -74,7 +75,8 @@ contract Document is Context, IDC {
      */
     function saveDoc(string memory phone,bytes memory signature) public override returns (uint256) {
         bytes32 phoneHash = hashPhoneNumber(phone);
-        for (uint i = 0;  i <= users.length; i++ ) {
+         uint i = 0;
+        for ( i = 0;  i <= users.length; i++ ) {
            if(compareBytes(users[i].phoneHash, phoneHash)){
                  users[i].doc[users[i].documentSize].signature = signature;
                  users[i].documentSize = users[i].documentSize + 1;
