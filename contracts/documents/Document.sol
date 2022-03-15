@@ -6,12 +6,12 @@ import "./IDC.sol";
 import "./utils/Context.sol";
 import "./StringsUtils.sol";
 
- contract Document is Context, IDC {
+contract Document is Context, IDC {
                              
     struct User {
         string userID;
         bytes32 infoHash;
-        string phoneHash;
+        bytes32 phoneHash;
         string publicKey;
         uint documentSize;
         mapping(uint => Doc) doc;
@@ -25,31 +25,30 @@ import "./StringsUtils.sol";
 
     event IndexDocument(string publickey, uint256 numdoc, bytes signature);
     event StoreUserStatus(bytes32 infoHash, string publickey);
-    event Status(bool);
+    event Status(string);
     /**
      * @dev Return True if user information is stored successfully, otherwise return False.
      */
     function storeUser(string memory userID,string memory name,string memory cmnd, string memory dateOB, string memory phone,string memory gmail,string memory publicKey) 
-    public override returns(bool) {
-        bytes32 hashInfo = hashUserInfo(name,cmnd,dateOB,phone,gmail);
+    public override returns(bytes32) {
+        bytes32 hashInfo = hashUserInfo(name,cmnd,dateOB,phone,gmail,publicKey);
         uint256 idx = users.length;
         users.push();
         User storage u = users[idx];
         u.userID = userID;
         u.infoHash = hashInfo;
         u.publicKey = publicKey;
-        u.phoneHash = bytes32ToString(keccak256(abi.encodePacked(phone)));
-        emit StoreUserStatus(u.infoHash, u.publicKey);
-        return true;
+        u.phoneHash = hashPhoneNumber(phone);
+        return u.phoneHash;
     }
     /**
      * @dev Verify user information
     */
     function verifyUser(string memory name,string memory cmnd, string memory dateOB, string memory phone,string memory gmail,string memory publicKey)
     public override view returns(bool) {
-         bytes32 hashInfo = hashUserInfo(name,cmnd,dateOB,phone,gmail);
+         bytes32 hashInfo = hashUserInfo(name,cmnd,dateOB,phone,gmail,publicKey);
          uint i = 0;
-         for (i = 0;  i < users.length; i++ ) {
+         for (i = 0;  i <= users.length; i++ ) {
             if(compareBytes(users[i].infoHash, hashInfo)){
                 return true;
             }
@@ -59,7 +58,7 @@ import "./StringsUtils.sol";
 
     function getHashUserInfo(string memory publickey) public view returns(bytes32) {
         uint index;
-        for (uint i = 0;  i < users.length; i++ ) {
+        for (uint i = 0;  i <= users.length; i++ ) {
             if(keccak256(abi.encodePacked(users[i].publicKey)) == keccak256(abi.encodePacked(publickey))){
                 index = i;
                 return users[index].infoHash;
@@ -74,12 +73,11 @@ import "./StringsUtils.sol";
      * Return index of Document in the document list of the owner
      */
     function saveDoc(string memory phone,bytes memory signature) public override returns (uint256) {
-        string memory hashPhone = bytes32ToString(keccak256(abi.encodePacked(phone)));
-        emit Status(true);
+        bytes32 phoneHash = hashPhoneNumber(phone);
         uint index = 100000000000;
-        for (uint i = 0;  i < users.length; i++ ) {
-            if(keccak256(abi.encodePacked(users[i].phoneHash)) == keccak256(abi.encodePacked(hashPhone))){
-                emit Status(true);
+        for (uint i = 0;  i <= users.length; i++ ) {
+           if(compareBytes(users[i].phoneHash, phoneHash)){
+                emit Status("found user by phone");
                 index = i;
             }
         }
@@ -94,13 +92,14 @@ import "./StringsUtils.sol";
      * @dev Return True if Doc wasn't change else False
      */
     function verifyDoc(string memory phone, bytes32 digest, uint indexDoc) public view override returns(bool) {
-        string memory hashPhone = bytes32ToString(keccak256(abi.encodePacked(phone)));
-        uint index;
-        for (uint i = 0;  i < users.length; i++ ) {
-            if(keccak256(abi.encodePacked(users[i].phoneHash)) == keccak256(abi.encodePacked(hashPhone))){
+        bytes32 phoneHash = hashPhoneNumber(phone);
+        uint index = 100000000000;
+        for (uint i = 0;  i <= users.length; i++ ) {
+           if(compareBytes(users[i].phoneHash, phoneHash)){
                 index = i;
             }
         }
+        require(index != 100000000000);
         return keccak256(abi.encodePacked(recoverSigner(digest,users[index].doc[indexDoc].signature))) == keccak256(abi.encodePacked(users[index].publicKey));
     }
     
@@ -152,9 +151,14 @@ import "./StringsUtils.sol";
     /**
      * @dev Return a hash of user information 
      */
-    function hashUserInfo(string memory name, string memory cmnd, string memory dOB, string memory phone, string memory gmail) 
+    function hashUserInfo(string memory name, string memory cmnd, string memory dOB, string memory phone, string memory gmail, string memory publickey) 
     private pure returns (bytes32) {
-        return keccak256(abi.encodePacked(name,cmnd,dOB,phone,gmail));
+        return keccak256(abi.encodePacked(name,cmnd,dOB,phone,gmail,publickey));
+    }
+
+    function hashPhoneNumber(string memory phone) 
+    private pure returns (bytes32) {
+        return keccak256(abi.encodePacked(phone));
     }
 
     function compareBytes(bytes32 a, bytes32 b) public pure returns (bool) {
@@ -172,3 +176,4 @@ import "./StringsUtils.sol";
         return string(bytesArray);
     }
 }
+
