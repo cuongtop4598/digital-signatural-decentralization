@@ -74,17 +74,15 @@ contract Document is Context, IDC {
      */
     function saveDoc(string memory phone,bytes memory signature) public override returns (uint256) {
         bytes32 phoneHash = hashPhoneNumber(phone);
-        uint index = 1000;
         for (uint i = 0;  i <= users.length; i++ ) {
            if(compareBytes(users[i].phoneHash, phoneHash)){
-                index = i;
+                 users[i].doc[users[i].documentSize].signature = signature;
+                 users[i].documentSize = users[i].documentSize + 1;
+                 emit IndexDocument( users[i].publicKey ,users[i].documentSize - 1, users[i].doc[users[i].documentSize-1].signature);
+                return  users[i].documentSize-1;
             }
         }
-        require(index < 1000);
-        users[index].doc[users[index].documentSize].signature = signature;
-        users[index].documentSize = users[index].documentSize + 1;
-        emit IndexDocument( users[index].publicKey ,users[index].documentSize - 1, users[index].doc[users[index].documentSize-1].signature);
-        return  users[index].documentSize-1;
+       revert("not found");
     }
 
     /**
