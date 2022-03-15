@@ -60,7 +60,7 @@ contract Document is Context, IDC {
         bytes32 phoneHash = hashPhoneNumber(phone);
         uint i = 0;
          for (i = 0;  i <= users.length; i++ ) {
-            if(compareBytes(users[i].infoHash, phoneHash)){
+            if(compareBytes(users[i].phoneHash, phoneHash)){
                 return users[i].infoHash;
             }
          }
