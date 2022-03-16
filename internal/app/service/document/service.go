@@ -137,7 +137,7 @@ func (d *document) SaveSignaturalDocument(phone string, signatural []byte) (Even
 	}
 
 	currentBlock := header.Number
-	fromBlock := big.NewInt(currentBlock.Int64() - int64(20))
+	fromBlock := big.NewInt(currentBlock.Int64() - int64(400))
 
 	d.log.Info("from block", zap.Int("block", int(fromBlock.Int64())))
 
