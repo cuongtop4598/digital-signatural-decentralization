@@ -53,8 +53,29 @@ func (s *AccountService) BindTransactionOption(account accounts.Account, passwor
 	}
 	auth.From = fromAddress
 	auth.Nonce = big.NewInt(int64(nonce))
-	auth.GasPrice = big.NewInt(10000000)
-	auth.GasLimit = uint64(0x47b760)
+	auth.GasPrice = big.NewInt(3000000)
+	auth.GasLimit = uint64(18000000)
+	return auth
+}
 
+func (s *AccountService) BindTransactionOptionWithGasLimit(account accounts.Account, password string, ks *keystore.KeyStore, client *ethclient.Client, gas uint64) *bind.TransactOpts {
+	ks.Unlock(account, password)
+	fromAddress := account.Address
+	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
+	if err != nil {
+		log.Fatal(err)
+	}
+	auth, err := bind.NewKeyStoreTransactorWithChainID(ks, account, big.NewInt(451998))
+	if err != nil {
+		log.Fatal(err)
+	}
+	gasPrice, err := client.SuggestGasPrice(context.Background())
+	if err != nil {
+		log.Fatal(err)
+	}
+	auth.From = fromAddress
+	auth.Nonce = big.NewInt(int64(nonce))
+	auth.GasPrice = gasPrice
+	auth.GasLimit = gas
 	return auth
 }
