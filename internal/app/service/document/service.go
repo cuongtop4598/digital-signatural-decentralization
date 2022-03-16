@@ -31,7 +31,7 @@ type AccountSrv interface {
 }
 
 type DocumentService interface {
-	VerifyDocument(phone string, digest [32]byte, docNum *big.Int) (bool, error)
+	VerifyDocument(phone string, digest string, docNum *big.Int) (bool, error)
 	SaveSignaturalDocument(phone string, signatural []byte) (Event, error)
 	GetDocumentByPublickey(publickey string) ([]model.Document, error)
 }
@@ -75,7 +75,7 @@ func (d *document) GetDocumentByPublickey(publickey string) ([]model.Document, e
 
 // Verify document by using phone, digest, DocID
 // phone using for get public key
-func (d *document) VerifyDocument(phone string, digest [32]byte, docNum *big.Int) (bool, error) {
+func (d *document) VerifyDocument(phone string, digest string, docNum *big.Int) (bool, error) {
 	contractAddress := common.HexToAddress(d.address)
 	// get hash user from onchain
 	documentIntance, err := NewDocument(contractAddress, d.client)

@@ -23,7 +23,7 @@ contract Document is Context, IDC {
         bytes signature;
     }
 
-    event Number(string);
+    event Number(uint num);
     /**
      * @dev Return True if user information is stored successfully, otherwise return False.
      */
@@ -63,7 +63,7 @@ contract Document is Context, IDC {
                 return users[i].infoHash;
             }
          }
-        revert("not found");
+         return 0;
     }
 
     /**
@@ -71,18 +71,25 @@ contract Document is Context, IDC {
      * 
      * Return index of Document in the document list of the owner
      */
-    function saveDoc(string memory phone,bytes memory signature) public override {
+    function saveDoc(string memory phone,bytes memory signature) public override returns (bytes32) {
         bytes32 phoneHash = hashPhoneNumber(phone);
         uint i = 0;
         for ( i = 0;  i <= users.length; i++ ) {
            if(compareBytes(users[i].phoneHash, phoneHash)){
-                 string memory numDoc = uint2str(users[i].documentSize);
+                 uint numDoc = users[i].documentSize;
                  emit Number(numDoc);
                  users[i].doc[users[i].documentSize].signature = signature;
                  users[i].documentSize = users[i].documentSize + 1;
+                 return phoneHash;
             }
         }
-       revert("not found");
+        return phoneHash;
+    }
+
+    function getMessageHash(
+        string memory _message
+    ) public pure returns (bytes32) {
+        return keccak256(abi.encodePacked(_message));
     }
 
     function getEthSignedMessageHash(bytes32 _messageHash)
@@ -102,11 +109,11 @@ contract Document is Context, IDC {
     /**
      * @dev Return True if Doc wasn't change else False
      */
-    function verifyDoc(string memory phone, bytes32 digest, uint indexDoc) public view override returns(bool) {
+    function verifyDoc(string memory phone, string memory digest, uint indexDoc) public view override returns(bool) {
         bytes memory signature;
         address publicKey;
         (signature, publicKey) = getSignature(phone, indexDoc);
-        bytes32 ethMessageHash = getEthSignedMessageHash(digest);
+        bytes32 ethMessageHash = getEthSignedMessageHash(getMessageHash(digest));
         address signer = recoverSigner(ethMessageHash,signature);
         return signer == publicKey;
     }
@@ -207,26 +214,5 @@ contract Document is Context, IDC {
         } else {
         return keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b));
         }
-    }
-    function uint2str(uint _i) internal pure returns (string memory _uintAsString) {
-        if (_i == 0) {
-            return "0";
-        }
-        uint j = _i;
-        uint len;
-        while (j != 0) {
-            len++;
-            j /= 10;
-        }
-        bytes memory bstr = new bytes(len);
-        uint k = len;
-        while (_i != 0) {
-            k = k-1;
-            uint8 temp = (48 + uint8(_i - _i / 10 * 10));
-            bytes1 b1 = bytes1(temp);
-            bstr[k] = b1;
-            _i /= 10;
-        }
-        return string(bstr);
     }
 }
