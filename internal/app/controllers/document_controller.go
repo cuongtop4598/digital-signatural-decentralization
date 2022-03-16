@@ -128,10 +128,16 @@ func (dc *DocumentController) Verify(c *gin.Context) {
 	digest, err := hex.DecodeString(verify.Digest)
 	fmt.Println("length digest byte : ", len(digest))
 	if err != nil {
-		log.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": err.Error(),
+			"data":    "",
+		})
+		return
 	}
 	digest32 := [32]byte{}
 	copy(digest32[:], digest)
+	fmt.Println(digest32)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":    http.StatusBadRequest,
@@ -236,7 +242,7 @@ func (dc *DocumentController) SaveSign(c *gin.Context) {
 	}
 	doc := model.Document{
 		DocID:     uuid.New(),
-		Number:    int(event.Numdoc),
+		Number:    int(event.Numdoc.Int64()),
 		Owner:     publickey,
 		Name:      h.Filename,
 		Type:      "pdf",

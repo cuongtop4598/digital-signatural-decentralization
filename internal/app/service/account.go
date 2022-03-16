@@ -53,8 +53,8 @@ func (s *AccountService) BindTransactionOption(account accounts.Account, passwor
 	}
 	auth.From = fromAddress
 	auth.Nonce = big.NewInt(int64(nonce))
-	auth.GasPrice = big.NewInt(3000000)
-	auth.GasLimit = uint64(18000000)
+	auth.GasPrice = big.NewInt(1000000000)
+	auth.GasLimit = uint64(4712388)
 	return auth
 }
 

@@ -40,15 +40,12 @@ type document struct {
 	accountSrv   AccountSrv
 	documentRepo *repository.DocumentRepository
 	client       *ethclient.Client
-	instance     *Document
 	log          *zap.Logger
 	address      string
 }
 
 type Event struct {
-	Publickey string
-	Numdoc    uint
-	Signature []byte
+	Numdoc *big.Int
 }
 
 func NewDocumentService(
@@ -59,16 +56,10 @@ func NewDocumentService(
 	address string,
 	log *zap.Logger) DocumentService {
 
-	doc, err := NewDocument(userAddress, client)
-	if err != nil {
-		log.Sugar().Error(err)
-	}
-
 	return &document{
 		accountSrv:   accountSrv,
 		documentRepo: documentRepo,
 		client:       client,
-		instance:     doc,
 		log:          log,
 		address:      address,
 	}
@@ -85,7 +76,14 @@ func (d *document) GetDocumentByPublickey(publickey string) ([]model.Document, e
 // Verify document by using phone, digest, DocID
 // phone using for get public key
 func (d *document) VerifyDocument(phone string, digest [32]byte, docNum *big.Int) (bool, error) {
-	isCorrect, err := d.instance.VerifyDoc(&bind.CallOpts{}, phone, digest, docNum)
+	contractAddress := common.HexToAddress(d.address)
+	// get hash user from onchain
+	documentIntance, err := NewDocument(contractAddress, d.client)
+	if err != nil {
+		d.log.Sugar().Error(err)
+		return false, err
+	}
+	isCorrect, err := documentIntance.VerifyDoc(&bind.CallOpts{}, phone, digest, docNum)
 	return isCorrect, err
 }
 
@@ -98,7 +96,14 @@ func (d *document) SaveSignaturalDocument(phone string, signatural []byte) (Even
 	}
 	opts := d.accountSrv.BindTransactionOption(*account, "123456", ks, d.client)
 
-	txn, err := d.instance.SaveDoc(opts, phone, signatural)
+	contractAddress := common.HexToAddress(d.address)
+	// get hash user from onchain
+	documentIntance, err := NewDocument(contractAddress, d.client)
+	if err != nil {
+		d.log.Sugar().Error(err)
+		return Event{}, err
+	}
+	txn, err := documentIntance.SaveDoc(opts, phone, signatural)
 	if err != nil {
 		d.log.Sugar().Error(err)
 		return Event{}, err
@@ -137,7 +142,7 @@ func (d *document) SaveSignaturalDocument(phone string, signatural []byte) (Even
 	}
 
 	currentBlock := header.Number
-	fromBlock := big.NewInt(currentBlock.Int64() - int64(400))
+	fromBlock := big.NewInt(currentBlock.Int64() - int64(100))
 
 	d.log.Info("from block", zap.Int("block", int(fromBlock.Int64())))
 
@@ -167,7 +172,7 @@ func (d *document) SaveSignaturalDocument(phone string, signatural []byte) (Even
 	events := []Event{}
 	for _, vLog := range logs {
 		event := Event{}
-		err = contractAbi.UnpackIntoInterface(&event, "IndexDocument", vLog.Data)
+		err = contractAbi.UnpackIntoInterface(&event, "Number", vLog.Data)
 		if err != nil {
 			d.log.Sugar().Error(err)
 		}
