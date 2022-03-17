@@ -36,6 +36,28 @@ func DocumentRouter(docService document.DocumentService, documentRepo repository
 	ar.GET("/download/:filename", dc.Download)
 	ar.POST("/verify", dc.Verify)
 	ar.GET("/list", dc.GetDocs)
+	ar.GET("/signature", dc.GetSign)
+}
+
+type GetSignRequest struct {
+	Phone  string `json:"phone"`
+	Number int    `json:"number"`
+}
+
+func (dc *DocumentController) GetSign(c *gin.Context) {
+	getSignRequest := GetSignRequest{}
+	err := c.BindJSON(&getSignRequest)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	sign, err := dc.documentSrv.GetSignature(getSignRequest.Phone, big.NewInt(int64(getSignRequest.Number)))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	log.Println(len(sign))
+	c.JSON(http.StatusOK, gin.H{"length": len(sign), "sign": sign})
 }
 
 func (dc *DocumentController) Upload(c *gin.Context) {
