@@ -5,6 +5,7 @@ import (
 	"digitalsignature/internal/app/repository"
 	"digitalsignature/internal/app/service/document"
 	"digitalsignature/internal/app/utils"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"log"
@@ -174,7 +175,6 @@ func (dc *DocumentController) SaveSign(c *gin.Context) {
 	}
 	publickey := c.Request.FormValue("publickey")
 	signature := c.Request.FormValue("signature")
-
 	os.Chdir(".")
 	tmpFile, err := os.Create("./static/" + h.Filename + ".pdf")
 	if err != nil {
@@ -209,7 +209,18 @@ func (dc *DocumentController) SaveSign(c *gin.Context) {
 		})
 		return
 	}
-	event, err := dc.documentSrv.SaveSignaturalDocument(phone, []byte(signature))
+	convert_signature, err := hex.DecodeString(signature[2:])
+	fmt.Printf("% x", convert_signature)
+	fmt.Println("\nlength:", len(convert_signature))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": err.Error(),
+			"data":    "",
+		})
+		return
+	}
+	event, err := dc.documentSrv.SaveSignaturalDocument(phone, convert_signature)
 	if err != nil {
 		log.Println("save signatural error:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
