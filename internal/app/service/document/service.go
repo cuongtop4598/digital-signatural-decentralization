@@ -75,7 +75,9 @@ func (d *document) GetDocumentByPhone(phone string) ([]model.Document, error) {
 	return docs, nil
 }
 
-func (d *document) GetDocumentByPublickey(publickey string) ([]model.Document, error)
+func (d *document) GetDocumentByPublickey(publickey string) ([]model.Document, error) {
+	return []model.Document{}, nil
+}
 
 func (d *document) GetSignature(phone string, number *big.Int) ([]byte, error) {
 	contractAddress := common.HexToAddress(d.address)
