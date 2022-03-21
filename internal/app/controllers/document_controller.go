@@ -250,7 +250,7 @@ func (dc *DocumentController) SaveSign(c *gin.Context) {
 }
 
 type GetDocsRequest struct {
-	PublicKey string `json:"public_key"`
+	Phone string `json:"phone"`
 }
 
 func (dc *DocumentController) GetDocs(c *gin.Context) {
@@ -263,7 +263,7 @@ func (dc *DocumentController) GetDocs(c *gin.Context) {
 			"data":    "",
 		})
 	}
-	docs, err := dc.documentSrv.GetDocumentByPublickey(request.PublicKey)
+	docs, err := dc.documentSrv.GetDocumentByPhone(request.Phone)
 	if err != nil {
 		log.Println("get list document error:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{

@@ -33,7 +33,7 @@ type AccountSrv interface {
 type DocumentService interface {
 	VerifyDocument(phone string, digest string, docNum *big.Int) (bool, error)
 	SaveSignaturalDocument(phone string, signatural []byte) (Event, error)
-	GetDocumentByPublickey(publickey string) ([]model.Document, error)
+	GetDocumentByPhone(phone string) ([]model.Document, error)
 }
 
 type document struct {
@@ -65,8 +65,8 @@ func NewDocumentService(
 	}
 }
 
-func (d *document) GetDocumentByPublickey(publickey string) ([]model.Document, error) {
-	docs, err := d.documentRepo.AllByOwner(publickey)
+func (d *document) GetDocumentByPhone(phone string) ([]model.Document, error) {
+	docs, err := d.documentRepo.AllByOwner(phone)
 	if err != nil {
 		log.Fatal(err)
 	}
