@@ -70,13 +70,19 @@ func NewDocumentService(
 func (d *document) GetDocumentByPhone(phone string) ([]model.Document, error) {
 	docs, err := d.documentRepo.AllByOwner(phone)
 	if err != nil {
-		log.Fatal(err)
+		d.log.Sugar().Error(err)
+		return []model.Document{}, err
 	}
 	return docs, nil
 }
 
 func (d *document) GetDocumentByPublickey(publickey string) ([]model.Document, error) {
-	return []model.Document{}, nil
+	docs, err := d.documentRepo.AllByOwner(publickey)
+	if err != nil {
+		d.log.Sugar().Error(err)
+		return []model.Document{}, err
+	}
+	return docs, nil
 }
 
 func (d *document) GetSignature(phone string, number *big.Int) ([]byte, error) {

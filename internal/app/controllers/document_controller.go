@@ -35,7 +35,7 @@ func DocumentRouter(docService document.DocumentService, documentRepo repository
 	ar.POST("/upload", dc.Upload)
 	ar.GET("/download/:filename", dc.Download)
 	ar.POST("/verify", dc.Verify)
-	ar.GET("/list/:phone", dc.GetDocs)
+	ar.GET("/list/:publickey", dc.GetDocs)
 	ar.GET("/signature", dc.GetSign)
 }
 
@@ -283,8 +283,8 @@ func (dc *DocumentController) SaveSign(c *gin.Context) {
 }
 
 func (dc *DocumentController) GetDocs(c *gin.Context) {
-	phone := c.Param("phone")
-	docs, err := dc.documentSrv.GetDocumentByPhone(phone)
+	publickey := c.Param("publickey")
+	docs, err := dc.documentSrv.GetDocumentByPublickey(publickey)
 	if err != nil {
 		log.Println("get list document error:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
