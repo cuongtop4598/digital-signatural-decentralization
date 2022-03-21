@@ -35,7 +35,7 @@ func DocumentRouter(docService document.DocumentService, documentRepo repository
 	ar.POST("/upload", dc.Upload)
 	ar.GET("/download/:filename", dc.Download)
 	ar.POST("/verify", dc.Verify)
-	ar.GET("/list", dc.GetDocs)
+	ar.GET("/list/:phone", dc.GetDocs)
 	ar.GET("/signature", dc.GetSign)
 }
 
@@ -282,22 +282,9 @@ func (dc *DocumentController) SaveSign(c *gin.Context) {
 	})
 }
 
-type GetDocsRequest struct {
-	Phone string `json:"phone"`
-}
-
 func (dc *DocumentController) GetDocs(c *gin.Context) {
-	request := GetDocsRequest{}
-	err := c.BindJSON(&request)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"code":    http.StatusBadRequest,
-			"message": err,
-			"data":    "",
-		})
-		return
-	}
-	docs, err := dc.documentSrv.GetDocumentByPhone(request.Phone)
+	phone := c.Param("phone")
+	docs, err := dc.documentSrv.GetDocumentByPhone(phone)
 	if err != nil {
 		log.Println("get list document error:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
