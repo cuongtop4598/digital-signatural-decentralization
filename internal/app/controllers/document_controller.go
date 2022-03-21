@@ -295,6 +295,7 @@ func (dc *DocumentController) GetDocs(c *gin.Context) {
 			"message": err,
 			"data":    "",
 		})
+		return
 	}
 	docs, err := dc.documentSrv.GetDocumentByPhone(request.Phone)
 	if err != nil {
