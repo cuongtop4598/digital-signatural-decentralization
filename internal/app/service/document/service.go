@@ -34,6 +34,8 @@ type DocumentService interface {
 	VerifyDocument(phone string, digest string, docNum *big.Int) (bool, error)
 	SaveSignaturalDocument(phone string, signatural []byte) (Event, error)
 	GetDocumentByPhone(phone string) ([]model.Document, error)
+	GetDocumentByPublickey(publickey string) ([]model.Document, error)
+	GetSignature(phone string, number *big.Int) ([]byte, error)
 }
 
 type document struct {
@@ -71,6 +73,24 @@ func (d *document) GetDocumentByPhone(phone string) ([]model.Document, error) {
 		log.Fatal(err)
 	}
 	return docs, nil
+}
+
+func (d *document) GetDocumentByPublickey(publickey string) ([]model.Document, error)
+
+func (d *document) GetSignature(phone string, number *big.Int) ([]byte, error) {
+	contractAddress := common.HexToAddress(d.address)
+	// get hash user from onchain
+	documentIntance, err := NewDocument(contractAddress, d.client)
+	if err != nil {
+		d.log.Sugar().Error(err)
+		return []byte{}, err
+	}
+	signature, _, err := documentIntance.GetSignature(&bind.CallOpts{}, phone, number)
+	if err != nil {
+		d.log.Sugar().Error(err)
+		return []byte{}, err
+	}
+	return signature, nil
 }
 
 // Verify document by using phone, digest, DocID
