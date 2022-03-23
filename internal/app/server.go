@@ -2,6 +2,7 @@ package app
 
 import (
 	"digitalsignature/config"
+	"digitalsignature/internal/app/middleware"
 	"digitalsignature/internal/app/migration"
 	"digitalsignature/internal/pkg/database"
 	"digitalsignature/internal/pkg/ethereum"
@@ -10,11 +11,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/gin-contrib/cors"
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-	gintrace "gopkg.in/DataDog/dd-trace-go.v1/contrib/gin-gonic/gin"
 	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 )
 
@@ -30,31 +29,7 @@ func (server *Server) Run(env string) error {
 	}
 	r := gin.Default()
 
-	headerPolicies := cors.DefaultConfig()
-
-	headerPolicies.AllowOrigins = []string{
-		"*",
-	}
-
-	headerPolicies.AllowMethods = []string{
-		"GET",
-		"POST",
-		"PUT",
-		"DELETE",
-		"OPTIONS",
-		"HEAD",
-	}
-
-	headerPolicies.AllowHeaders = []string{
-		"Accept",
-		"Content-Type",
-	}
-
-	headerPolicies.AllowCredentials = true
-	headerPolicies.MaxAge = (24 * time.Hour)
-
-	r.Use(cors.Default())
-	r.Use(gintrace.Middleware(""))
+	r.Use(middleware.CORSMiddleware())
 
 	log, _ := zap.NewDevelopment()
 	if env != "debug" {

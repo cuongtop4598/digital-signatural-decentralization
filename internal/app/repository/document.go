@@ -26,7 +26,7 @@ func (repo *DocumentRepository) Create(doc *model.Document) error {
 
 func (repo *DocumentRepository) AllByOwner(publickey string) ([]model.Document, error) {
 	docs := []model.Document{}
-	result := repo.DB.Model(&model.Document{}).Where("public_key = ? ", publickey).Find(&docs)
+	result := repo.DB.Model(&model.Document{}).Where("owner = ? ", publickey).Find(&docs)
 	if result.Error != nil {
 		return nil, result.Error
 	}
