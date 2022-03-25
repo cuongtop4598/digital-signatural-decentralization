@@ -36,7 +36,7 @@ func (repo *DocumentRepository) AllByOwner(publickey string) ([]model.Document, 
 func (repo *DocumentRepository) IsPublic(name string) (bool, error) {
 	var count int64
 	var doc model.Document
-	result := repo.DB.Model(&doc).Where("public = ?", true).Where("name = ?", doc.Name).Count(&count)
+	result := repo.DB.Model(&doc).Where("public = ?", true).Where("name = ?", name).Count(&count)
 	if result.Error != nil {
 		return false, result.Error
 	}
