@@ -5,12 +5,12 @@ import (
 	"digitalsignature/internal/app/middleware"
 	"digitalsignature/internal/app/migration"
 	"digitalsignature/internal/pkg/database"
-	"digitalsignature/internal/pkg/ethereum"
-	"fmt"
-	"log"
 	"os"
 	"time"
 
+	"github.com/ethereum/go-ethereum/ethclient"
+
+	"github.com/gin-contrib/cors"
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -22,13 +22,26 @@ type Server struct{}
 
 // Run runs our API server
 func (server *Server) Run(env string) error {
-	os.Chdir(".")
-	configuration, err := config.NewConfig("./config/", "dev")
-	if err != nil {
-		log.Fatal(err)
-	}
 	r := gin.Default()
-
+	headerPolicies := cors.DefaultConfig()
+	headerPolicies.AllowOrigins = []string{
+		"http://localhost:3000",
+		"http://localhost:3001",
+		"http://192.168.78.2:3000",
+		"http://192.168.78.2:3001",
+	}
+	headerPolicies.AllowHeaders = []string{
+		"Access-Control-Allow-Credentials",
+		"Access-Control-Allow-Headers",
+		"Content-Type",
+		"Content-Length",
+		"Accept-Encoding",
+		"Authorization",
+		"Access-Control-Allow-Origin",
+	}
+	headerPolicies.AllowCredentials = true
+	headerPolicies.MaxAge = (24 * time.Hour)
+	r.Use(cors.New(headerPolicies))
 	r.Use(middleware.CORSMiddleware())
 
 	log, _ := zap.NewDevelopment()
@@ -42,18 +55,18 @@ func (server *Server) Run(env string) error {
 			tracer.WithService(""),
 		)
 	}
-	fmt.Println(configuration.Database)
-	db, err := database.GetConnection(configuration.Database)
-	if err != nil {
-		log.Sugar().Errorf("Connect to database fail ", err)
-	}
+	schema := "public"
+	db := database.NewDBConnection(log, &schema)
 
-	err = migration.Migrate(db, log)
+	err := migration.Migrate(db, log)
 	if err != nil {
 		log.Sugar().Errorf("Migrate fail ", err)
 	}
-
-	client, err := ethereum.NewClient(configuration.Ethereum)
+	ethEndpoint, ok := os.LookupEnv("CHAIN_ENDPOINT")
+	if !ok {
+		ethEndpoint = "http://127.0.0.1:8545"
+	}
+	client, err := ethclient.Dial(ethEndpoint)
 	if err != nil {
 		log.Sugar().Error(err)
 	}
@@ -66,12 +79,13 @@ func (server *Server) Run(env string) error {
 		DB:        db,
 		Log:       log,
 		R:         r,
-		Config:    configuration,
 	}
 	// setup router
 	rsDefault.SetupRoutes()
 
-	host := configuration.Server.Host
-	port := configuration.Server.Port
-	return r.Run(host + ":" + port)
+	port, ok := os.LookupEnv("BACKEND_PORT")
+	if !ok {
+		port = "8080"
+	}
+	return r.Run(":" + port)
 }

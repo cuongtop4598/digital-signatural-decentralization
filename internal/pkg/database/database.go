@@ -2,26 +2,60 @@ package database
 
 import (
 	"fmt"
+	"log"
 
+	"github.com/caarlos0/env/v6"
+	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 )
 
-// PostgresConfig persists the config for our PostgreSQL database connection
-type DBConfig struct {
-	Host        string `yaml:"host"`
-	Port        string `yaml:"port"`
-	User        string `yaml:"user"`
-	Password    string `yaml:"password"`
-	Database    string `yaml:"database"`
-	Environment string `yaml:"env"`
+func NewDBConnection(log *zap.Logger, sc *string) *gorm.DB {
+	config := getPgConfig()
+	connection := config.ToConnectionString()
+	fmt.Println(connection)
+	public := "public"
+	if sc == nil {
+		sc = &public
+	}
+	db, err := gorm.Open(postgres.Open(connection), &gorm.Config{
+		NamingStrategy: schema.NamingStrategy{
+			TablePrefix:   *sc + ".",
+			SingularTable: false,
+		},
+	})
+	if err != nil {
+		log.Error(err.Error())
+	}
+	return db
 }
 
-func GetConnection(c *DBConfig) (*gorm.DB, error) {
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", c.Host, c.User, c.Password, c.Database, c.Port)
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		return nil, err
+type PgConfig struct {
+	URL         string `env:"DATABASE_URL"`
+	Host        string `env:"DATABASE_HOST"`
+	Port        int32  `env:"DATABASE_PORT"`
+	User        string `env:"DATABASE_USER"`
+	SSLMode     string `env:"SSL_MODE"`
+	Password    string `env:"DATABASE_PASSWORD"`
+	Database    string `env:"DATABASE_DB"`
+	Environment string `env:"GIN_MODE"`
+}
+
+func (c PgConfig) ToConnectionString() string {
+	return fmt.Sprintf("host=%s user=%s dbname=%s port=%d password=%s",
+		c.Host,
+		c.User,
+		c.Database,
+		c.Port,
+		c.Password,
+	)
+}
+
+func getPgConfig() *PgConfig {
+	c := PgConfig{}
+	if err := env.Parse(&c); err != nil {
+		log.Fatal(err)
 	}
-	return db, nil
+	return &c
 }

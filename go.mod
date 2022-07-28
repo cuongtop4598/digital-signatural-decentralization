@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/Microsoft/go-winio v0.5.1 // indirect
+	github.com/caarlos0/env/v6 v6.9.3 // indirect
 	github.com/ethereum/go-ethereum v1.10.11
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-contrib/zap v0.0.1
@@ -11,6 +12,7 @@ require (
 	github.com/go-playground/validator/v10 v10.6.1 // indirect
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/google/uuid v1.3.0
+	github.com/joho/godotenv v1.4.0 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/mattn/go-isatty v0.0.13 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect

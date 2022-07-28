@@ -1,0 +1,6 @@
+make.exe --dry-run --always-make --keep-going --print-directory
+make: Entering directory 'd:/graduation-thesis/backend'
+solc --abi ./contracts/documents/Document.sol -o build && \
+abigen --abi ./contracts/documents/build/Document.abi --pkg document --out document.go 
+make: Leaving directory 'd:/graduation-thesis/backend'
+ 

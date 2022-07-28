@@ -49,8 +49,6 @@ func (uc *UserController) SignUp(c *gin.Context) {
 		})
 		return
 	}
-	// c.SetCookie("publickey", userInfo.PublicKey, 10000000, "", "", false, false)
-	// c.SetCookie("phone", userInfo.Phone, 10000000, "", "", false, false)
 	userInfo.SantisizePassword()
 	c.JSON(200, gin.H{
 		"code":    200,
@@ -86,8 +84,6 @@ func (uc *UserController) SignIn(c *gin.Context) {
 		return
 	}
 	if isLog {
-		// c.SetCookie("publickey", userInfo.PublicKey, 10000000, "", "", false, false)
-		// c.SetCookie("phone", userInfo.Phone, 10000000, "", "", false, false)
 		userInfo.SantisizePassword()
 		c.JSON(http.StatusOK, gin.H{
 			"code":    http.StatusOK,

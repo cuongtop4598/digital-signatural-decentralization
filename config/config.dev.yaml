@@ -1,18 +1,8 @@
-server:
-  mode: "development"
-  host: "0.0.0.0"
-  port: "10115"
 ethereum:
   endpoint: "http://27.72.105.169:10198"
   keystore_path: "./wallets/keystore/"
   chain_id: 451998
   pass_admin: "123456"
-database:
-  host: "localhost" 
-  port: "5435"
-  user: "root"
-  password: "local"
-  database: "digital_signatural"
 address: 
   document: "0x6614EBfbef7Ec56148126fcDe2249fc5e9E522B8"
   accounts: []
