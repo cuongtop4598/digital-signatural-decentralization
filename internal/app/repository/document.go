@@ -46,3 +46,13 @@ func (repo *DocumentRepository) IsPublic(name string) (bool, error) {
 		return false, nil
 	}
 }
+
+func (repo *DocumentRepository) UpdateDocumentNumber(signature string, number int) error {
+
+	var doc model.Document
+	result := repo.DB.Model(&doc).Where("signature = ?", signature).Update("number", number)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}

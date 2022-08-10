@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log"
 	"math/big"
-	"os"
 	"strings"
 	"sync"
 	"time"
@@ -53,17 +52,18 @@ type Event struct {
 
 func NewDocumentService(
 	client *ethclient.Client,
+	userAddress common.Address,
 	accountSrv AccountSrv,
 	documentRepo *repository.DocumentRepository,
+	address string,
 	log *zap.Logger) DocumentService {
 
-	contractAddress, _ := os.LookupEnv("CONTRACT_ADDRESS")
 	return &document{
 		accountSrv:   accountSrv,
 		documentRepo: documentRepo,
 		client:       client,
 		log:          log,
-		address:      contractAddress,
+		address:      address,
 	}
 }
 
@@ -208,6 +208,13 @@ func (d *document) SaveSignaturalDocument(phone string, signatural []byte) (Even
 	}
 	if len(events) > 0 {
 		fmt.Println(events)
+		// Update doc_num trong database
+		num := int(events[len(events)-1].Numdoc.Int64())
+		err := d.documentRepo.UpdateDocumentNumber(string(signatural), num)
+		if err != nil {
+			d.log.Sugar().Error(err)
+		}
+		d.log.Info("document", zap.Int("number", num))
 		return events[len(events)-1], nil
 	}
 	return Event{}, nil
