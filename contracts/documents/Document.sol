@@ -7,7 +7,6 @@ import "./utils/Context.sol";
 import "./StringsUtils.sol";
 
 contract Document is Context, IDC {
-                             
     struct User {
         string userID;
         bytes32 infoHash;
@@ -16,28 +15,75 @@ contract Document is Context, IDC {
         uint documentSize;
         mapping(uint => Doc) doc;
     }
-
-    User[] users;
-
     struct Doc {
         bytes signature;
     }
 
-    event Number(uint num);
+    struct MultiSignerDoc {
+        uint256 ID;
+        uint256 startDate; // timestamp
+        uint256 validDate;
+        address partnerA; // the first signer 
+        address partnerB; // the second signer
+        bytes firstSignature;
+        bytes secondSignature;
+        bool valid;
+    }
+
+    User[] users;
+    MultiSignerDoc[] multiSignerDocs;
+
+    event NumberOfOwnerDocument(uint num);
+    event CreateAccountSuccess(string userInfo);
+    /*
+     @dev The first user will sign their document and send to the other signer
+    */
+    function createMultipleSignerDocument(address partner, bytes memory signatureA) public override returns (uint256, uint256, bool) {
+        if(partner == msg.sender) {
+            return (0, 0 , false);
+        }
+        uint256 idx = multiSignerDocs.length;
+        multiSignerDocs.push();
+        MultiSignerDoc storage ms = multiSignerDocs[idx];
+        ms.ID = idx;
+        ms.partnerA = msg.sender;
+        ms.partnerB = partner;
+        ms.firstSignature = signatureA;
+        ms.startDate = block.timestamp;
+        ms.valid = false;
+        return (ms.ID, ms.startDate , true);
+    }
+
+    /*
+        @dev The second user use this function to sign the document 
+    */
+    function signMultipleSignerDocument(uint256 DocID, bytes memory signatureB) public override returns (uint256,bool) {
+        if(DocID < multiSignerDocs.length) {
+            if(multiSignerDocs[DocID].partnerB == msg.sender){
+                multiSignerDocs[DocID].secondSignature = signatureB;
+                multiSignerDocs[DocID].valid = true;
+                multiSignerDocs[DocID].validDate = block.timestamp;
+                return ( multiSignerDocs[DocID].validDate, true);
+            } 
+            return (0,false);
+        }
+        return (0,false);
+    } 
+
     /**
      * @dev Return True if user information is stored successfully, otherwise return False.
      */
-    function storeUser(string memory userID,string memory name,string memory cmnd, string memory dateOB, string memory phone,string memory gmail,address publicKey) 
+    function storeUser(string memory name,string memory cmnd, string memory dateOB, string memory phone,string memory gmail,address publicKey) 
     public override returns(bytes32) {
         bytes32 hashInfo = hashUserInfo(name,cmnd,dateOB,phone,gmail,publicKey);
         uint256 idx = users.length;
         users.push();
         User storage u = users[idx];
-        u.userID = userID;
         u.infoHash = hashInfo;
         u.publicKey = publicKey;
         u.phoneHash = hashPhoneNumber(phone);
         u.documentSize = 0;
+        emit CreateAccountSuccess(string(abi.encodePacked(phone,'-',publicKey)));
         return u.phoneHash;
     }
     /**
@@ -47,7 +93,7 @@ contract Document is Context, IDC {
     public override view returns(bool) {
          bytes32 hashInfo = hashUserInfo(name,cmnd,dateOB,phone,gmail,publicKey);
          uint i = 0;
-         for (i = 0;  i <= users.length; i++ ) {
+         for (i = 0;  i < users.length; i++ ) {
             if(compareBytes(users[i].infoHash, hashInfo)){
                 return true;
             }
@@ -71,13 +117,13 @@ contract Document is Context, IDC {
      * 
      * Return index of Document in the document list of the owner
      */
-    function saveDoc(string memory phone,bytes memory signature) public override returns (bytes32) {
+    function createSingleSignerDocument(string memory phone,bytes memory signature) public override returns (bytes32) {
         bytes32 phoneHash = hashPhoneNumber(phone);
         uint i = 0;
         for ( i = 0;  i <= users.length; i++ ) {
            if(compareBytes(users[i].phoneHash, phoneHash)){
                  uint numDoc = users[i].documentSize;
-                 emit Number(numDoc);
+                 emit NumberOfOwnerDocument(numDoc);
                  users[i].doc[users[i].documentSize].signature = signature;
                  users[i].documentSize = users[i].documentSize + 1;
                  return phoneHash;
@@ -130,14 +176,13 @@ contract Document is Context, IDC {
     
     function getSignature(string memory phone, uint indexDoc) public view returns (bytes memory, address ) {
         string memory hashPhone = bytes32ToString(keccak256(abi.encodePacked(phone)));
-       uint index;
         for (uint i = 0;  i < users.length; i++ ) {
             if(keccak256(abi.encodePacked(users[i].phoneHash)) == keccak256(abi.encodePacked(hashPhone))){
-                index = i;
+                Doc memory d = users[i].doc[indexDoc];
+                return (d.signature,  users[i].publicKey);
             }
         }
-        Doc memory d = users[index].doc[indexDoc];
-        return (d.signature,  users[index].publicKey);
+        revert('Not found');
     }
 
    function recoverSigner(bytes32 _ethSignedMessageHash, bytes memory _signature)

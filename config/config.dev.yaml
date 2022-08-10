@@ -1,8 +1,0 @@
-ethereum:
-  endpoint: "http://27.72.105.169:10198"
-  keystore_path: "./wallets/keystore/"
-  chain_id: 451998
-  pass_admin: "123456"
-address: 
-  document: "0x6614EBfbef7Ec56148126fcDe2249fc5e9E522B8"
-  accounts: []

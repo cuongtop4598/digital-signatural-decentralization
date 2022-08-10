@@ -11,7 +11,7 @@ type User struct {
 	Name        string    `json:"name"`
 	PublicKey   string    `json:"public_key" gorm:"primaryKey;not null;unique"`
 	CardID      string    `json:"card_id"`
-	Phone       string    `json:"phone"`
+	Phone       string    `json:"phone" gorm:"primaryKey;not null;unique"`
 	Gmail       string    `json:"gmail"`
 	DateOfBirth string    `json:"dateo_of_birth,omitempty"`
 	Password    string    `json:"password"`

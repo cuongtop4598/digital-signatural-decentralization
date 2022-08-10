@@ -8,6 +8,7 @@ import (
 	"digitalsignature/internal/app/response"
 	"digitalsignature/internal/app/service/document"
 	"log"
+	"os"
 	"sync"
 	"time"
 
@@ -33,17 +34,18 @@ type UserService struct {
 	documentContract string
 }
 
-func NewUserService(client *ethclient.Client, userRepo *repository.UserRepo, accountSrv AccountSrv, docContract string, log *zap.Logger) *UserService {
+func NewUserService(client *ethclient.Client, userRepo *repository.UserRepo, accountSrv AccountSrv, log *zap.Logger) *UserService {
+	contractAddress, _ := os.LookupEnv("CONTRACT_ADDRESS")
 	return &UserService{
 		ethclient:        client,
 		userRepo:         userRepo,
 		logger:           log,
 		accountSrv:       accountSrv,
-		documentContract: docContract,
+		documentContract: contractAddress,
 	}
 }
 func (s *UserService) Create(c *gin.Context, userInfo request.UserInfo) error {
-	// Validate user info including gmail, phone, id card
+	// TODO: Validate user info including gmail, phone, id card
 
 	// Insert user info to offchain
 	user := model.User{

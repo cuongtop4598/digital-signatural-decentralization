@@ -1,15 +1,15 @@
 package app
 
 import (
-	"digitalsignature/config"
 	"digitalsignature/internal/app/middleware"
 	"digitalsignature/internal/app/migration"
 	"digitalsignature/internal/pkg/database"
 	"os"
 	"time"
 
-	"github.com/ethereum/go-ethereum/ethclient"
+	"digitalsignature/routers"
 
+	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gin-contrib/cors"
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
@@ -74,7 +74,7 @@ func (server *Server) Run(env string) error {
 	defer tracer.Stop()
 	defer log.Sync()
 
-	rsDefault := &config.Services{
+	rsDefault := &routers.Router{
 		EthClient: client,
 		DB:        db,
 		Log:       log,

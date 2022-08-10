@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"math/big"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -52,18 +53,17 @@ type Event struct {
 
 func NewDocumentService(
 	client *ethclient.Client,
-	userAddress common.Address,
 	accountSrv AccountSrv,
 	documentRepo *repository.DocumentRepository,
-	address string,
 	log *zap.Logger) DocumentService {
 
+	contractAddress, _ := os.LookupEnv("CONTRACT_ADDRESS")
 	return &document{
 		accountSrv:   accountSrv,
 		documentRepo: documentRepo,
 		client:       client,
 		log:          log,
-		address:      address,
+		address:      contractAddress,
 	}
 }
 

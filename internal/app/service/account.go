@@ -19,7 +19,15 @@ type AccountService struct {
 	Password string
 }
 
-func NewAccountService(keyPath string, password string) *AccountService {
+func NewAccountService() *AccountService {
+	keyPath, ok := os.LookupEnv("KEYSTORE_PATH")
+	if !ok {
+		keyPath = "./wallets/keystore"
+	}
+	password, ok := os.LookupEnv("PASSWORD_UNLOCK")
+	if !ok {
+		password = "123456"
+	}
 	return &AccountService{
 		KeyPath:  keyPath,
 		Password: password,

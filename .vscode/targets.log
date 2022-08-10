@@ -8,12 +8,10 @@ make: *** No rule to make target 'all'.  Stop.
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Thu Jul 28 23:17:53 2022
+# Make data base, printed on Thu Aug 11 00:41:54 2022
 
 # Variables
 
-# environment
-FPS_BROWSER_APP_PROFILE_STRING = Internet Explorer
 # environment
 SYSTEMDRIVE = C:
 # environment
@@ -43,9 +41,7 @@ GOPATH = C:\Users\cuong\go
 # automatic
 @D = $(patsubst %/,%,$(patsubst %\,%,$(dir $@)))
 # environment
-CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_14268_SIASZTFROYBVUMXI
-# environment
-FPS_BROWSER_USER_PROFILE_STRING = Default
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_26560_RNTAMYOSOKEOETJL
 # environment
 VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # default
@@ -59,7 +55,7 @@ VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # environment
 CONDA_PROMPT_MODIFIER = False
 # environment
-VSCODE_CODE_CACHE_PATH = C:\Users\cuong\AppData\Roaming\Code\CachedData\3b889b090b5ad5793f524b5d1d39fda662b96a2a
+VSCODE_CODE_CACHE_PATH = C:\Users\cuong\AppData\Roaming\Code\CachedData\da76f93349a72022ca4670c1b84860304616aaa2
 # environment
 LANG = C
 # default
@@ -99,7 +95,7 @@ MAKEFILE_LIST := Makefile
 # automatic
 @F = $(notdir $@)
 # environment
-VSCODE_PID = 14268
+VSCODE_PID = 26560
 # automatic
 ?D = $(patsubst %/,%,$(patsubst %\,%,$(dir $?)))
 # environment
@@ -213,7 +209,7 @@ ELECTRON_RUN_AS_NODE = 1
 # environment
 TEMP = C:\Users\cuong\AppData\Local\Temp
 # environment
-VSCODE_IPC_HOOK = \\.\pipe\e94ae9dbae3ecdd11f46d8acb5f6d9e3-1.69.2-main-sock
+VSCODE_IPC_HOOK = \\.\pipe\e94ae9dbae3ecdd11f46d8acb5f6d9e3-1.70.0-main-sock
 # environment
 GOPROXY = https://proxy.golang.org,direct
 # default
@@ -235,7 +231,7 @@ PROCESSOR_REVISION = 8d01
 # environment
 PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 141 Stepping 1, GenuineIntel
 # variable set hash-table stats:
-# Load=111/1024=11%, Rehash=0, Collisions=11/138=8%
+# Load=109/1024=11%, Rehash=0, Collisions=10/136=7%
 
 # Pattern-specific Variable Values
 
@@ -243,9 +239,9 @@ PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 141 Stepping 1, GenuineIntel
 
 # Directories
 
-# . (key d:/graduation-thesis/backend, mtime 1658709458): 19 files, no impossibilities.
+# . (key d:/graduation-thesis/backend, mtime 1660151709): 21 files, no impossibilities.
 
-# 19 files, no impossibilities in 1 directories.
+# 21 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -303,12 +299,12 @@ run:
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 25 / storage = 198 B / avg = 7 B
-# current buf: size = 8174 B / used = 198 B / count = 25 / avg = 7 B
+# strcache buffers: 1 (0) / strings = 27 / storage = 217 B / avg = 8 B
+# current buf: size = 8174 B / used = 217 B / count = 27 / avg = 8 B
 
-# strcache performance: lookups = 32 / hit rate = 21%
+# strcache performance: lookups = 34 / hit rate = 20%
 # hash-table stats:
-# Load=25/8192=0%, Rehash=0, Collisions=0/32=0%
-# Finished Make data base on Thu Jul 28 23:17:53 2022
+# Load=27/8192=0%, Rehash=0, Collisions=0/34=0%
+# Finished Make data base on Thu Aug 11 00:41:54 2022
 
  
