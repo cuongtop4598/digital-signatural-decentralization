@@ -32,12 +32,12 @@ func (r *Router) SetupRoutes() {
 	docRepo := repository.NewDocumentRepo(r.DB, r.Log)
 
 	accountSrv := service.NewAccountService()
-	documentSrv := document.NewDocumentService(r.EthClient, accountSrv, docRepo, r.Log)
+	documentSrv := document.NewDocumentService(r.EthClient, accountSrv, docRepo, userRepo, r.Log)
+	userSrv := service.NewUserService(r.EthClient, userRepo, accountSrv, r.Log)
 
-	controllers.HomeRouter(r.R)
 	rg := r.R.Group("/v1")
 
-	userService := service.NewUserService(r.EthClient, userRepo, accountSrv, r.Log)
-	controllers.UserRouter(*userService, rg)
-	controllers.DocumentRouter(documentSrv, *docRepo, *userRepo, rg)
+	controllers.HomeRouter(r.R)
+	controllers.UserRouter(userSrv, rg)
+	controllers.DocumentRouter(documentSrv, docRepo, userRepo, rg)
 }

@@ -2,7 +2,6 @@ package app
 
 import (
 	"digitalsignature/internal/app/middleware"
-	"digitalsignature/internal/app/migration"
 	"digitalsignature/internal/pkg/database"
 	"os"
 	"time"
@@ -58,10 +57,6 @@ func (server *Server) Run(env string) error {
 	schema := "public"
 	db := database.NewDBConnection(log, &schema)
 
-	err := migration.Migrate(db, log)
-	if err != nil {
-		log.Sugar().Errorf("Migrate fail ", err)
-	}
 	ethEndpoint, ok := os.LookupEnv("CHAIN_ENDPOINT")
 	if !ok {
 		ethEndpoint = "http://127.0.0.1:8545"

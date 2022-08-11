@@ -28,11 +28,11 @@ func Migrate(db *gorm.DB, log *zap.Logger) error {
 		log.Sugar().Error(err)
 		return err
 	}
-	if !tx.HasConstraint(&model.Document{}, "fk_user_documents") {
-		db.Exec(
-			"alter table documents add constraint fk_user_documents foreign key (owner) references users(public_key)",
-		)
-	}
+	// if !tx.HasConstraint(&model.Document{}, "fk_user_documents") {
+	// 	db.Exec(
+	// 		"alter table documents add constraint fk_user_documents foreign key (owner) references users(public_key)",
+	// 	)
+	// }
 	// db.Exec(
 	// 	"alter table user_allows add constraint fk_user_allow_users foreign key (user_id) references users(id)",
 	// )
@@ -59,26 +59,5 @@ func InsertData(db *gorm.DB) error {
 		return err
 	}
 	db.Create(&user)
-
-	// document := []model.Document{}
-	// if err := utils.Json2struct("./internal/app/mockup/document.json", &document); err != nil {
-	// 	return err
-	// }
-	// db.Create(&document)
-	// userallow := []model.UserAllow{}
-	// if err := utils.Json2struct("./internal/app/mockup/userallow.json", &userallow); err != nil {
-	// 	return err
-	// }
-	// db.Create(&userallow)
-	// role := []model.Role{}
-	// if err := utils.Json2struct("./internal/app/mockup/role.json", &role); err != nil {
-	// 	return err
-	// }
-	// db.Create(&role)
-	// userrole := []model.UserRole{}
-	// if err := utils.Json2struct("./internal/app/mockup/userrole.json", &userrole); err != nil {
-	// 	return err
-	// }
-	// db.Create(&userrole)
 	return nil
 }

@@ -25,13 +25,13 @@ func (repo *UserRepo) Create(user model.User) error {
 	if result.Error != nil {
 		return result.Error
 	}
-	repo.log.Info("Create user:", zap.String("Info", strings.Join([]string{user.Phone, user.Password}, "-")))
+	repo.log.Info("Create user:", zap.String("Info", strings.Join([]string{user.Phone, user.PublicKey}, "-")))
 	return nil
 }
 
 func (repo *UserRepo) GetUserByPubkey(pubkey string) (*model.User, error) {
 	user := model.User{}
-	result := repo.DB.Where("phone = ?", pubkey).First(&user)
+	result := repo.DB.Where("public_key = ?", pubkey).First(&user)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -54,6 +54,15 @@ func (repo *UserRepo) GetUserByPhone(phone string) (*model.User, error) {
 		return nil, result.Error
 	}
 	return &user, nil
+}
+
+func (repo *UserRepo) GetPublickeyByPhone(phone string) (string, error) {
+	user := model.User{}
+	result := repo.DB.Where("phone = ?", phone).First(&user)
+	if result.Error != nil {
+		return "", result.Error
+	}
+	return user.PublicKey, nil
 }
 
 func (repo *UserRepo) GetUserByGmail(gmail string) (*model.User, error) {

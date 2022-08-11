@@ -3,6 +3,7 @@ package controllers
 import (
 	"digitalsignature/internal/app/model"
 	"digitalsignature/internal/app/repository"
+	"digitalsignature/internal/app/request"
 	"digitalsignature/internal/app/service/document"
 	"digitalsignature/internal/app/utils"
 	"encoding/hex"
@@ -19,12 +20,12 @@ import (
 )
 
 type DocumentController struct {
-	documentSrv  document.DocumentService
-	documentRepo repository.DocumentRepository
-	userRepo     repository.UserRepo
+	documentSrv  *document.DocumentService
+	documentRepo *repository.DocumentRepo
+	userRepo     *repository.UserRepo
 }
 
-func DocumentRouter(docService document.DocumentService, documentRepo repository.DocumentRepository, userRepo repository.UserRepo, r *gin.RouterGroup) {
+func DocumentRouter(docService *document.DocumentService, documentRepo *repository.DocumentRepo, userRepo *repository.UserRepo, r *gin.RouterGroup) {
 	dc := DocumentController{
 		documentSrv:  docService,
 		documentRepo: documentRepo,
@@ -39,13 +40,8 @@ func DocumentRouter(docService document.DocumentService, documentRepo repository
 	ar.GET("/signature", dc.GetSign)
 }
 
-type GetSignRequest struct {
-	Phone  string `json:"phone"`
-	Number int    `json:"number"`
-}
-
 func (dc *DocumentController) GetSign(c *gin.Context) {
-	getSignRequest := GetSignRequest{}
+	getSignRequest := request.GetSignRequest{}
 	err := c.BindJSON(&getSignRequest)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -83,12 +79,11 @@ func (dc *DocumentController) Upload(c *gin.Context) {
 	defer tmpFile.Close()
 
 	doc := model.Document{
-		DocID:     uuid.New(),
-		Owner:     publickey,
+		ID:        uuid.New(),
+		Owner:     []string{publickey},
 		Name:      h.Filename,
-		Type:      "pdf",
+		TypeFile:  "pdf",
 		Signature: signature,
-		Path:      "static/",
 		Public:    true,
 		CreateAt:  time.Now(),
 	}
@@ -253,17 +248,16 @@ func (dc *DocumentController) SaveSign(c *gin.Context) {
 		return
 	}
 	doc := model.Document{
-		DocID:     uuid.New(),
-		Number:    int(event.Numdoc.Int64()),
-		Owner:     publickey,
-		Name:      h.Filename,
-		Type:      "pdf",
-		Signature: signature,
-		Path:      "static/",
-		Public:    true,
-		CreateAt:  time.Now(),
-		UpdateAt:  time.Time{},
-		DeleteAt:  time.Time{},
+		ID:           uuid.New(),
+		IndexOnchain: int(event.Numdoc.Int64()),
+		Owner:        []string{publickey},
+		Name:         h.Filename,
+		TypeFile:     "pdf",
+		Signature:    signature,
+		Public:       true,
+		CreateAt:     time.Now(),
+		UpdateAt:     time.Time{},
+		DeleteAt:     time.Time{},
 	}
 	err = dc.documentRepo.Create(&doc)
 	if err != nil {
@@ -284,7 +278,7 @@ func (dc *DocumentController) SaveSign(c *gin.Context) {
 
 func (dc *DocumentController) GetDocs(c *gin.Context) {
 	publickey := c.Param("publickey")
-	docs, err := dc.documentSrv.GetDocumentByPublickey(publickey)
+	docs, err := dc.documentSrv.GetDocumentByPublickey([]string{publickey})
 	if err != nil {
 		log.Println("get list document error:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{

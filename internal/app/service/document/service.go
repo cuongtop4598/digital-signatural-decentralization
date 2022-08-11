@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"math/big"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -30,20 +31,13 @@ type AccountSrv interface {
 		client *ethclient.Client) *bind.TransactOpts
 }
 
-type DocumentService interface {
-	VerifyDocument(phone string, digest string, docNum *big.Int) (bool, error)
-	SaveSignaturalDocument(phone string, signatural []byte) (Event, error)
-	GetDocumentByPhone(phone string) ([]model.Document, error)
-	GetDocumentByPublickey(publickey string) ([]model.Document, error)
-	GetSignature(phone string, number *big.Int) ([]byte, error)
-}
-
-type document struct {
-	accountSrv   AccountSrv
-	documentRepo *repository.DocumentRepository
-	client       *ethclient.Client
-	log          *zap.Logger
-	address      string
+type DocumentService struct {
+	accountSrv      AccountSrv
+	documentRepo    *repository.DocumentRepo
+	userRepo        *repository.UserRepo
+	contractAddress common.Address
+	client          *ethclient.Client
+	log             *zap.Logger
 }
 
 type Event struct {
@@ -52,23 +46,32 @@ type Event struct {
 
 func NewDocumentService(
 	client *ethclient.Client,
-	userAddress common.Address,
 	accountSrv AccountSrv,
-	documentRepo *repository.DocumentRepository,
-	address string,
-	log *zap.Logger) DocumentService {
+	documentRepo *repository.DocumentRepo,
+	userRepo *repository.UserRepo,
+	log *zap.Logger) *DocumentService {
 
-	return &document{
-		accountSrv:   accountSrv,
-		documentRepo: documentRepo,
-		client:       client,
-		log:          log,
-		address:      address,
+	contractAddress, ok := os.LookupEnv("CONTRACT_ADDRESS")
+	if !ok {
+		return nil
+	}
+	return &DocumentService{
+		accountSrv:      accountSrv,
+		documentRepo:    documentRepo,
+		userRepo:        userRepo,
+		contractAddress: common.HexToAddress(contractAddress),
+		client:          client,
+		log:             log,
 	}
 }
 
-func (d *document) GetDocumentByPhone(phone string) ([]model.Document, error) {
-	docs, err := d.documentRepo.AllByOwner(phone)
+func (d *DocumentService) GetDocumentByPhone(phone string) ([]model.Document, error) {
+	userPublicKey, err := d.userRepo.GetPublickeyByPhone(phone)
+	if err != nil {
+		d.log.Sugar().Error(err)
+		return []model.Document{}, err
+	}
+	docs, err := d.documentRepo.AllByOwner([]string{userPublicKey})
 	if err != nil {
 		d.log.Sugar().Error(err)
 		return []model.Document{}, err
@@ -76,8 +79,8 @@ func (d *document) GetDocumentByPhone(phone string) ([]model.Document, error) {
 	return docs, nil
 }
 
-func (d *document) GetDocumentByPublickey(publickey string) ([]model.Document, error) {
-	docs, err := d.documentRepo.AllByOwner(publickey)
+func (d *DocumentService) GetDocumentByPublickey(publickeys []string) ([]model.Document, error) {
+	docs, err := d.documentRepo.AllByOwner(publickeys)
 	if err != nil {
 		d.log.Sugar().Error(err)
 		return []model.Document{}, err
@@ -85,10 +88,9 @@ func (d *document) GetDocumentByPublickey(publickey string) ([]model.Document, e
 	return docs, nil
 }
 
-func (d *document) GetSignature(phone string, number *big.Int) ([]byte, error) {
-	contractAddress := common.HexToAddress(d.address)
+func (d *DocumentService) GetSignature(phone string, number *big.Int) ([]byte, error) {
 	// get hash user from onchain
-	documentIntance, err := NewDocument(contractAddress, d.client)
+	documentIntance, err := NewDocument(d.contractAddress, d.client)
 	if err != nil {
 		d.log.Sugar().Error(err)
 		return []byte{}, err
@@ -103,10 +105,9 @@ func (d *document) GetSignature(phone string, number *big.Int) ([]byte, error) {
 
 // Verify document by using phone, digest, DocID
 // phone using for get public key
-func (d *document) VerifyDocument(phone string, digest string, docNum *big.Int) (bool, error) {
-	contractAddress := common.HexToAddress(d.address)
+func (d *DocumentService) VerifyDocument(phone string, digest string, docNum *big.Int) (bool, error) {
 	// get hash user from onchain
-	documentIntance, err := NewDocument(contractAddress, d.client)
+	documentIntance, err := NewDocument(d.contractAddress, d.client)
 	if err != nil {
 		d.log.Sugar().Error(err)
 		return false, err
@@ -115,7 +116,7 @@ func (d *document) VerifyDocument(phone string, digest string, docNum *big.Int) 
 	return isCorrect, err
 }
 
-func (d *document) SaveSignaturalDocument(phone string, signatural []byte) (Event, error) {
+func (d *DocumentService) SaveSignaturalDocument(phone string, signatural []byte) (Event, error) {
 	fmt.Println("phone:", phone)
 	fmt.Println("signatural:", signatural)
 	account, ks, err := d.accountSrv.GetAminAccount()
@@ -123,10 +124,8 @@ func (d *document) SaveSignaturalDocument(phone string, signatural []byte) (Even
 		d.log.Sugar().Error(err)
 	}
 	opts := d.accountSrv.BindTransactionOption(*account, "123456", ks, d.client)
-
-	contractAddress := common.HexToAddress(d.address)
 	// get hash user from onchain
-	documentIntance, err := NewDocument(contractAddress, d.client)
+	documentIntance, err := NewDocument(d.contractAddress, d.client)
 	if err != nil {
 		d.log.Sugar().Error(err)
 		return Event{}, err
@@ -175,14 +174,12 @@ func (d *document) SaveSignaturalDocument(phone string, signatural []byte) (Even
 	d.log.Info("from block", zap.Int("block", int(fromBlock.Int64())))
 
 	d.log.Info("current block", zap.Int("block", int(currentBlock.Int64())))
-
-	address := common.HexToAddress(d.address)
-	d.log.Info("contract address: " + address.String())
+	d.log.Info("contract address: " + d.contractAddress.String())
 	query := ethereum.FilterQuery{
 		FromBlock: fromBlock,
 		ToBlock:   currentBlock,
 		Addresses: []common.Address{
-			address,
+			d.contractAddress,
 		},
 	}
 	logs, err := d.client.FilterLogs(context.Background(), query)

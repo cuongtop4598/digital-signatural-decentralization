@@ -10,21 +10,21 @@ import (
 )
 
 type UserController struct {
-	userService service.UserService
+	userService *service.UserService
 }
 
-func UserRouter(userService service.UserService, r *gin.RouterGroup) {
+func UserRouter(userService *service.UserService, r *gin.RouterGroup) {
 	uc := UserController{
 		userService: userService,
 	}
 	ar := r.Group("/user")
-	ar.POST("/signup", uc.SignUp)
+	ar.POST("/register", uc.Register)
 	ar.GET("/info/:phone", uc.GetInfo)
 	ar.POST("/verify", uc.Verify)
-	ar.POST("/signin", uc.SignIn)
+	ar.POST("/login", uc.Login)
 }
 
-func (uc *UserController) SignUp(c *gin.Context) {
+func (uc *UserController) Register(c *gin.Context) {
 	// nhận user info và uccount address từ UI
 	userInfo := request.UserInfo{}
 	err := c.BindJSON(&userInfo)
@@ -57,7 +57,7 @@ func (uc *UserController) SignUp(c *gin.Context) {
 	})
 }
 
-func (uc *UserController) SignIn(c *gin.Context) {
+func (uc *UserController) Login(c *gin.Context) {
 	loginInfo := request.Login{}
 	err := c.BindJSON(&loginInfo)
 	if err != nil {

@@ -3,37 +3,38 @@ package repository
 import (
 	"digitalsignature/internal/app/model"
 
+	"github.com/go-pg/pg/v10"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
-type DocumentRepository struct {
+type DocumentRepo struct {
 	DB  *gorm.DB
 	log *zap.Logger
 }
 
-func NewDocumentRepo(db *gorm.DB, log *zap.Logger) *DocumentRepository {
-	return &DocumentRepository{
+func NewDocumentRepo(db *gorm.DB, log *zap.Logger) *DocumentRepo {
+	return &DocumentRepo{
 		DB:  db,
 		log: log,
 	}
 }
 
-func (repo *DocumentRepository) Create(doc *model.Document) error {
+func (repo *DocumentRepo) Create(doc *model.Document) error {
 	result := repo.DB.Create(&doc)
 	return result.Error
 }
 
-func (repo *DocumentRepository) AllByOwner(publickey string) ([]model.Document, error) {
+func (repo *DocumentRepo) AllByOwner(publickeys []string) ([]model.Document, error) {
 	docs := []model.Document{}
-	result := repo.DB.Model(&model.Document{}).Where("owner = ? ", publickey).Find(&docs)
+	result := repo.DB.Model(&model.Document{}).Where("owner in (?) ", pg.Strings(publickeys)).Find(&docs)
 	if result.Error != nil {
 		return nil, result.Error
 	}
 	return docs, nil
 }
 
-func (repo *DocumentRepository) IsPublic(name string) (bool, error) {
+func (repo *DocumentRepo) IsPublic(name string) (bool, error) {
 	var count int64
 	var doc model.Document
 	result := repo.DB.Model(&doc).Where("public = ?", true).Where("name = ?", name).Count(&count)
@@ -47,7 +48,7 @@ func (repo *DocumentRepository) IsPublic(name string) (bool, error) {
 	}
 }
 
-func (repo *DocumentRepository) UpdateDocumentNumber(signature string, number int) error {
+func (repo *DocumentRepo) UpdateDocumentNumber(signature string, number int) error {
 
 	var doc model.Document
 	result := repo.DB.Model(&doc).Where("signature = ?", signature).Update("number", number)

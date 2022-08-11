@@ -8,7 +8,7 @@ make: *** No rule to make target 'all'.  Stop.
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Thu Aug 11 00:41:54 2022
+# Make data base, printed on Thu Aug 11 07:25:56 2022
 
 # Variables
 
@@ -41,7 +41,7 @@ GOPATH = C:\Users\cuong\go
 # automatic
 @D = $(patsubst %/,%,$(patsubst %\,%,$(dir $@)))
 # environment
-CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_26560_RNTAMYOSOKEOETJL
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_25928_XIEXGIHVPVQSQHMO
 # environment
 VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # default
@@ -95,7 +95,7 @@ MAKEFILE_LIST := Makefile
 # automatic
 @F = $(notdir $@)
 # environment
-VSCODE_PID = 26560
+VSCODE_PID = 25928
 # automatic
 ?D = $(patsubst %/,%,$(patsubst %\,%,$(dir $?)))
 # environment
@@ -144,8 +144,6 @@ MAKEFILES :=
 PROMPT = $P$G
 # environment
 CHOCOLATEYLASTPATHUPDATE = 132984776452807825
-# environment
-GOROOT = C:\Program Files\Go
 # environment
 LOGONSERVER = \\TOPER
 # environment
@@ -231,7 +229,7 @@ PROCESSOR_REVISION = 8d01
 # environment
 PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 141 Stepping 1, GenuineIntel
 # variable set hash-table stats:
-# Load=109/1024=11%, Rehash=0, Collisions=10/136=7%
+# Load=108/1024=11%, Rehash=0, Collisions=10/135=7%
 
 # Pattern-specific Variable Values
 
@@ -305,6 +303,6 @@ run:
 # strcache performance: lookups = 34 / hit rate = 20%
 # hash-table stats:
 # Load=27/8192=0%, Rehash=0, Collisions=0/34=0%
-# Finished Make data base on Thu Aug 11 00:41:54 2022
+# Finished Make data base on Thu Aug 11 07:25:56 2022
 
  
