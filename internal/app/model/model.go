@@ -8,32 +8,37 @@ import (
 )
 
 type User struct {
-	ID          uuid.UUID `json:"id" gorm:"primaryKey"`
-	Name        string    `json:"name" gorm:"not null"`
-	PublicKey   string    `json:"public_key" gorm:"primaryKey;not null;unique"`
-	CardID      string    `json:"card_id" gorm:"not null"`
-	Phone       string    `json:"phone" gorm:"primaryKey;not null;unique"`
-	Gmail       string    `json:"gmail" gorm:"not null"` // verify Gmail
-	DateOfBirth string    `json:"date_of_birth" gorm:"not null"`
-	Password    string    `json:"password" gorm:"not null"` // hash MD5
-	CreateAt    time.Time `json:"creat_at,omitempty"`
-	UpdateAt    time.Time `json:"update_at,omitempty"`
-	DeleteAt    time.Time `json:"dalete_at,omitempty"`
+	ID              uuid.UUID `json:"id" gorm:"primaryKey"`
+	Name            string    `json:"name" gorm:"not null"`
+	PublicKey       string    `json:"public_key" gorm:"primaryKey;not null;unique"`
+	CardID          string    `json:"card_id" gorm:"not null"`
+	Phone           string    `json:"phone" gorm:"primaryKey;not null;unique"`
+	Gmail           string    `json:"gmail" gorm:"not null"` // verify Gmail
+	DateOfBirth     string    `json:"date_of_birth" gorm:"not null"`
+	Password        string    `json:"password" gorm:"not null"` // hash MD5
+	BlockNumber     int       `json:"block_number,omitempty"`
+	BlockTimetamp   int       `json:"block_timestamp,omitempty"`
+	BlockHash       string    `json:"block_hash,omitempty"`
+	TransactionHash string    `json:"transaction_hash"`
+	CreateAt        time.Time `json:"creat_at,omitempty"`
+	UpdateAt        time.Time `json:"update_at,omitempty"`
+	DeleteAt        time.Time `json:"dalete_at,omitempty"`
 }
 
 type Document struct {
-	ID            uuid.UUID `gorm:"primaryKey, autoIncrement"`
-	IndexOnchain  int
-	Owner         []string `gorm:"type:text"`
-	Name          string
-	BlockNumber   int
-	BlockTimetamp int
-	Signature     string
-	Public        bool
-	TypeFile      string
-	CreateAt      time.Time `json:"create_at,omitempty"`
-	UpdateAt      time.Time `json:"update_at,omitempty"`
-	DeleteAt      time.Time `json:"delete_at,omitempty"`
+	ID              uuid.UUID `gorm:"primaryKey, autoIncrement"`
+	IndexOnchain    int       `json:"index_onchain"`
+	Owner           []string  `gorm:"type:text"`
+	Name            string    `json:"name"`
+	BlockTimetamp   int       `json:"block_timestamp,omitempty"`
+	BlockHash       string    `json:"block_hash,omitempty"`
+	TransactionHash string    `json:"transaction_hash"`
+	Signature       string    `json:"signature"`
+	Public          bool      `json:"public"`
+	TypeFile        string    `json:"type_file"`
+	CreateAt        time.Time `json:"create_at,omitempty"`
+	UpdateAt        time.Time `json:"update_at,omitempty"`
+	DeleteAt        time.Time `json:"delete_at,omitempty"`
 }
 
 type UserAllow struct {

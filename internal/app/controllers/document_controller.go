@@ -4,7 +4,7 @@ import (
 	"digitalsignature/internal/app/model"
 	"digitalsignature/internal/app/repository"
 	"digitalsignature/internal/app/request"
-	"digitalsignature/internal/app/service/document"
+	"digitalsignature/internal/app/service"
 	"digitalsignature/internal/app/utils"
 	"encoding/hex"
 	"fmt"
@@ -20,22 +20,21 @@ import (
 )
 
 type DocumentController struct {
-	documentSrv  *document.DocumentService
-	documentRepo *repository.DocumentRepo
-	userRepo     *repository.UserRepo
+	documentService *service.DocumentService
+	documentRepo    *repository.DocumentRepo
+	userRepo        *repository.UserRepo
 }
 
-func DocumentRouter(docService *document.DocumentService, documentRepo *repository.DocumentRepo, userRepo *repository.UserRepo, r *gin.RouterGroup) {
+func DocumentRouter(docService *service.DocumentService, documentRepo *repository.DocumentRepo, userRepo *repository.UserRepo, r *gin.RouterGroup) {
 	dc := DocumentController{
-		documentSrv:  docService,
-		documentRepo: documentRepo,
-		userRepo:     userRepo,
+		documentService: docService,
+		documentRepo:    documentRepo,
+		userRepo:        userRepo,
 	}
 	ar := r.Group("/document")
 	ar.POST("/savesign", dc.SaveSign)
 	ar.POST("/upload", dc.Upload)
 	ar.GET("/download/:filename", dc.Download)
-	ar.POST("/verify", dc.Verify)
 	ar.GET("/list/:publickey", dc.GetDocs)
 	ar.GET("/signature", dc.GetSign)
 }
@@ -47,7 +46,7 @@ func (dc *DocumentController) GetSign(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	sign, err := dc.documentSrv.GetSignature(getSignRequest.Phone, big.NewInt(int64(getSignRequest.Number)))
+	sign, err := dc.documentService.GetSignature(getSignRequest.Phone, big.NewInt(int64(getSignRequest.Number)))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -130,45 +129,6 @@ type VerifyDocRequest struct {
 	DocNum int64  `json:"doc_number"`
 }
 
-func (dc *DocumentController) Verify(c *gin.Context) {
-	verify := VerifyDocRequest{}
-	err := c.BindJSON(&verify)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusBadRequest, gin.H{
-			"code":    http.StatusBadRequest,
-			"message": err.Error(),
-			"data":    "",
-		})
-		return
-	}
-
-	isTrue, err := dc.documentSrv.VerifyDocument(verify.Phone, verify.Digest, big.NewInt(verify.DocNum))
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"code":    http.StatusBadRequest,
-			"message": err.Error(),
-			"data":    "",
-		})
-		return
-	}
-	if isTrue {
-		c.JSON(http.StatusOK, gin.H{
-			"code":    http.StatusOK,
-			"message": "OK",
-			"data":    "True",
-		})
-		return
-	} else {
-		c.JSON(http.StatusOK, gin.H{
-			"code":    http.StatusOK,
-			"message": "OK",
-			"data":    "False",
-		})
-		return
-	}
-}
-
 func (dc *DocumentController) SaveSign(c *gin.Context) {
 	err := c.Request.ParseMultipartForm(32 << 20) // maxMemory 32MB
 	if err != nil {
@@ -216,16 +176,16 @@ func (dc *DocumentController) SaveSign(c *gin.Context) {
 		})
 		return
 	}
-	phone, err := dc.userRepo.GetPhoneByPublickey(publickey)
-	if err != nil {
-		log.Println("get phone error:", err)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code":    http.StatusInternalServerError,
-			"message": err.Error(),
-			"data":    "",
-		})
-		return
-	}
+	// phone, err := dc.userRepo.GetPhoneByPublickey(publickey)
+	// if err != nil {
+	// 	log.Println("get phone error:", err)
+	// 	c.JSON(http.StatusInternalServerError, gin.H{
+	// 		"code":    http.StatusInternalServerError,
+	// 		"message": err.Error(),
+	// 		"data":    "",
+	// 	})
+	// 	return
+	// }
 	convert_signature, err := hex.DecodeString(signature[2:])
 	fmt.Printf("% x", convert_signature)
 	fmt.Println("\nlength:", len(convert_signature))
@@ -237,27 +197,28 @@ func (dc *DocumentController) SaveSign(c *gin.Context) {
 		})
 		return
 	}
-	event, err := dc.documentSrv.SaveSignaturalDocument(phone, convert_signature)
-	if err != nil {
-		log.Println("save signatural error:", err)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code":    http.StatusInternalServerError,
-			"message": err.Error(),
-			"data":    "",
-		})
-		return
-	}
+	// TODO: User send event from client to server, server must check event onchain before save valid document
+	// event, err := dc.documentService.SaveSignaturalDocument(phone, convert_signature)
+	// if err != nil {
+	// 	log.Println("save signatural error:", err)
+	// 	c.JSON(http.StatusInternalServerError, gin.H{
+	// 		"code":    http.StatusInternalServerError,
+	// 		"message": err.Error(),
+	// 		"data":    "",
+	// 	})
+	// 	return
+	// }
 	doc := model.Document{
-		ID:           uuid.New(),
-		IndexOnchain: int(event.Numdoc.Int64()),
-		Owner:        []string{publickey},
-		Name:         h.Filename,
-		TypeFile:     "pdf",
-		Signature:    signature,
-		Public:       true,
-		CreateAt:     time.Now(),
-		UpdateAt:     time.Time{},
-		DeleteAt:     time.Time{},
+		ID: uuid.New(),
+		//IndexOnchain: int(event.Numdoc.Int64()),
+		Owner:     []string{publickey},
+		Name:      h.Filename,
+		TypeFile:  "pdf",
+		Signature: signature,
+		Public:    true,
+		CreateAt:  time.Now(),
+		UpdateAt:  time.Time{},
+		DeleteAt:  time.Time{},
 	}
 	err = dc.documentRepo.Create(&doc)
 	if err != nil {
@@ -272,13 +233,13 @@ func (dc *DocumentController) SaveSign(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"code":    http.StatusOK,
 		"message": "OK",
-		"data":    event,
+		//"data":    event,
 	})
 }
 
 func (dc *DocumentController) GetDocs(c *gin.Context) {
 	publickey := c.Param("publickey")
-	docs, err := dc.documentSrv.GetDocumentByPublickey([]string{publickey})
+	docs, err := dc.documentService.GetDocumentByPublickey([]string{publickey})
 	if err != nil {
 		log.Println("get list document error:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{

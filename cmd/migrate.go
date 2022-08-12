@@ -18,4 +18,5 @@ func main() {
 	db := database.NewDBConnection(log, &schema)
 	cmd := routers.NewCMD(db, log)
 	cmd.MigrateDB()
+	log.Info("Migrate done!")
 }

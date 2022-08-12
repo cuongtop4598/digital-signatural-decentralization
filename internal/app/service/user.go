@@ -6,26 +6,24 @@ import (
 	"digitalsignature/internal/app/repository"
 	"digitalsignature/internal/app/request"
 	"digitalsignature/internal/app/response"
-	"digitalsignature/internal/app/service/document"
-	"log"
+	"digitalsignature/internal/pkg/abi"
+	"digitalsignature/internal/pkg/async"
 	"os"
 	"sync"
 	"time"
 
-	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"go.uber.org/zap"
 )
 
 type AccountSrv interface {
-	GetAminAccount() (*accounts.Account, *keystore.KeyStore, error)
-	BindTransactionOption(account accounts.Account, password string, ks *keystore.KeyStore, client *ethclient.Client) *bind.TransactOpts
+	GetBindTransactionOptions(client *ethclient.Client) *bind.TransactOpts
 }
+
 type UserService struct {
 	ethclient        *ethclient.Client
 	userRepo         *repository.UserRepo
@@ -44,12 +42,15 @@ func NewUserService(client *ethclient.Client, userRepo *repository.UserRepo, acc
 		documentContract: contractAddress,
 	}
 }
-func (s *UserService) Create(c *gin.Context, userInfo request.UserInfo) error {
+
+func (s *UserService) Register(c *gin.Context, userInfo request.UserInfo) error {
+	registerStatus := false
+	s.logger.Info("USER_REGISTER", zap.Any("Data", userInfo))
 	// TODO: Validate user info including gmail, phone, id card
 
-	// Insert user info to offchain
+	// TODO: Check user is exist in database?
+	// Insert valid user
 	user := model.User{
-		ID:          uuid.New(),
 		Name:        userInfo.Name,
 		PublicKey:   userInfo.PublicKey,
 		CardID:      userInfo.CardID,
@@ -59,76 +60,84 @@ func (s *UserService) Create(c *gin.Context, userInfo request.UserInfo) error {
 		Password:    userInfo.Password,
 		CreateAt:    time.Now(),
 	}
-	err := s.userRepo.Create(user)
-	if err != nil {
-		s.logger.Error("create new account error", zap.String("error", err.Error()))
-	}
+
 	// make transaction with admin account
-	adminAccount, ks, err := s.accountSrv.GetAminAccount()
-	if err != nil {
-		s.logger.Sugar().Error(err)
-	}
 	contractAddress := common.HexToAddress(s.documentContract)
 	// store hash user info to blockchain
-	documentIntance, err := document.NewDocument(contractAddress, s.ethclient)
+	documentIntance, err := abi.NewAbi(contractAddress, s.ethclient)
 	if err != nil {
 		s.logger.Sugar().Error(err)
 	}
-	tnxOption := s.accountSrv.BindTransactionOption(*adminAccount, "123456", ks, s.ethclient)
 	address := common.HexToAddress(user.PublicKey)
-	txn, err := documentIntance.StoreUser(tnxOption, user.ID.String(), user.Name, user.CardID, user.DateOfBirth, user.Phone, user.Gmail, address)
+	txOption := s.accountSrv.GetBindTransactionOptions(s.ethclient)
+	storeUserAsync := async.Exec(func() (*types.Transaction, error) {
+		return documentIntance.StoreUser(txOption, user.Name, user.CardID, user.DateOfBirth, user.Phone, user.Gmail, address)
+	})
+	txn, _ := storeUserAsync.Await()
 	if err != nil {
 		s.logger.Sugar().Error(err)
 	}
-	var wg1 sync.WaitGroup
 	time.Sleep(5 * time.Second)
-	wg1.Add(1)
+	var wg sync.WaitGroup
+	wg.Add(1)
 	go func() {
 		for {
 			receipt, err := s.ethclient.TransactionReceipt(context.Background(), txn.Hash())
 			if err != nil {
-				log.Println("transaction store user: ", txn.Hash(), ":", err)
+				s.logger.Info("TRANSACTION_STORE_USER", zap.Any(txn.Hash().String(), "Is Pending"))
+				time.Sleep(5 * time.Second)
 			} else {
+				wg.Done()
 				if receipt.Status == 1 || receipt.Status == 0 {
-					defer wg1.Done()
 					if receipt.Status == 1 {
-						out, _ := txn.MarshalJSON()
-						s.logger.Info("Transaction Success")
-						s.logger.Info("Hash user info:", zap.String("data", string(out)))
+						s.logger.Info("TRANSACTION_STORE_USER_STATUS", zap.Any("Status", "Success"))
+						// out, _ := txn.MarshalJSON()
+						// s.logger.Info("HASH USER INFO", zap.String("Hash", string(out)))
+						registerStatus = true
 					}
 					if receipt.Status == 0 {
-						s.logger.Info("Transaction Failt")
+						s.logger.Warn("TRANSACTION_STORE_USER_STATUS STORE USER STATUS", zap.Any("Status", "Failt"))
 					}
-					break
 				}
+				break
 			}
-			time.Sleep(2 * time.Second)
 		}
 	}()
-	wg1.Wait()
-	s.logger.Info("created user", zap.String("publickey", userInfo.PublicKey))
+	wg.Wait()
+	if registerStatus {
+		err = s.userRepo.Create(user)
+		if err != nil {
+			s.logger.Sugar().Error("INSERT USER", zap.String("Error", err.Error()))
+		}
+		s.logger.Info("CREATE USER SUCCESS", zap.String("Publickey", userInfo.PublicKey))
+	}
 	return nil
+}
+
+func (s *UserService) Login(login request.Login) (bool, *model.User, error) {
+	return s.userRepo.CheckLogin(login.Password, login.Phone)
 }
 
 func (s *UserService) GetUserInfo(c *gin.Context, phone string) (*response.User, error) {
 	contractAddress := common.HexToAddress(s.documentContract)
-	// get hash user from onchain
-	documentIntance, err := document.NewDocument(contractAddress, s.ethclient)
+	documentAbi, err := abi.NewAbi(contractAddress, s.ethclient)
 	if err != nil {
 		s.logger.Sugar().Error(err)
 		return nil, err
 	}
-	hash, err := documentIntance.GetHashUserInfo(&bind.CallOpts{}, phone)
+
+	hash, err := documentAbi.GetHashUserInfo(&bind.CallOpts{}, phone)
 	if err != nil {
 		s.logger.Sugar().Error(err)
 		return nil, err
 	}
-	// get user info from offchain
+
 	user, err := s.userRepo.GetUserByPhone(phone)
 	if err != nil {
 		s.logger.Sugar().Error(err)
 		return nil, err
 	}
+
 	return &response.User{
 		ID:          user.ID,
 		Name:        user.Name,
@@ -143,8 +152,7 @@ func (s *UserService) GetUserInfo(c *gin.Context, phone string) (*response.User,
 
 func (s *UserService) VerifyUser(user request.UserInfo) (bool, error) {
 	contractAddress := common.HexToAddress(s.documentContract)
-	// get hash user from onchain
-	documentIntance, err := document.NewDocument(contractAddress, s.ethclient)
+	documentIntance, err := abi.NewAbi(contractAddress, s.ethclient)
 	if err != nil {
 		s.logger.Sugar().Error(err)
 		return false, err
@@ -152,8 +160,4 @@ func (s *UserService) VerifyUser(user request.UserInfo) (bool, error) {
 	address := common.HexToAddress(user.PublicKey)
 	isVerify, err := documentIntance.VerifyUser(&bind.CallOpts{}, user.Name, user.CardID, user.DateOfBirth, user.Phone, user.Gmail, address)
 	return isVerify, err
-}
-
-func (s *UserService) Login(login request.Login) (bool, *model.User, error) {
-	return s.userRepo.CheckLogin(login.Password, login.Phone)
 }

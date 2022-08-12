@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"crypto/ecdsa"
 	"errors"
 	"log"
 	"math/big"
@@ -10,45 +11,88 @@ import (
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
+	ethereumCrypto "github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"go.uber.org/zap"
 )
 
 // This service use to interface with admin account ethereum
-type AccountService struct {
-	KeyPath  string
-	Password string
+type AdminAccountService struct {
+	KeyPath    string
+	Password   string
+	Publickey  *ecdsa.PublicKey
+	PrivateKey *ecdsa.PrivateKey
+	log        *zap.Logger
 }
 
-func NewAccountService() *AccountService {
-	keyPath, ok := os.LookupEnv("KEYSTORE_PATH")
+func NewAdminAccountService() *AdminAccountService {
+	keyPath, _ := os.LookupEnv("KEYSTORE_PATH")
+	password, _ := os.LookupEnv("PASSWORD_UNLOCK")
+	privatekey, ok := os.LookupEnv("PRIVATE_KEY")
 	if !ok {
-		keyPath = "./wallets/keystore"
+		privatekey = "0x07535d6917bdf7ca39da2f477b7f96d350672a2549f546572d905fb553fc9988"
 	}
-	password, ok := os.LookupEnv("PASSWORD_UNLOCK")
+	private, err := ethereumCrypto.HexToECDSA(privatekey)
+	if err != nil {
+		log.Fatal(err)
+	}
+	pubkey, ok := private.Public().(*ecdsa.PublicKey)
 	if !ok {
-		password = "123456"
+		log.Fatal("error casting public key to ECDSA")
 	}
-	return &AccountService{
-		KeyPath:  keyPath,
-		Password: password,
+	return &AdminAccountService{
+		KeyPath:    keyPath,
+		Password:   password,
+		Publickey:  pubkey,
+		PrivateKey: private,
 	}
 }
 
-func (s *AccountService) GetAminAccount() (*accounts.Account, *keystore.KeyStore, error) {
-	os.Chdir(".")
-	ks := keystore.NewKeyStore(s.KeyPath, keystore.StandardScryptN, keystore.StandardScryptP)
-	accounts := ks.Accounts()
-	if len(accounts) > 0 {
-		err := ks.Unlock(accounts[0], s.Password)
-		if err != nil {
-			return nil, nil, err
-		}
-		return &accounts[0], ks, nil
+func (s *AdminAccountService) GetBindTransactionOptions(client *ethclient.Client) *bind.TransactOpts {
+	fromAddress := ethereumCrypto.PubkeyToAddress(*s.Publickey)
+	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
+	if err != nil {
+		s.log.Sugar().Error(err)
 	}
-	return nil, nil, errors.New("No key file in keystore path")
+	gasLimit := uint64(4712388) // in units
+	gasPrice, err := client.SuggestGasPrice(context.Background())
+	if err != nil {
+		s.log.Sugar().Error(err)
+	}
+	return &bind.TransactOpts{
+		From:  fromAddress,
+		Nonce: big.NewInt(int64(nonce)),
+		Signer: func(address common.Address, tx *types.Transaction) (*types.Transaction, error) {
+			if address != fromAddress {
+				return nil, errors.New("not authorized to sign this account")
+			}
+			signedTx, err := s.SignTransaction(tx, client)
+			if err != nil {
+				return nil, err
+			}
+			return signedTx, nil
+		},
+		GasPrice: gasPrice,
+		GasLimit: gasLimit,
+		Context:  context.Background(),
+	}
 }
 
-func (s *AccountService) BindTransactionOption(account accounts.Account, password string, ks *keystore.KeyStore, client *ethclient.Client) *bind.TransactOpts {
+func (s *AdminAccountService) SignTransaction(tx *types.Transaction, client *ethclient.Client) (*types.Transaction, error) {
+	chainID, err := client.NetworkID(context.Background())
+	if err != nil {
+		log.Fatal(err)
+	}
+	signedTx, err := types.SignTx(tx, types.NewEIP155Signer(chainID), s.PrivateKey)
+	if err != nil {
+		return nil, err
+	}
+	return signedTx, nil
+}
+
+func (s *AdminAccountService) BindTransactionOption(account accounts.Account, password string, ks *keystore.KeyStore, client *ethclient.Client) *bind.TransactOpts {
 	ks.Unlock(account, password)
 	fromAddress := account.Address
 	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
@@ -66,7 +110,7 @@ func (s *AccountService) BindTransactionOption(account accounts.Account, passwor
 	return auth
 }
 
-func (s *AccountService) BindTransactionOptionWithGasLimit(account accounts.Account, password string, ks *keystore.KeyStore, client *ethclient.Client, gas uint64) *bind.TransactOpts {
+func (s *AdminAccountService) BindTransactionOptionWithGasLimit(account accounts.Account, password string, ks *keystore.KeyStore, client *ethclient.Client, gas uint64) *bind.TransactOpts {
 	ks.Unlock(account, password)
 	fromAddress := account.Address
 	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)

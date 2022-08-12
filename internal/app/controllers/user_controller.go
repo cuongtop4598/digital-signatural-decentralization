@@ -19,13 +19,12 @@ func UserRouter(userService *service.UserService, r *gin.RouterGroup) {
 	}
 	ar := r.Group("/user")
 	ar.POST("/register", uc.Register)
-	ar.GET("/info/:phone", uc.GetInfo)
+	ar.GET("/profile/:phone", uc.GetProfile)
 	ar.POST("/verify", uc.Verify)
 	ar.POST("/login", uc.Login)
 }
 
 func (uc *UserController) Register(c *gin.Context) {
-	// nhận user info và uccount address từ UI
 	userInfo := request.UserInfo{}
 	err := c.BindJSON(&userInfo)
 	if err != nil {
@@ -38,22 +37,16 @@ func (uc *UserController) Register(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"status": "false"})
 		return
 	}
-	log.Info("User register request", userInfo)
-	err = uc.userService.Create(c, userInfo)
+
+	err = uc.userService.Register(c, userInfo)
 	if err != nil {
 		log.Error(err.Error())
-		c.JSON(400, gin.H{
-			"code":    400,
-			"message": "Fail",
-			"data":    "",
-		})
+		c.JSON(http.StatusNotAcceptable, gin.H{"message": "user is invalid"})
 		return
 	}
 	userInfo.SantisizePassword()
 	c.JSON(200, gin.H{
-		"code":    200,
-		"message": "OK",
-		"data":    userInfo,
+		"data": userInfo,
 	})
 }
 
@@ -77,19 +70,13 @@ func (uc *UserController) Login(c *gin.Context) {
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"code":    http.StatusInternalServerError,
 			"message": err.Error(),
-			"data":    "",
 		})
 		return
 	}
 	if isLog {
 		userInfo.SantisizePassword()
-		c.JSON(http.StatusOK, gin.H{
-			"code":    http.StatusOK,
-			"message": "OK",
-			"data":    userInfo,
-		})
+		c.JSON(http.StatusOK, userInfo)
 	} else {
 		c.JSON(http.StatusForbidden, gin.H{
 			"code":    http.StatusForbidden,
@@ -99,7 +86,7 @@ func (uc *UserController) Login(c *gin.Context) {
 	}
 }
 
-func (uc *UserController) GetInfo(c *gin.Context) {
+func (uc *UserController) GetProfile(c *gin.Context) {
 	phone := c.Param("phone")
 	response, err := uc.userService.GetUserInfo(c, phone)
 	if err != nil {

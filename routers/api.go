@@ -4,7 +4,6 @@ import (
 	"digitalsignature/internal/app/controllers"
 	"digitalsignature/internal/app/repository"
 	"digitalsignature/internal/app/service"
-	"digitalsignature/internal/app/service/document"
 
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gin-gonic/gin"
@@ -31,12 +30,11 @@ func (r *Router) SetupRoutes() {
 	userRepo := repository.NewUserRepository(r.DB, r.Log)
 	docRepo := repository.NewDocumentRepo(r.DB, r.Log)
 
-	accountSrv := service.NewAccountService()
-	documentSrv := document.NewDocumentService(r.EthClient, accountSrv, docRepo, userRepo, r.Log)
-	userSrv := service.NewUserService(r.EthClient, userRepo, accountSrv, r.Log)
+	adminAccountSrv := service.NewAdminAccountService()
+	documentSrv := service.NewDocumentService(docRepo, userRepo, r.EthClient, r.Log)
+	userSrv := service.NewUserService(r.EthClient, userRepo, adminAccountSrv, r.Log)
 
 	rg := r.R.Group("/v1")
-
 	controllers.HomeRouter(r.R)
 	controllers.UserRouter(userSrv, rg)
 	controllers.DocumentRouter(documentSrv, docRepo, userRepo, rg)

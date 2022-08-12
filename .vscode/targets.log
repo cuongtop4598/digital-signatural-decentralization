@@ -8,7 +8,7 @@ make: *** No rule to make target 'all'.  Stop.
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Thu Aug 11 07:25:56 2022
+# Make data base, printed on Fri Aug 12 09:18:50 2022
 
 # Variables
 
@@ -33,7 +33,7 @@ SYSTEMROOT = C:\Windows
 # environment
 PROCESSOR_LEVEL = 6
 # environment
-PSMODULEPATH = C:\Users\cuong\OneDrive\Documents\PowerShell\Modules;C:\Program Files\PowerShell\Modules;c:\program files\windowsapps\microsoft.powershell_7.2.5.0_x64__8wekyb3d8bbwe\Modules;C:\Program Files\WindowsPowerShell\Modules;C:\Windows\system32\WindowsPowerShell\v1.0\Modules
+PSMODULEPATH = C:\Users\cuong\OneDrive\Documents\PowerShell\Modules;C:\Program Files\PowerShell\Modules;c:\program files\windowsapps\microsoft.powershell_7.2.6.0_x64__8wekyb3d8bbwe\Modules;C:\Program Files\WindowsPowerShell\Modules;C:\Windows\system32\WindowsPowerShell\v1.0\Modules
 # default
 MAKE_COMMAND := C:/Users/cuong/scoop/apps/make/current/bin/make.exe
 # environment
@@ -41,7 +41,7 @@ GOPATH = C:\Users\cuong\go
 # automatic
 @D = $(patsubst %/,%,$(patsubst %\,%,$(dir $@)))
 # environment
-CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_25928_XIEXGIHVPVQSQHMO
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_30012_XLJXJIFWFAJJROJL
 # environment
 VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # default
@@ -55,7 +55,7 @@ VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # environment
 CONDA_PROMPT_MODIFIER = False
 # environment
-VSCODE_CODE_CACHE_PATH = C:\Users\cuong\AppData\Roaming\Code\CachedData\da76f93349a72022ca4670c1b84860304616aaa2
+VSCODE_CODE_CACHE_PATH = C:\Users\cuong\AppData\Roaming\Code\CachedData\6d9b74a70ca9c7733b29f0456fd8195364076dda
 # environment
 LANG = C
 # default
@@ -95,7 +95,7 @@ MAKEFILE_LIST := Makefile
 # automatic
 @F = $(notdir $@)
 # environment
-VSCODE_PID = 25928
+VSCODE_PID = 30012
 # automatic
 ?D = $(patsubst %/,%,$(patsubst %\,%,$(dir $?)))
 # environment
@@ -131,7 +131,7 @@ MAKELEVEL := 0
 # default
 MAKE = $(MAKE_COMMAND)
 # environment
-PATH = C:\Users\cuong\AppData\Local\oh-my-posh;C:\Program Files\WindowsApps\Microsoft.PowerShell_7.2.5.0_x64__8wekyb3d8bbwe;C:\Program Files\Geth;C:\Program Files (x86)\VMware\VMware Workstation\bin\;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files\Go\bin;C:\Program Files\Git\cmd;C:\Program Files\nodejs\;C:\Program Files (x86)\Common Files\Acronis\SnapAPI\;C:\Program Files\Docker\Docker\resources\bin;C:\ProgramData\DockerDesktop\version-bin;C:\Program Files\Java\jdk-12.0.2\bin;C:\Program Files\Java\jdk-14.0.1\bin;C:\ProgramData\chocolatey\bin;C:\Ruby31-x64\bin;C:\Program Files\Geth\abigen;C:\Program Files\Geth\geth;C:\Users\cuong\scoop\apps\gcc\current\bin;C:\Users\cuong\scoop\shims;C:\Users\cuong\AppData\Local\Programs\Python\Python310\Scripts\;C:\Users\cuong\AppData\Local\Programs\Python\Python310\;C:\Users\cuong\AppData\Local\Microsoft\WindowsApps;C:\Users\cuong\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\cuong\go\bin;C:\Users\cuong\AppData\Local\GitHubDesktop\bin;C:\Users\cuong\AppData\Roaming\npm;C:\intelFPGA\18.1\modelsim_ase\win32aloem
+PATH = C:\Users\cuong\AppData\Local\oh-my-posh;C:\Program Files\WindowsApps\Microsoft.PowerShell_7.2.6.0_x64__8wekyb3d8bbwe;C:\Program Files\Geth;C:\Program Files (x86)\VMware\VMware Workstation\bin\;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files\Go\bin;C:\Program Files\Git\cmd;C:\Program Files\nodejs\;C:\Program Files (x86)\Common Files\Acronis\SnapAPI\;C:\Program Files\Docker\Docker\resources\bin;C:\ProgramData\DockerDesktop\version-bin;C:\Program Files\Java\jdk-12.0.2\bin;C:\Program Files\Java\jdk-14.0.1\bin;C:\ProgramData\chocolatey\bin;C:\Ruby31-x64\bin;C:\Program Files\Geth\abigen;C:\Program Files\Geth\geth;C:\Users\cuong\scoop\apps\gcc\current\bin;C:\Users\cuong\scoop\shims;C:\Users\cuong\AppData\Local\Programs\Python\Python310\Scripts\;C:\Users\cuong\AppData\Local\Programs\Python\Python310\;C:\Users\cuong\AppData\Local\Microsoft\WindowsApps;C:\Users\cuong\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\cuong\go\bin;C:\Users\cuong\AppData\Local\GitHubDesktop\bin;C:\Users\cuong\AppData\Roaming\npm;C:\intelFPGA\18.1\modelsim_ase\win32aloem
 # environment
 ZES_ENABLE_SYSMAN = 1
 # environment
@@ -168,6 +168,8 @@ USERDOMAIN = TOPER
 GNUMAKEFLAGS := 
 # environment
 OS = Windows_NT
+# environment
+__COMPAT_LAYER = DetectorsAppHealth
 # makefile
 .DEFAULT_GOAL := build-sc
 # default
@@ -207,7 +209,7 @@ ELECTRON_RUN_AS_NODE = 1
 # environment
 TEMP = C:\Users\cuong\AppData\Local\Temp
 # environment
-VSCODE_IPC_HOOK = \\.\pipe\e94ae9dbae3ecdd11f46d8acb5f6d9e3-1.70.0-main-sock
+VSCODE_IPC_HOOK = \\.\pipe\e94ae9dbae3ecdd11f46d8acb5f6d9e3-1.70.1-main-sock
 # environment
 GOPROXY = https://proxy.golang.org,direct
 # default
@@ -229,7 +231,7 @@ PROCESSOR_REVISION = 8d01
 # environment
 PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 141 Stepping 1, GenuineIntel
 # variable set hash-table stats:
-# Load=108/1024=11%, Rehash=0, Collisions=10/135=7%
+# Load=109/1024=11%, Rehash=0, Collisions=10/136=7%
 
 # Pattern-specific Variable Values
 
@@ -237,9 +239,9 @@ PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 141 Stepping 1, GenuineIntel
 
 # Directories
 
-# . (key d:/graduation-thesis/backend, mtime 1660151709): 21 files, no impossibilities.
+# . (key d:/graduation-thesis/backend, mtime 1660192128): 24 files, no impossibilities.
 
-# 21 files, no impossibilities in 1 directories.
+# 24 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -297,12 +299,12 @@ run:
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 27 / storage = 217 B / avg = 8 B
-# current buf: size = 8174 B / used = 217 B / count = 27 / avg = 8 B
+# strcache buffers: 1 (0) / strings = 30 / storage = 240 B / avg = 8 B
+# current buf: size = 8174 B / used = 240 B / count = 30 / avg = 8 B
 
-# strcache performance: lookups = 34 / hit rate = 20%
+# strcache performance: lookups = 37 / hit rate = 18%
 # hash-table stats:
-# Load=27/8192=0%, Rehash=0, Collisions=0/34=0%
-# Finished Make data base on Thu Aug 11 07:25:56 2022
+# Load=30/8192=0%, Rehash=0, Collisions=0/37=0%
+# Finished Make data base on Fri Aug 12 09:18:50 2022
 
  

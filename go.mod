@@ -3,9 +3,13 @@ module digitalsignature
 go 1.16
 
 require (
+	github.com/Azure/azure-pipeline-go v0.2.2 // indirect
+	github.com/Azure/azure-storage-blob-go v0.7.0 // indirect
+	github.com/Azure/go-autorest/autorest/adal v0.8.0 // indirect
 	github.com/Microsoft/go-winio v0.5.1 // indirect
+	github.com/btcsuite/btcd v0.20.1-beta // indirect
 	github.com/caarlos0/env/v6 v6.9.3
-	github.com/ethereum/go-ethereum v1.10.11
+	github.com/ethereum/go-ethereum v1.10.21
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-contrib/zap v0.0.1
@@ -25,6 +29,8 @@ require (
 	go.uber.org/zap v1.19.1
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/DataDog/dd-trace-go.v1 v1.32.0
+	gopkg.in/olebedev/go-duktape.v3 v3.0.0-20200619000410-60c24ae608a6 // indirect
 	gorm.io/driver/postgres v1.2.3
 	gorm.io/gorm v1.22.5
+	gotest.tools v2.2.0+incompatible // indirect
 )

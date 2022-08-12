@@ -21,6 +21,7 @@ type Server struct{}
 
 // Run runs our API server
 func (server *Server) Run(env string) error {
+	gin.ForceConsoleColor()
 	r := gin.Default()
 	headerPolicies := cors.DefaultConfig()
 	headerPolicies.AllowOrigins = []string{
@@ -42,7 +43,6 @@ func (server *Server) Run(env string) error {
 	headerPolicies.MaxAge = (24 * time.Hour)
 	r.Use(cors.New(headerPolicies))
 	r.Use(middleware.CORSMiddleware())
-
 	log, _ := zap.NewDevelopment()
 	if env != "debug" {
 		log, _ = zap.NewProduction()
@@ -58,6 +58,7 @@ func (server *Server) Run(env string) error {
 	db := database.NewDBConnection(log, &schema)
 
 	ethEndpoint, ok := os.LookupEnv("CHAIN_ENDPOINT")
+	log.Sugar().Info("RPC", zap.String("ENDPOINT", ethEndpoint))
 	if !ok {
 		ethEndpoint = "http://127.0.0.1:8545"
 	}
