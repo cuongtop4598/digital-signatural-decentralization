@@ -48,7 +48,17 @@ func (s *UserService) Register(c *gin.Context, userInfo request.UserInfo) error 
 	registerStatus := false
 	s.logger.Info("USER_REGISTER", zap.Any("Data", userInfo))
 	// TODO: Validate user info including gmail, phone, id card
-
+	// Verify gmail
+	{
+		// OTP := rand.Int31n(100000)
+		// auth := smtp.NewGmailAdminAuth("", "")
+		// mail := smtp.NewMail(
+		// 	"Digital Signature | User Register",
+		// 	[]string{userInfo.Gmail},
+		// 	fmt.Sprintf("Your OTP is: %d", OTP),
+		// )
+		// mail.SendMail(auth)
+	}
 	// TODO: Check user is exist in database?
 	if s.userRepo.IsExist(userInfo.Phone, userInfo.PublicKey) {
 		// Insert valid user
