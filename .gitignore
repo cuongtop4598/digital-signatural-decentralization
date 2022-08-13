@@ -1,3 +1,5 @@
 # vendor folder using for deploying only
 /vendor
 .vscode
+.env
+/.env
