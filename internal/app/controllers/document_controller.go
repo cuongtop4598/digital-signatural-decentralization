@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"digitalsignature/internal/app/middleware"
 	"digitalsignature/internal/app/model"
 	"digitalsignature/internal/app/repository"
 	"digitalsignature/internal/app/request"
@@ -31,7 +32,7 @@ func DocumentRouter(docService *service.DocumentService, documentRepo *repositor
 		documentRepo:    documentRepo,
 		userRepo:        userRepo,
 	}
-	ar := r.Group("/document")
+	ar := r.Group("/document", middleware.AuthMiddleware())
 	ar.POST("/savesign", dc.SaveSign)
 	ar.POST("/upload", dc.Upload)
 	ar.GET("/download/:filename", dc.Download)

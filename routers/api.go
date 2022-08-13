@@ -36,6 +36,6 @@ func (r *Router) SetupRoutes() {
 
 	rg := r.R.Group("/v1")
 	controllers.HomeRouter(r.R)
-	controllers.UserRouter(userSrv, rg)
+	controllers.UserRouter(r.DB, r.Log, userSrv, rg)
 	controllers.DocumentRouter(documentSrv, docRepo, userRepo, rg)
 }

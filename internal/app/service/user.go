@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"crypto/sha256"
 	"digitalsignature/internal/app/errors"
 	"digitalsignature/internal/app/model"
 	"digitalsignature/internal/app/repository"
@@ -9,6 +10,7 @@ import (
 	"digitalsignature/internal/app/response"
 	"digitalsignature/internal/pkg/abi"
 	"digitalsignature/internal/pkg/async"
+	"fmt"
 	"os"
 	"sync"
 	"time"
@@ -60,7 +62,7 @@ func (s *UserService) Register(c *gin.Context, userInfo request.UserInfo) error 
 		// mail.SendMail(auth)
 	}
 	// TODO: Check user is exist in database?
-	if s.userRepo.IsExist(userInfo.Phone, userInfo.PublicKey) {
+	if !s.userRepo.IsExist(userInfo.Phone, userInfo.PublicKey) {
 		// Insert valid user
 		user := model.User{
 			Name:        userInfo.Name,
@@ -79,6 +81,7 @@ func (s *UserService) Register(c *gin.Context, userInfo request.UserInfo) error 
 		documentIntance, err := abi.NewAbi(contractAddress, s.ethclient)
 		if err != nil {
 			s.logger.Sugar().Error(err)
+			return err
 		}
 		address := common.HexToAddress(user.PublicKey)
 		txOption := s.accountSrv.GetBindTransactionOptions(s.ethclient)
@@ -117,14 +120,18 @@ func (s *UserService) Register(c *gin.Context, userInfo request.UserInfo) error 
 		}()
 		wg.Wait()
 		if registerStatus {
+			h := sha256.New()
+			user.Password = fmt.Sprintf("%x", h.Sum([]byte(user.Password)))
 			err = s.userRepo.Create(user)
 			if err != nil {
 				s.logger.Sugar().Error("INSERT USER", zap.String("Error", err.Error()))
 			}
 			s.logger.Info("CREATE USER SUCCESS", zap.String("Publickey", userInfo.PublicKey))
 		}
+	} else {
+		return errors.UserIsExisted
 	}
-	return errors.New(200, "User is registed")
+	return nil
 }
 
 func (s *UserService) Login(login request.Login) (bool, *model.User, error) {

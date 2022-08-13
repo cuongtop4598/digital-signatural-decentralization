@@ -1,20 +1,30 @@
 package controllers
 
 import (
+	"digitalsignature/internal/app/errors"
+	"digitalsignature/internal/app/handlers"
 	"digitalsignature/internal/app/request"
 	"digitalsignature/internal/app/service"
 	"net/http"
+
+	"gorm.io/gorm"
+
+	"go.uber.org/zap"
 
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/gin-gonic/gin"
 )
 
 type UserController struct {
+	db          *gorm.DB
+	log         *zap.Logger
 	userService *service.UserService
 }
 
-func UserRouter(userService *service.UserService, r *gin.RouterGroup) {
+func UserRouter(db *gorm.DB, log *zap.Logger, userService *service.UserService, r *gin.RouterGroup) {
 	uc := UserController{
+		db:          db,
+		log:         log,
 		userService: userService,
 	}
 	ar := r.Group("/user")
@@ -26,7 +36,7 @@ func UserRouter(userService *service.UserService, r *gin.RouterGroup) {
 
 func (uc *UserController) Register(c *gin.Context) {
 	userInfo := request.UserInfo{}
-	err := c.BindJSON(&userInfo)
+	err := c.ShouldBindJSON(&userInfo)
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"status": "false"})
@@ -39,51 +49,25 @@ func (uc *UserController) Register(c *gin.Context) {
 	}
 
 	err = uc.userService.Register(c, userInfo)
-	if err != nil {
-		log.Error(err.Error())
-		c.JSON(http.StatusNotAcceptable, gin.H{"message": "user is invalid"})
+	switch err {
+	case nil:
+		break
+	case errors.UserIsExisted:
+		c.JSON(http.StatusOK, errors.UserIsExisted)
+		return
+	default:
+		c.JSON(http.StatusNotAcceptable, err)
 		return
 	}
 	userInfo.SantisizePassword()
 	c.JSON(200, gin.H{
-		"data": userInfo,
+		"user": userInfo,
 	})
 }
 
 func (uc *UserController) Login(c *gin.Context) {
-	loginInfo := request.Login{}
-	err := c.BindJSON(&loginInfo)
-	if err != nil {
-		log.Error(err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"status": "false"})
-		return
-	}
-
-	// bad security, i will change this verify later
-	if loginInfo.Phone == "" || loginInfo.Password == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "false"})
-		return
-	}
-
-	isLog, userInfo, err := uc.userService.Login(loginInfo)
-
-	if err != nil {
-		log.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
-		return
-	}
-	if isLog {
-		userInfo.SantisizePassword()
-		c.JSON(http.StatusOK, userInfo)
-	} else {
-		c.JSON(http.StatusForbidden, gin.H{
-			"code":    http.StatusForbidden,
-			"message": "Forbidden",
-			"data":    "",
-		})
-	}
+	authHandler := handlers.NewAuthHandler(uc.db, uc.log, c)
+	authHandler.SignInHandler(c)
 }
 
 func (uc *UserController) GetProfile(c *gin.Context) {

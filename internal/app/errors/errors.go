@@ -27,6 +27,8 @@ var (
 	NotFound = NewStatus(http.StatusNotFound)
 	// Unauthorized represents errors for unauthorized requests
 	Unauthorized = NewStatus(http.StatusUnauthorized)
+	// User is existed
+	UserIsExisted = New(http.StatusOK, "User is existed")
 )
 
 // NewStatus generates new error containing only http status code
