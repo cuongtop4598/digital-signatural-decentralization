@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"digitalsignature/internal/app/errors"
 	"digitalsignature/internal/app/model"
 	"digitalsignature/internal/app/repository"
 	"digitalsignature/internal/app/request"
@@ -49,69 +50,71 @@ func (s *UserService) Register(c *gin.Context, userInfo request.UserInfo) error 
 	// TODO: Validate user info including gmail, phone, id card
 
 	// TODO: Check user is exist in database?
-	// Insert valid user
-	user := model.User{
-		Name:        userInfo.Name,
-		PublicKey:   userInfo.PublicKey,
-		CardID:      userInfo.CardID,
-		Phone:       userInfo.Phone,
-		Gmail:       userInfo.Gmail,
-		DateOfBirth: userInfo.DateOfBirth,
-		Password:    userInfo.Password,
-		CreateAt:    time.Now(),
-	}
+	if s.userRepo.IsExist(userInfo.Phone, userInfo.PublicKey) {
+		// Insert valid user
+		user := model.User{
+			Name:        userInfo.Name,
+			PublicKey:   userInfo.PublicKey,
+			CardID:      userInfo.CardID,
+			Phone:       userInfo.Phone,
+			Gmail:       userInfo.Gmail,
+			DateOfBirth: userInfo.DateOfBirth,
+			Password:    userInfo.Password,
+			CreateAt:    time.Now(),
+		}
 
-	// make transaction with admin account
-	contractAddress := common.HexToAddress(s.documentContract)
-	// store hash user info to blockchain
-	documentIntance, err := abi.NewAbi(contractAddress, s.ethclient)
-	if err != nil {
-		s.logger.Sugar().Error(err)
-	}
-	address := common.HexToAddress(user.PublicKey)
-	txOption := s.accountSrv.GetBindTransactionOptions(s.ethclient)
-	storeUserAsync := async.Exec(func() (*types.Transaction, error) {
-		return documentIntance.StoreUser(txOption, user.Name, user.CardID, user.DateOfBirth, user.Phone, user.Gmail, address)
-	})
-	txn, _ := storeUserAsync.Await()
-	if err != nil {
-		s.logger.Sugar().Error(err)
-	}
-	time.Sleep(5 * time.Second)
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		for {
-			receipt, err := s.ethclient.TransactionReceipt(context.Background(), txn.Hash())
-			if err != nil {
-				s.logger.Info("TRANSACTION_STORE_USER", zap.Any(txn.Hash().String(), "Is Pending"))
-				time.Sleep(5 * time.Second)
-			} else {
-				wg.Done()
-				if receipt.Status == 1 || receipt.Status == 0 {
-					if receipt.Status == 1 {
-						s.logger.Info("TRANSACTION_STORE_USER_STATUS", zap.Any("Status", "Success"))
-						// out, _ := txn.MarshalJSON()
-						// s.logger.Info("HASH USER INFO", zap.String("Hash", string(out)))
-						registerStatus = true
-					}
-					if receipt.Status == 0 {
-						s.logger.Warn("TRANSACTION_STORE_USER_STATUS STORE USER STATUS", zap.Any("Status", "Failt"))
-					}
-				}
-				break
-			}
-		}
-	}()
-	wg.Wait()
-	if registerStatus {
-		err = s.userRepo.Create(user)
+		// make transaction with admin account
+		contractAddress := common.HexToAddress(s.documentContract)
+		// store hash user info to blockchain
+		documentIntance, err := abi.NewAbi(contractAddress, s.ethclient)
 		if err != nil {
-			s.logger.Sugar().Error("INSERT USER", zap.String("Error", err.Error()))
+			s.logger.Sugar().Error(err)
 		}
-		s.logger.Info("CREATE USER SUCCESS", zap.String("Publickey", userInfo.PublicKey))
+		address := common.HexToAddress(user.PublicKey)
+		txOption := s.accountSrv.GetBindTransactionOptions(s.ethclient)
+		storeUserAsync := async.Exec(func() (*types.Transaction, error) {
+			return documentIntance.StoreUser(txOption, user.Name, user.CardID, user.DateOfBirth, user.Phone, user.Gmail, address)
+		})
+		txn, _ := storeUserAsync.Await()
+		if err != nil {
+			s.logger.Sugar().Error(err)
+		}
+		time.Sleep(5 * time.Second)
+		var wg sync.WaitGroup
+		wg.Add(1)
+		go func() {
+			for {
+				receipt, err := s.ethclient.TransactionReceipt(context.Background(), txn.Hash())
+				if err != nil {
+					s.logger.Info("TRANSACTION_STORE_USER", zap.Any(txn.Hash().String(), "Is Pending"))
+					time.Sleep(5 * time.Second)
+				} else {
+					wg.Done()
+					if receipt.Status == 1 || receipt.Status == 0 {
+						if receipt.Status == 1 {
+							s.logger.Info("TRANSACTION_STORE_USER_STATUS", zap.Any("Status", "Success"))
+							// out, _ := txn.MarshalJSON()
+							// s.logger.Info("HASH USER INFO", zap.String("Hash", string(out)))
+							registerStatus = true
+						}
+						if receipt.Status == 0 {
+							s.logger.Warn("TRANSACTION_STORE_USER_STATUS STORE USER STATUS", zap.Any("Status", "Failt"))
+						}
+					}
+					break
+				}
+			}
+		}()
+		wg.Wait()
+		if registerStatus {
+			err = s.userRepo.Create(user)
+			if err != nil {
+				s.logger.Sugar().Error("INSERT USER", zap.String("Error", err.Error()))
+			}
+			s.logger.Info("CREATE USER SUCCESS", zap.String("Publickey", userInfo.PublicKey))
+		}
 	}
-	return nil
+	return errors.New(200, "User is registed")
 }
 
 func (s *UserService) Login(login request.Login) (bool, *model.User, error) {

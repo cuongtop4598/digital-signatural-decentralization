@@ -8,7 +8,7 @@ make: *** No rule to make target 'all'.  Stop.
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Fri Aug 12 09:18:50 2022
+# Make data base, printed on Sat Aug 13 08:28:03 2022
 
 # Variables
 
@@ -41,7 +41,7 @@ GOPATH = C:\Users\cuong\go
 # automatic
 @D = $(patsubst %/,%,$(patsubst %\,%,$(dir $@)))
 # environment
-CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_30012_XLJXJIFWFAJJROJL
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_3736_CFEOCXNJNWEXIMOT
 # environment
 VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # default
@@ -95,7 +95,7 @@ MAKEFILE_LIST := Makefile
 # automatic
 @F = $(notdir $@)
 # environment
-VSCODE_PID = 30012
+VSCODE_PID = 3736
 # automatic
 ?D = $(patsubst %/,%,$(patsubst %\,%,$(dir $?)))
 # environment
@@ -168,8 +168,6 @@ USERDOMAIN = TOPER
 GNUMAKEFLAGS := 
 # environment
 OS = Windows_NT
-# environment
-__COMPAT_LAYER = DetectorsAppHealth
 # makefile
 .DEFAULT_GOAL := build-sc
 # default
@@ -231,7 +229,7 @@ PROCESSOR_REVISION = 8d01
 # environment
 PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 141 Stepping 1, GenuineIntel
 # variable set hash-table stats:
-# Load=109/1024=11%, Rehash=0, Collisions=10/136=7%
+# Load=108/1024=11%, Rehash=0, Collisions=10/135=7%
 
 # Pattern-specific Variable Values
 
@@ -239,9 +237,9 @@ PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 141 Stepping 1, GenuineIntel
 
 # Directories
 
-# . (key d:/graduation-thesis/backend, mtime 1660192128): 24 files, no impossibilities.
+# . (key d:/graduation-thesis/backend, mtime 1660293799): 22 files, no impossibilities.
 
-# 24 files, no impossibilities in 1 directories.
+# 22 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -299,12 +297,12 @@ run:
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 30 / storage = 240 B / avg = 8 B
-# current buf: size = 8174 B / used = 240 B / count = 30 / avg = 8 B
+# strcache buffers: 1 (0) / strings = 28 / storage = 226 B / avg = 8 B
+# current buf: size = 8174 B / used = 226 B / count = 28 / avg = 8 B
 
-# strcache performance: lookups = 37 / hit rate = 18%
+# strcache performance: lookups = 35 / hit rate = 20%
 # hash-table stats:
-# Load=30/8192=0%, Rehash=0, Collisions=0/37=0%
-# Finished Make data base on Fri Aug 12 09:18:50 2022
+# Load=28/8192=0%, Rehash=0, Collisions=0/35=0%
+# Finished Make data base on Sat Aug 13 08:28:03 2022
 
  

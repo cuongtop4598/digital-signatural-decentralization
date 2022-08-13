@@ -29,6 +29,16 @@ func (repo *UserRepo) Create(user model.User) error {
 	return nil
 }
 
+func (repo *UserRepo) IsExist(phone string, publicKey string) bool {
+	var exist bool
+	err := repo.DB.Model(&model.User{}).Select("count(*) > 0").Where("phone = ? or public_key = ?", phone, publicKey).Find(&exist).Error
+	if err != nil {
+		repo.log.Sugar().Error(err)
+		return false
+	}
+	return exist
+}
+
 func (repo *UserRepo) GetUserByPubkey(pubkey string) (*model.User, error) {
 	user := model.User{}
 	result := repo.DB.Where("public_key = ?", pubkey).First(&user)
