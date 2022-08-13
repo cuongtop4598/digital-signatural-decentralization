@@ -1,7 +1,9 @@
 package repository
 
 import (
+	"crypto/sha256"
 	"digitalsignature/internal/app/model"
+	"fmt"
 	"strings"
 
 	"go.uber.org/zap"
@@ -86,7 +88,9 @@ func (repo *UserRepo) GetUserByGmail(gmail string) (*model.User, error) {
 
 func (repo *UserRepo) CheckLogin(password string, phone string) (bool, *model.User, error) {
 	user := model.User{}
-	result := repo.DB.Model(&model.User{}).Where("password = ? and phone = ?", password, phone).First(&user)
+	h := sha256.New()
+	hashPass := fmt.Sprintf("%x", (h.Sum([]byte(password))))
+	result := repo.DB.Model(&model.User{}).Where("password = ? and phone = ?", hashPass, phone).First(&user)
 	if result.Error != nil {
 		repo.log.Sugar().Error(result.Error)
 		return false, nil, result.Error
