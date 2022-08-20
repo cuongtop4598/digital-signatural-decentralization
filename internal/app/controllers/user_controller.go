@@ -42,6 +42,7 @@ func (uc *UserController) Register(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"status": "false"})
 		return
 	}
+	uc.log.Sugar().Info(userInfo)
 	if userInfo.Phone == "" || userInfo.PublicKey == "" || userInfo.Password == "" {
 		log.Error(err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"status": "false"})
@@ -61,6 +62,7 @@ func (uc *UserController) Register(c *gin.Context) {
 	}
 	userInfo.SantisizePassword()
 	c.JSON(200, gin.H{
+		"code": 200,
 		"user": userInfo,
 	})
 }

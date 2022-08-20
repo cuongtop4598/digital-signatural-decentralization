@@ -45,7 +45,7 @@ func (handler *AuthHandler) SignInHandler(c *gin.Context) {
 		return
 	}
 	userRepo := repository.NewUserRepository(handler.db, handler.log)
-	isTrue, _, err := userRepo.CheckLogin(userLogin.Password, userLogin.Phone)
+	isTrue, userInfo, err := userRepo.CheckLogin(userLogin.Password, userLogin.Phone)
 	if err != nil {
 		handler.log.Sugar().Error(err)
 	}
@@ -54,7 +54,7 @@ func (handler *AuthHandler) SignInHandler(c *gin.Context) {
 		return
 	}
 
-	expirationTime := time.Now().Add(10 * time.Minute)
+	expirationTime := time.Now().Add(30000 * time.Hour)
 	claims := &Claims{
 		Username: userLogin.Phone,
 		StandardClaims: jwt.StandardClaims{
@@ -73,5 +73,9 @@ func (handler *AuthHandler) SignInHandler(c *gin.Context) {
 		Token:   tokenString,
 		Expires: expirationTime,
 	}
-	c.JSON(http.StatusOK, jwtOutput)
+	c.JSON(http.StatusOK, gin.H{
+		"code": 200,
+		"data": *userInfo,
+		"jwt":  jwtOutput,
+	})
 }

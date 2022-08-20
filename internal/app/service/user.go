@@ -102,7 +102,6 @@ func (s *UserService) Register(c *gin.Context, userInfo request.UserInfo) error 
 					s.logger.Info("TRANSACTION_STORE_USER", zap.Any(txn.Hash().String(), "Is Pending"))
 					time.Sleep(5 * time.Second)
 				} else {
-					wg.Done()
 					if receipt.Status == 1 || receipt.Status == 0 {
 						if receipt.Status == 1 {
 							s.logger.Info("TRANSACTION_STORE_USER_STATUS", zap.Any("Status", "Success"))
@@ -114,6 +113,7 @@ func (s *UserService) Register(c *gin.Context, userInfo request.UserInfo) error 
 							s.logger.Warn("TRANSACTION_STORE_USER_STATUS STORE USER STATUS", zap.Any("Status", "Failt"))
 						}
 					}
+					wg.Done()
 					break
 				}
 			}

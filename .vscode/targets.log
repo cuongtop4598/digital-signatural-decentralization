@@ -8,12 +8,10 @@ make: *** No rule to make target 'all'.  Stop.
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Sat Aug 13 21:19:45 2022
+# Make data base, printed on Sat Aug 20 08:15:30 2022
 
 # Variables
 
-# environment
-FPS_BROWSER_APP_PROFILE_STRING = Internet Explorer
 # environment
 SYSTEMDRIVE = C:
 # environment
@@ -43,9 +41,7 @@ GOPATH = C:\Users\cuong\go
 # automatic
 @D = $(patsubst %/,%,$(patsubst %\,%,$(dir $@)))
 # environment
-CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_3736_CFEOCXNJNWEXIMOT
-# environment
-FPS_BROWSER_USER_PROFILE_STRING = Default
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_25088_WBISXEOTWUUHUGLT
 # environment
 VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # default
@@ -59,7 +55,7 @@ VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # environment
 CONDA_PROMPT_MODIFIER = False
 # environment
-VSCODE_CODE_CACHE_PATH = C:\Users\cuong\AppData\Roaming\Code\CachedData\6d9b74a70ca9c7733b29f0456fd8195364076dda
+VSCODE_CODE_CACHE_PATH = C:\Users\cuong\AppData\Roaming\Code\CachedData\e4503b30fc78200f846c62cf8091b76ff5547662
 # environment
 LANG = C
 # default
@@ -99,7 +95,7 @@ MAKEFILE_LIST := Makefile
 # automatic
 @F = $(notdir $@)
 # environment
-VSCODE_PID = 3736
+VSCODE_PID = 25088
 # automatic
 ?D = $(patsubst %/,%,$(patsubst %\,%,$(dir $?)))
 # environment
@@ -211,7 +207,7 @@ ELECTRON_RUN_AS_NODE = 1
 # environment
 TEMP = C:\Users\cuong\AppData\Local\Temp
 # environment
-VSCODE_IPC_HOOK = \\.\pipe\e94ae9dbae3ecdd11f46d8acb5f6d9e3-1.70.1-main-sock
+VSCODE_IPC_HOOK = \\.\pipe\e94ae9dbae3ecdd11f46d8acb5f6d9e3-1.70.2-main-sock
 # environment
 GOPROXY = https://proxy.golang.org,direct
 # default
@@ -233,7 +229,7 @@ PROCESSOR_REVISION = 8d01
 # environment
 PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 141 Stepping 1, GenuineIntel
 # variable set hash-table stats:
-# Load=110/1024=11%, Rehash=0, Collisions=11/137=8%
+# Load=108/1024=11%, Rehash=0, Collisions=10/135=7%
 
 # Pattern-specific Variable Values
 
@@ -307,6 +303,6 @@ run:
 # strcache performance: lookups = 35 / hit rate = 20%
 # hash-table stats:
 # Load=28/8192=0%, Rehash=0, Collisions=0/35=0%
-# Finished Make data base on Sat Aug 13 21:19:45 2022
+# Finished Make data base on Sat Aug 20 08:15:30 2022
 
  

@@ -7,6 +7,7 @@ import (
 	"digitalsignature/internal/pkg/abi"
 	"math/big"
 	"os"
+	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -63,7 +64,7 @@ func (d *DocumentService) GetDocumentByPhone(phone string) (*response.ListDocume
 			IndexOnchain:    doc.IndexOnchain,
 			Owner:           doc.Owner,
 			Name:            doc.Name,
-			BlockTimetamp:   doc.BlockTimetamp,
+			BlockNumber:     doc.BlockNumber,
 			BlockHash:       doc.BlockHash,
 			TransactionHash: doc.TransactionHash,
 			Signature:       doc.Signature,
@@ -86,7 +87,7 @@ func (d *DocumentService) GetDocumentByPublickey(publickeys []string) ([]model.D
 			IndexOnchain:    doc.IndexOnchain,
 			Owner:           doc.Owner,
 			Name:            doc.Name,
-			BlockTimetamp:   doc.BlockTimetamp,
+			BlockNumber:     doc.BlockNumber,
 			BlockHash:       doc.BlockHash,
 			TransactionHash: doc.TransactionHash,
 			Signature:       doc.Signature,
@@ -119,4 +120,35 @@ func (d *DocumentService) GetSignature(phone string, documentIndex *big.Int) ([]
 		return nil, err
 	}
 	return signature, nil
+}
+
+func (d *DocumentService) StoreDocument(
+	fileName string,
+	fileType string,
+	publickeys []string,
+	signature string,
+	blockHash string,
+	transactionHash string,
+	blockNumber string,
+	documentId int) error {
+	document := model.Document{
+		ID:              [16]byte{},
+		IndexOnchain:    documentId,
+		Owner:           publickeys,
+		Name:            fileName,
+		BlockNumber:     blockNumber,
+		BlockHash:       blockHash,
+		TransactionHash: transactionHash,
+		Signature:       signature,
+		Public:          false,
+		TypeFile:        fileType,
+		CreateAt:        time.Now(),
+		UpdateAt:        time.Time{},
+		DeleteAt:        time.Time{},
+	}
+	err := d.documentRepo.Create(&document)
+	if err != nil {
+		return err
+	}
+	return nil
 }
