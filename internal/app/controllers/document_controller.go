@@ -72,7 +72,13 @@ func (dc *DocumentController) Upload(c *gin.Context) {
 	publickey := c.Request.FormValue("publickey")
 	signature := c.Request.FormValue("signature")
 
-	tmpFile, err := os.Create("static/" + h.Filename)
+	path := fmt.Sprintf("static/" + publickey)
+	log.Println(path)
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		err = os.Mkdir(path, os.ModePerm)
+		log.Println(err)
+	}
+	tmpFile, err := os.Create(path + h.Filename)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -164,7 +170,11 @@ func (dc *DocumentController) SaveSignedDocument(c *gin.Context) {
 	}
 
 	os.Chdir(".")
-	tmpFile, err := os.Create("./static/" + h.Filename + ".pdf")
+	path := fmt.Sprintf("./static/" + publickey)
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		_ = os.Mkdir(path, os.ModePerm)
+	}
+	tmpFile, err := os.Create(path + "/" + strconv.FormatInt(time.Now().Unix(), 10) + "-" + h.Filename)
 	if err != nil {
 		log.Println("Save file error: ", err)
 		c.JSON(http.StatusBadRequest, gin.H{

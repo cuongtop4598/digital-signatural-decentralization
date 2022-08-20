@@ -3,7 +3,6 @@ package middleware
 import (
 	"digitalsignature/internal/app/handlers"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"os"
 
@@ -21,7 +20,6 @@ func AuthMiddleware() gin.HandlerFunc {
 		tkn, err := jwt.ParseWithClaims(jwtOut.Token, claims, func(token *jwt.Token) (interface{}, error) {
 			return []byte(os.Getenv("JWT_SECRET")), nil
 		})
-		fmt.Println(tkn)
 		if err != nil {
 			c.AbortWithStatus(http.StatusUnauthorized)
 		}
