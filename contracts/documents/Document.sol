@@ -2,11 +2,86 @@
 
 pragma solidity ^0.8.0;
 
-import "./IDC.sol";
-import "./utils/Context.sol";
-import "./StringsUtils.sol";
+abstract contract Context {
+    function _msgSender() internal view virtual returns (address) {
+        return msg.sender;
+    }
+    function _msgData() internal view virtual returns (bytes calldata) {
+        return msg.data;
+    }
+}
+
+library StringUtils {
+    /// @dev Does a byte-by-byte lexicographical comparison of two strings.
+    /// @return a negative number if `_a` is smaller, zero if they are equal
+    /// and a positive numbe if `_b` is smaller.
+    function compare(string memory _a, string memory _b) public pure returns (int) {
+        bytes memory a = bytes(_a);
+        bytes memory b = bytes(_b);
+        uint minLength = a.length;
+        if (b.length < minLength) minLength = b.length;
+        //@todo unroll the loop into increments of 32 and do full 32 byte comparisons
+        for (uint i = 0; i < minLength; i ++)
+            if (a[i] < b[i])
+                return -1;
+            else if (a[i] > b[i])
+                return 1;
+        if (a.length < b.length)
+            return -1;
+        else if (a.length > b.length)
+            return 1;
+        else
+            return 0;
+    }
+    /// @dev Compares two strings and returns true iff they are equal.
+    function equal(string memory _a, string memory _b) public pure returns (bool) {
+        return compare(_a, _b) == 0;
+    }
+    /// @dev Finds the index of the first occurrence of _needle in _haystack
+    function indexOf(string memory _haystack, string memory _needle) public pure returns (int)
+    {
+    	bytes memory h = bytes(_haystack);
+    	bytes memory n = bytes(_needle);
+    	if(h.length < 1 || n.length < 1 || (n.length > h.length)) 
+    		return -1;
+    	else if(h.length > (2**128 -1)) // since we have to be able to return -1 (if the char isn't found or input error), this function must return an "int" type with a max length of (2^128 - 1)
+    		return -1;									
+    	else
+    	{
+    		uint subindex = 0;
+    		for (uint i = 0; i < h.length; i ++)
+    		{
+    			if (h[i] == n[0]) // found the first char of b
+    			{
+    				subindex = 1;
+    				while(subindex < n.length && (i + subindex) < h.length && h[i + subindex] == n[subindex]) // search until the chars don't match or until we reach the end of a or b
+    				{
+    					subindex++;
+    				}	
+    				if(subindex == n.length)
+    					return int(i);
+    			}
+    		}
+    		return -1;
+    	}	
+    }
+}
+
+
+/**
+ * @dev Interface for document contract
+ */
+interface IDC {
+    function storeUser(string memory name,string memory cmnd, string memory dateOB, string memory phone,string memory gmail,address publicKey) external returns (bytes32);
+    function verifyUser(string memory name,string memory cmnd, string memory dateOB, string memory phone,string memory gmail,address publicKey) external returns(bool);
+    function createSingleSignerDocument(string memory phone, bytes memory signature) external returns (bytes32 phoneHash) ;
+    function createMultipleSignerDocument(address partner, bytes memory signature) external returns (uint256 DocID, uint256 startDate , bool success);
+    function signMultipleSignerDocument(uint256 DocID, bytes memory signatureB) external returns (uint256 signDate, bool success);
+    function verifyDoc(string memory phone, string memory digest, uint indexDoc) external returns(bool); 
+}
 
 contract Document is Context, IDC {
+                             
     struct User {
         string userID;
         bytes32 infoHash;
@@ -34,7 +109,7 @@ contract Document is Context, IDC {
     MultiSignerDoc[] multiSignerDocs;
 
     event NumberOfOwnerDocument(uint num);
-    event CreateAccountSuccess(string userInfo);
+    event CreateAccountSuccess(bytes32 userInfoHash);
     /*
      @dev The first user will sign their document and send to the other signer
     */
@@ -75,15 +150,26 @@ contract Document is Context, IDC {
      */
     function storeUser(string memory name,string memory cmnd, string memory dateOB, string memory phone,string memory gmail,address publicKey) 
     public override returns(bytes32) {
+        User storage u;
+        bytes32 hashPhone = hashPhoneNumber(phone);
+        for(uint256 i = 0; i < users.length; i++){
+            u = users[i];
+            if(u.phoneHash == hashPhone){
+                revert("The phone number is existed");
+            }
+            if(u.publicKey == publicKey){
+                revert("The user's public key is existed");
+            }
+        }
         bytes32 hashInfo = hashUserInfo(name,cmnd,dateOB,phone,gmail,publicKey);
         uint256 idx = users.length;
         users.push();
-        User storage u = users[idx];
+        u = users[idx];
         u.infoHash = hashInfo;
         u.publicKey = publicKey;
         u.phoneHash = hashPhoneNumber(phone);
         u.documentSize = 0;
-        emit CreateAccountSuccess(string(abi.encodePacked(phone,'-',publicKey)));
+        emit CreateAccountSuccess(hashInfo);
         return u.phoneHash;
     }
     /**
@@ -104,7 +190,7 @@ contract Document is Context, IDC {
     function getHashUserInfo(string memory phone) public view returns(bytes32) {
         bytes32 phoneHash = hashPhoneNumber(phone);
         uint i = 0;
-         for (i = 0;  i <= users.length; i++ ) {
+         for (i = 0;  i < users.length; i++ ) {
             if(compareBytes(users[i].phoneHash, phoneHash)){
                 return users[i].infoHash;
             }
@@ -120,7 +206,7 @@ contract Document is Context, IDC {
     function createSingleSignerDocument(string memory phone,bytes memory signature) public override returns (bytes32) {
         bytes32 phoneHash = hashPhoneNumber(phone);
         uint i = 0;
-        for ( i = 0;  i <= users.length; i++ ) {
+        for ( i = 0;  i < users.length; i++ ) {
            if(compareBytes(users[i].phoneHash, phoneHash)){
                  uint numDoc = users[i].documentSize;
                  emit NumberOfOwnerDocument(numDoc);
@@ -129,7 +215,7 @@ contract Document is Context, IDC {
                  return phoneHash;
             }
         }
-        return phoneHash;
+        revert("sign is not success");
     }
 
     function getMessageHash(

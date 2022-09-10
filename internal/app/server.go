@@ -1,14 +1,15 @@
 package app
 
 import (
+	"context"
 	"digitalsignature/internal/app/middleware"
 	"digitalsignature/internal/pkg/database"
+	"digitalsignature/internal/pkg/ethereum"
 	"os"
 	"time"
 
 	"digitalsignature/routers"
 
-	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gin-contrib/cors"
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
@@ -27,6 +28,7 @@ func (server *Server) Run(env string) error {
 	headerPolicies.AllowOrigins = []string{
 		"http://localhost:3000",
 		"http://localhost:3001",
+		"http://localhost:3002",
 		"http://192.168.78.2:3000",
 		"http://192.168.78.2:3001",
 	}
@@ -57,16 +59,13 @@ func (server *Server) Run(env string) error {
 	schema := "public"
 	db := database.NewDBConnection(log, &schema)
 
-	ethEndpoint, ok := os.LookupEnv("CHAIN_ENDPOINT")
-	log.Sugar().Info("RPC", zap.String("ENDPOINT", ethEndpoint))
-	if !ok {
-		ethEndpoint = "http://127.0.0.1:8545"
-	}
-	client, err := ethclient.Dial(ethEndpoint)
-	if err != nil {
-		log.Sugar().Error(err)
-	}
+	client := ethereum.NewClient()
 
+	currentBlockNumber, err := client.BlockNumber(context.Background())
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	log.Sugar().Info("Block number: ", currentBlockNumber)
 	defer tracer.Stop()
 	defer log.Sync()
 

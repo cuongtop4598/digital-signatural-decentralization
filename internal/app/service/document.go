@@ -23,7 +23,7 @@ func NewDocumentService(
 ) *DocumentService {
 	contractAddress, ok := os.LookupEnv("CONTRACT_ADDRESS")
 	if !ok {
-		return nil
+		log.Fatal("Can't load contract address")
 	}
 	return &DocumentService{
 		documentRepo:    documentRepo,
@@ -54,7 +54,7 @@ func (d *DocumentService) GetDocumentByPhone(phone string) (*response.ListDocume
 		d.log.Sugar().Error(err)
 		return nil, err
 	}
-	docs, err := d.documentRepo.AllByOwner([]string{userPublicKey})
+	docs, err := d.documentRepo.AllByOwner(userPublicKey)
 	if err != nil {
 		d.log.Sugar().Error(err)
 		return nil, err
@@ -75,9 +75,9 @@ func (d *DocumentService) GetDocumentByPhone(phone string) (*response.ListDocume
 	return &result, nil
 }
 
-func (d *DocumentService) GetDocumentByPublickey(publickeys []string) ([]model.Document, error) {
+func (d *DocumentService) GetDocumentByPublickey(publickey string) ([]model.Document, error) {
 	result := response.ListDocumentResponse{}
-	docs, err := d.documentRepo.AllByOwner(publickeys)
+	docs, err := d.documentRepo.AllByOwner(publickey)
 	if err != nil {
 		d.log.Sugar().Error(err)
 		return nil, err
@@ -99,7 +99,7 @@ func (d *DocumentService) GetDocumentByPublickey(publickeys []string) ([]model.D
 }
 
 func (d *DocumentService) VerifyDocument(phone string, digest string, documentIndex *big.Int) (bool, error) {
-	documentAbi, err := abi.NewAbi(d.contractAddress, d.client)
+	documentAbi, err := abi.NewDocument(d.contractAddress, d.client)
 	if err != nil {
 		d.log.Sugar().Error(err)
 		return false, err
@@ -109,7 +109,7 @@ func (d *DocumentService) VerifyDocument(phone string, digest string, documentIn
 }
 
 func (d *DocumentService) GetSignature(phone string, documentIndex *big.Int) ([]byte, error) {
-	documentAbi, err := abi.NewAbi(d.contractAddress, d.client)
+	documentAbi, err := abi.NewDocument(d.contractAddress, d.client)
 	if err != nil {
 		d.log.Sugar().Error(err)
 		return nil, err
@@ -125,7 +125,7 @@ func (d *DocumentService) GetSignature(phone string, documentIndex *big.Int) ([]
 func (d *DocumentService) StoreDocument(
 	fileName string,
 	fileType string,
-	publickeys []string,
+	publickeys string,
 	signature string,
 	blockHash string,
 	transactionHash string,

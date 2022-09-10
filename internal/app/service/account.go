@@ -4,9 +4,11 @@ import (
 	"context"
 	"crypto/ecdsa"
 	"errors"
+	"fmt"
 	"log"
 	"math/big"
 	"os"
+	"strconv"
 
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -27,18 +29,19 @@ type AdminAccountService struct {
 	log        *zap.Logger
 }
 
-func NewAdminAccountService() *AdminAccountService {
+func NewAdminAccountService(log *zap.Logger) *AdminAccountService {
 	keyPath, _ := os.LookupEnv("KEYSTORE_PATH")
 	password, _ := os.LookupEnv("PASSWORD_UNLOCK")
 	privatekey, ok := os.LookupEnv("PRIVATE_KEY")
 	if !ok {
-		privatekey = "0x07535d6917bdf7ca39da2f477b7f96d350672a2549f546572d905fb553fc9988"
+		log.Fatal("Can't load privatekey")
 	}
 	private, err := ethereumCrypto.HexToECDSA(privatekey)
 	if err != nil {
-		log.Fatal(err)
+		log.Sugar().Error(err)
 	}
 	pubkey, ok := private.Public().(*ecdsa.PublicKey)
+	log.Sugar().Info("Publickey: ", ethereumCrypto.PubkeyToAddress(*pubkey))
 	if !ok {
 		log.Fatal("error casting public key to ECDSA")
 	}
@@ -47,6 +50,7 @@ func NewAdminAccountService() *AdminAccountService {
 		Password:   password,
 		Publickey:  pubkey,
 		PrivateKey: private,
+		log:        log,
 	}
 }
 
@@ -56,11 +60,11 @@ func (s *AdminAccountService) GetBindTransactionOptions(client *ethclient.Client
 	if err != nil {
 		s.log.Sugar().Error(err)
 	}
-	gasLimit := uint64(4712388) // in units
 	gasPrice, err := client.SuggestGasPrice(context.Background())
 	if err != nil {
 		s.log.Sugar().Error(err)
 	}
+	s.log.Sugar().Info("Gas price :", gasPrice)
 	return &bind.TransactOpts{
 		From:  fromAddress,
 		Nonce: big.NewInt(int64(nonce)),
@@ -74,18 +78,20 @@ func (s *AdminAccountService) GetBindTransactionOptions(client *ethclient.Client
 			}
 			return signedTx, nil
 		},
+		Value:    big.NewInt(0),
 		GasPrice: gasPrice,
-		GasLimit: gasLimit,
 		Context:  context.Background(),
 	}
 }
 
 func (s *AdminAccountService) SignTransaction(tx *types.Transaction, client *ethclient.Client) (*types.Transaction, error) {
-	chainID, err := client.NetworkID(context.Background())
-	if err != nil {
-		log.Fatal(err)
+	chainID, ok := os.LookupEnv("CHAIN_ID")
+	if !ok {
+		chainID = "451998"
 	}
-	signedTx, err := types.SignTx(tx, types.NewEIP155Signer(chainID), s.PrivateKey)
+	chainId, _ := strconv.ParseInt(chainID, 10, 32)
+	fmt.Println("Chain id: ", chainId)
+	signedTx, err := types.SignTx(tx, types.NewEIP155Signer(big.NewInt(chainId)), s.PrivateKey)
 	if err != nil {
 		return nil, err
 	}
@@ -105,8 +111,8 @@ func (s *AdminAccountService) BindTransactionOption(account accounts.Account, pa
 	}
 	auth.From = fromAddress
 	auth.Nonce = big.NewInt(int64(nonce))
-	auth.GasPrice = big.NewInt(1000000000)
-	auth.GasLimit = uint64(4712388)
+	auth.GasPrice = big.NewInt(1000)
+	auth.GasLimit = uint64(8000000)
 	return auth
 }
 

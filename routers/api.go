@@ -30,7 +30,7 @@ func (r *Router) SetupRoutes() {
 	userRepo := repository.NewUserRepository(r.DB, r.Log)
 	docRepo := repository.NewDocumentRepo(r.DB, r.Log)
 
-	adminAccountSrv := service.NewAdminAccountService()
+	adminAccountSrv := service.NewAdminAccountService(r.Log)
 	documentSrv := service.NewDocumentService(docRepo, userRepo, r.EthClient, r.Log)
 	userSrv := service.NewUserService(r.EthClient, userRepo, adminAccountSrv, r.Log)
 

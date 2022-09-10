@@ -9,34 +9,33 @@ import (
 	"digitalsignature/internal/app/request"
 	"digitalsignature/internal/app/response"
 	"digitalsignature/internal/pkg/abi"
-	"digitalsignature/internal/pkg/async"
+	"digitalsignature/internal/pkg/ethereum"
 	"fmt"
 	"os"
 	"sync"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
-type AccountSrv interface {
-	GetBindTransactionOptions(client *ethclient.Client) *bind.TransactOpts
-}
-
 type UserService struct {
 	ethclient        *ethclient.Client
 	userRepo         *repository.UserRepo
 	logger           *zap.Logger
-	accountSrv       AccountSrv
+	accountSrv       *AdminAccountService
 	documentContract string
 }
 
-func NewUserService(client *ethclient.Client, userRepo *repository.UserRepo, accountSrv AccountSrv, log *zap.Logger) *UserService {
-	contractAddress, _ := os.LookupEnv("CONTRACT_ADDRESS")
+func NewUserService(client *ethclient.Client, userRepo *repository.UserRepo, accountSrv *AdminAccountService, log *zap.Logger) *UserService {
+	contractAddress, ok := os.LookupEnv("CONTRACT_ADDRESS")
+	if !ok {
+		log.Fatal("Can't load document contract")
+	}
 	return &UserService{
 		ethclient:        client,
 		userRepo:         userRepo,
@@ -47,6 +46,7 @@ func NewUserService(client *ethclient.Client, userRepo *repository.UserRepo, acc
 }
 
 func (s *UserService) Register(c *gin.Context, userInfo request.UserInfo) error {
+	s.ethclient = ethereum.NewClient()
 	registerStatus := false
 	s.logger.Info("USER_REGISTER", zap.Any("Data", userInfo))
 	// TODO: Validate user info including gmail, phone, id card
@@ -74,34 +74,36 @@ func (s *UserService) Register(c *gin.Context, userInfo request.UserInfo) error 
 			Password:    userInfo.Password,
 			CreateAt:    time.Now(),
 		}
-
-		// make transaction with admin account
 		contractAddress := common.HexToAddress(s.documentContract)
 		// store hash user info to blockchain
-		documentIntance, err := abi.NewAbi(contractAddress, s.ethclient)
+		documentIntance, err := abi.NewDocument(contractAddress, s.ethclient)
 		if err != nil {
 			s.logger.Sugar().Error(err)
 			return err
 		}
 		address := common.HexToAddress(user.PublicKey)
 		txOption := s.accountSrv.GetBindTransactionOptions(s.ethclient)
-		storeUserAsync := async.Exec(func() (*types.Transaction, error) {
-			return documentIntance.StoreUser(txOption, user.Name, user.CardID, user.DateOfBirth, user.Phone, user.Gmail, address)
-		})
-		txn, _ := storeUserAsync.Await()
-		if err != nil {
-			s.logger.Sugar().Error(err)
+		s.logger.Sugar().Info("Init store user transaction")
+		retry := 0
+	RETRY:
+		tx, err := documentIntance.StoreUser(txOption, user.Name, user.CardID, user.DateOfBirth, user.Phone, user.Gmail, address)
+		if err != nil && retry < 30 {
+			s.logger.Sugar().Info("Retry store user onchain!")
+			time.Sleep(5 * time.Second)
+			retry++
+			goto RETRY
 		}
-		time.Sleep(5 * time.Second)
 		var wg sync.WaitGroup
 		wg.Add(1)
 		go func() {
 			for {
-				receipt, err := s.ethclient.TransactionReceipt(context.Background(), txn.Hash())
+				receipt, err := s.ethclient.TransactionReceipt(context.Background(), tx.Hash())
 				if err != nil {
-					s.logger.Info("TRANSACTION_STORE_USER", zap.Any(txn.Hash().String(), "Is Pending"))
+					s.logger.Info(err.Error())
+					s.logger.Info("TRANSACTION_STORE_USER", zap.Any(tx.Hash().String(), "Is Pending"))
 					time.Sleep(5 * time.Second)
 				} else {
+					spew.Dump(receipt)
 					if receipt.Status == 1 || receipt.Status == 0 {
 						if receipt.Status == 1 {
 							s.logger.Info("TRANSACTION_STORE_USER_STATUS", zap.Any("Status", "Success"))
@@ -129,6 +131,7 @@ func (s *UserService) Register(c *gin.Context, userInfo request.UserInfo) error 
 			s.logger.Info("CREATE USER SUCCESS", zap.String("Publickey", userInfo.PublicKey))
 		}
 	} else {
+		s.logger.Sugar().Error("User is existed")
 		return errors.UserIsExisted
 	}
 	return nil
@@ -140,7 +143,7 @@ func (s *UserService) Login(login request.Login) (bool, *model.User, error) {
 
 func (s *UserService) GetUserInfo(c *gin.Context, phone string) (*response.User, error) {
 	contractAddress := common.HexToAddress(s.documentContract)
-	documentAbi, err := abi.NewAbi(contractAddress, s.ethclient)
+	documentAbi, err := abi.NewDocument(contractAddress, s.ethclient)
 	if err != nil {
 		s.logger.Sugar().Error(err)
 		return nil, err
@@ -172,7 +175,7 @@ func (s *UserService) GetUserInfo(c *gin.Context, phone string) (*response.User,
 
 func (s *UserService) VerifyUser(user request.UserInfo) (bool, error) {
 	contractAddress := common.HexToAddress(s.documentContract)
-	documentIntance, err := abi.NewAbi(contractAddress, s.ethclient)
+	documentIntance, err := abi.NewDocument(contractAddress, s.ethclient)
 	if err != nil {
 		s.logger.Sugar().Error(err)
 		return false, err

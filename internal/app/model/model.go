@@ -28,7 +28,7 @@ type User struct {
 type Document struct {
 	ID              uuid.UUID `gorm:"primaryKey, autoIncrement"`
 	IndexOnchain    int       `json:"index_onchain"`
-	Owner           []string  `gorm:"type:text"`
+	Owner           string    `gorm:"type:text"`
 	Name            string    `json:"name"`
 	BlockNumber     string    `json:"block_number,omitempty"`
 	BlockHash       string    `json:"block_hash,omitempty"`

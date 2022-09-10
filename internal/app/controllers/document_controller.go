@@ -36,9 +36,11 @@ func DocumentRouter(docService *service.DocumentService, documentRepo *repositor
 	ar := r.Group("/document", middleware.AuthMiddleware())
 	ar.POST("/savesign", dc.SaveSignedDocument)
 	ar.POST("/upload", dc.Upload)
-	ar.GET("/download/:filename", dc.Download)
 	ar.GET("/list/:publickey", dc.GetDocs)
 	ar.GET("/signature", dc.GetSign)
+
+	publicRouter := r.Group("/document")
+	publicRouter.GET("/download/filename/:filename/owner/:owner", dc.Download)
 }
 
 func (dc *DocumentController) GetSign(c *gin.Context) {
@@ -87,7 +89,7 @@ func (dc *DocumentController) Upload(c *gin.Context) {
 
 	doc := model.Document{
 		ID:        uuid.New(),
-		Owner:     []string{publickey},
+		Owner:     publickey,
 		Name:      h.Filename,
 		TypeFile:  "pdf",
 		Signature: signature,
@@ -111,9 +113,10 @@ func (dc *DocumentController) Upload(c *gin.Context) {
 
 func (dc *DocumentController) Download(c *gin.Context) {
 	name := c.Param("filename")
-	files := utils.SearchFileInPath("static/")
+	owner := c.Param("owner")
+	files := utils.SearchFileInPath("static/" + owner + "/")
 	for _, file := range files {
-		if file == ("static/" + name) {
+		if file == ("static/" + owner + "/" + name) {
 			isPublic, err := dc.documentRepo.IsPublic(name)
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": err})
@@ -163,8 +166,7 @@ func (dc *DocumentController) SaveSignedDocument(c *gin.Context) {
 	blockNumber := c.Request.FormValue("block_number")
 	blockHash := c.Request.FormValue("block_hash")
 	txHash := c.Request.FormValue("transaction_hash")
-
-	documentId, err := strconv.Atoi(c.Request.FormValue("document_id"))
+	documentId, err := strconv.ParseInt(c.Request.FormValue("document_id"), 10, 64)
 	if err != nil {
 		log.Println("Document Id must be integer value: ", err)
 	}
@@ -174,7 +176,8 @@ func (dc *DocumentController) SaveSignedDocument(c *gin.Context) {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		_ = os.Mkdir(path, os.ModePerm)
 	}
-	tmpFile, err := os.Create(path + "/" + strconv.FormatInt(time.Now().Unix(), 10) + "-" + h.Filename)
+	fileName := strconv.FormatInt(time.Now().Unix(), 10) + "-" + h.Filename
+	tmpFile, err := os.Create(path + "/" + fileName)
 	if err != nil {
 		log.Println("Save file error: ", err)
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -197,13 +200,14 @@ func (dc *DocumentController) SaveSignedDocument(c *gin.Context) {
 	}
 
 	err = dc.documentService.StoreDocument(
-		h.Filename,
-		"pdf", []string{publickey},
+		fileName,
+		"pdf",
+		publickey,
 		signature,
 		blockHash,
 		txHash,
 		blockNumber,
-		documentId)
+		int(documentId))
 	if err != nil {
 		log.Println("create document error:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -217,8 +221,8 @@ func (dc *DocumentController) SaveSignedDocument(c *gin.Context) {
 		"code":    http.StatusOK,
 		"message": "OK",
 		"data": response.DocumentResponse{
-			IndexOnchain:    documentId,
-			Owner:           []string{publickey},
+			IndexOnchain:    int(documentId),
+			Owner:           publickey,
 			Name:            h.Filename,
 			BlockNumber:     blockNumber,
 			BlockHash:       blockHash,
@@ -232,7 +236,7 @@ func (dc *DocumentController) SaveSignedDocument(c *gin.Context) {
 
 func (dc *DocumentController) GetDocs(c *gin.Context) {
 	publickey := c.Param("publickey")
-	docs, err := dc.documentService.GetDocumentByPublickey([]string{publickey})
+	docs, err := dc.documentService.GetDocumentByPublickey(publickey)
 	if err != nil {
 		log.Println("get list document error:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{

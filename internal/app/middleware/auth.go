@@ -3,6 +3,7 @@ package middleware
 import (
 	"digitalsignature/internal/app/handlers"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 
@@ -15,6 +16,7 @@ func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		jwtOut := handlers.JWTOutput{}
 		tokenValue := c.GetHeader("Authorization")
+		fmt.Println(tokenValue)
 		claims := &handlers.Claims{}
 		json.Unmarshal([]byte(tokenValue), &jwtOut)
 		tkn, err := jwt.ParseWithClaims(jwtOut.Token, claims, func(token *jwt.Token) (interface{}, error) {

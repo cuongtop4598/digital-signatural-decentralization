@@ -8,10 +8,12 @@ make: *** No rule to make target 'all'.  Stop.
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Sat Aug 20 08:15:30 2022
+# Make data base, printed on Sat Sep 10 09:55:37 2022
 
 # Variables
 
+# environment
+FPS_BROWSER_APP_PROFILE_STRING = Internet Explorer
 # environment
 SYSTEMDRIVE = C:
 # environment
@@ -24,6 +26,8 @@ USERPROFILE = C:\Users\cuong
 C_INCLUDE_PATH = C:\Users\cuong\scoop\apps\gcc\current\include
 # environment
 LOCALAPPDATA = C:\Users\cuong\AppData\Local
+# environment
+WSLENV = WT_SESSION::WT_PROFILE_ID
 # environment
 VSCODE_CWD = D:\graduation-thesis\backend
 # environment
@@ -41,7 +45,9 @@ GOPATH = C:\Users\cuong\go
 # automatic
 @D = $(patsubst %/,%,$(patsubst %\,%,$(dir $@)))
 # environment
-CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_25088_WBISXEOTWUUHUGLT
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_27612_RBFZRXVICCXQBHWP
+# environment
+FPS_BROWSER_USER_PROFILE_STRING = Default
 # environment
 VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # default
@@ -95,11 +101,13 @@ MAKEFILE_LIST := Makefile
 # automatic
 @F = $(notdir $@)
 # environment
-VSCODE_PID = 25088
+VSCODE_PID = 27612
 # automatic
 ?D = $(patsubst %/,%,$(patsubst %\,%,$(dir $?)))
 # environment
 POSH_THEMES_PATH = C:\Users\cuong\AppData\Local\oh-my-posh\themes
+# environment
+WT_PROFILE_ID = {574e775e-4f2a-5b96-ac1e-a2962a402336}
 # automatic
 *F = $(notdir $*)
 # automatic
@@ -144,6 +152,8 @@ MAKEFILES :=
 PROMPT = $P$G
 # environment
 CHOCOLATEYLASTPATHUPDATE = 132984776452807825
+# environment
+WT_SESSION = 1fc9955f-8fc8-4b67-b95c-ab1e6e6b9aa2
 # environment
 LOGONSERVER = \\TOPER
 # environment
@@ -229,7 +239,7 @@ PROCESSOR_REVISION = 8d01
 # environment
 PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 141 Stepping 1, GenuineIntel
 # variable set hash-table stats:
-# Load=108/1024=11%, Rehash=0, Collisions=10/135=7%
+# Load=113/1024=11%, Rehash=0, Collisions=11/140=8%
 
 # Pattern-specific Variable Values
 
@@ -237,7 +247,7 @@ PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 141 Stepping 1, GenuineIntel
 
 # Directories
 
-# . (key d:/graduation-thesis/backend, mtime 1660398611): 22 files, no impossibilities.
+# . (key d:/graduation-thesis/backend, mtime 1661527992): 22 files, no impossibilities.
 
 # 22 files, no impossibilities in 1 directories.
 
@@ -303,6 +313,6 @@ run:
 # strcache performance: lookups = 35 / hit rate = 20%
 # hash-table stats:
 # Load=28/8192=0%, Rehash=0, Collisions=0/35=0%
-# Finished Make data base on Sat Aug 20 08:15:30 2022
+# Finished Make data base on Sat Sep 10 09:55:37 2022
 
  

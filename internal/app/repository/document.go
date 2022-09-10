@@ -3,7 +3,6 @@ package repository
 import (
 	"digitalsignature/internal/app/model"
 
-	"github.com/go-pg/pg/v10"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -25,9 +24,9 @@ func (repo *DocumentRepo) Create(doc *model.Document) error {
 	return result.Error
 }
 
-func (repo *DocumentRepo) AllByOwner(publickeys []string) ([]model.Document, error) {
+func (repo *DocumentRepo) AllByOwner(publickey string) ([]model.Document, error) {
 	docs := []model.Document{}
-	result := repo.DB.Model(&model.Document{}).Where("owner in (?) ", pg.Strings(publickeys)).Find(&docs)
+	result := repo.DB.Model(&model.Document{}).Where("owner = ? ", publickey).Find(&docs)
 	if result.Error != nil {
 		return nil, result.Error
 	}
