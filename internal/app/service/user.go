@@ -45,9 +45,72 @@ func NewUserService(client *ethclient.Client, userRepo *repository.UserRepo, acc
 	}
 }
 
-func (s *UserService) Register(c *gin.Context, userInfo request.UserInfo) error {
+func (s *UserService) Confirm(c *gin.Context, userInfo request.UserConfirm) error {
 	s.ethclient = ethereum.NewClient()
 	registerStatus := false
+	s.logger.Info("USER_CONFIRM", zap.Any("Data", userInfo))
+	contractAddress := common.HexToAddress(s.documentContract)
+	// store hash user info to blockchain
+	documentIntance, err := abi.NewDocument(contractAddress, s.ethclient)
+	if err != nil {
+		s.logger.Sugar().Error(err)
+		return err
+	}
+	address := common.HexToAddress(userInfo.PublicKey)
+	txOption := s.accountSrv.GetBindTransactionOptions(s.ethclient)
+	s.logger.Sugar().Info("Init store user transaction")
+	retry := 0
+RETRY:
+	tx, err := documentIntance.StoreUser(txOption, userInfo.Name, userInfo.CardID, userInfo.DateOfBirth, userInfo.Phone, userInfo.Gmail, address)
+	if err != nil && retry < 30 {
+		s.logger.Sugar().Info("Retry store user onchain!")
+		time.Sleep(5 * time.Second)
+		retry++
+		goto RETRY
+	}
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		for {
+			receipt, err := s.ethclient.TransactionReceipt(context.Background(), tx.Hash())
+			if err != nil {
+				s.logger.Info(err.Error())
+				s.logger.Info("TRANSACTION_STORE_USER", zap.Any(tx.Hash().String(), "Is Pending"))
+				time.Sleep(5 * time.Second)
+			} else {
+				spew.Dump(receipt)
+				if receipt.Status == 1 || receipt.Status == 0 {
+					if receipt.Status == 1 {
+						s.logger.Info("TRANSACTION_STORE_USER_STATUS", zap.Any("Status", "Success"))
+						// out, _ := txn.MarshalJSON()
+						// s.logger.Info("HASH USER INFO", zap.String("Hash", string(out)))
+						registerStatus = true
+					}
+					if receipt.Status == 0 {
+						s.logger.Warn("TRANSACTION_STORE_USER_STATUS STORE USER STATUS", zap.Any("Status", "Failt"))
+					}
+				}
+				wg.Done()
+				break
+			}
+		}
+	}()
+	wg.Wait()
+	if registerStatus {
+		s.logger.Info("CONFIRM USER SUCCESS", zap.String("Publickey", userInfo.PublicKey))
+		s.userRepo.UpdateConfirmState(model.User{
+			Name:        userInfo.Name,
+			PublicKey:   userInfo.PublicKey,
+			CardID:      userInfo.CardID,
+			Phone:       userInfo.Phone,
+			Gmail:       userInfo.Gmail,
+			DateOfBirth: userInfo.DateOfBirth,
+		})
+	}
+	return nil
+}
+
+func (s *UserService) Register(c *gin.Context, userInfo request.UserInfo) error {
 	s.logger.Info("USER_REGISTER", zap.Any("Data", userInfo))
 	// TODO: Validate user info including gmail, phone, id card
 	// Verify gmail
@@ -72,63 +135,15 @@ func (s *UserService) Register(c *gin.Context, userInfo request.UserInfo) error 
 			Gmail:       userInfo.Gmail,
 			DateOfBirth: userInfo.DateOfBirth,
 			Password:    userInfo.Password,
+			IsAdmin:     false,
+			IsConfirmed: false,
 			CreateAt:    time.Now(),
 		}
-		contractAddress := common.HexToAddress(s.documentContract)
-		// store hash user info to blockchain
-		documentIntance, err := abi.NewDocument(contractAddress, s.ethclient)
+		h := sha256.New()
+		user.Password = fmt.Sprintf("%x", h.Sum([]byte(user.Password)))
+		err := s.userRepo.Create(user)
 		if err != nil {
-			s.logger.Sugar().Error(err)
-			return err
-		}
-		address := common.HexToAddress(user.PublicKey)
-		txOption := s.accountSrv.GetBindTransactionOptions(s.ethclient)
-		s.logger.Sugar().Info("Init store user transaction")
-		retry := 0
-	RETRY:
-		tx, err := documentIntance.StoreUser(txOption, user.Name, user.CardID, user.DateOfBirth, user.Phone, user.Gmail, address)
-		if err != nil && retry < 30 {
-			s.logger.Sugar().Info("Retry store user onchain!")
-			time.Sleep(5 * time.Second)
-			retry++
-			goto RETRY
-		}
-		var wg sync.WaitGroup
-		wg.Add(1)
-		go func() {
-			for {
-				receipt, err := s.ethclient.TransactionReceipt(context.Background(), tx.Hash())
-				if err != nil {
-					s.logger.Info(err.Error())
-					s.logger.Info("TRANSACTION_STORE_USER", zap.Any(tx.Hash().String(), "Is Pending"))
-					time.Sleep(5 * time.Second)
-				} else {
-					spew.Dump(receipt)
-					if receipt.Status == 1 || receipt.Status == 0 {
-						if receipt.Status == 1 {
-							s.logger.Info("TRANSACTION_STORE_USER_STATUS", zap.Any("Status", "Success"))
-							// out, _ := txn.MarshalJSON()
-							// s.logger.Info("HASH USER INFO", zap.String("Hash", string(out)))
-							registerStatus = true
-						}
-						if receipt.Status == 0 {
-							s.logger.Warn("TRANSACTION_STORE_USER_STATUS STORE USER STATUS", zap.Any("Status", "Failt"))
-						}
-					}
-					wg.Done()
-					break
-				}
-			}
-		}()
-		wg.Wait()
-		if registerStatus {
-			h := sha256.New()
-			user.Password = fmt.Sprintf("%x", h.Sum([]byte(user.Password)))
-			err = s.userRepo.Create(user)
-			if err != nil {
-				s.logger.Sugar().Error("INSERT USER", zap.String("Error", err.Error()))
-			}
-			s.logger.Info("CREATE USER SUCCESS", zap.String("Publickey", userInfo.PublicKey))
+			s.logger.Sugar().Error("INSERT USER", zap.String("Error", err.Error()))
 		}
 	} else {
 		s.logger.Sugar().Error("User is existed")
@@ -183,4 +198,26 @@ func (s *UserService) VerifyUser(user request.UserInfo) (bool, error) {
 	address := common.HexToAddress(user.PublicKey)
 	isVerify, err := documentIntance.VerifyUser(&bind.CallOpts{}, user.Name, user.CardID, user.DateOfBirth, user.Phone, user.Gmail, address)
 	return isVerify, err
+}
+
+func (s *UserService) GetUserConfirmed() []model.User {
+	users := s.userRepo.GetAll()
+	result := []model.User{}
+	for _, user := range users {
+		if user.IsConfirmed {
+			result = append(result, user)
+		}
+	}
+	return result
+}
+
+func (s *UserService) GetUserUnConfirmed() []model.User {
+	users := s.userRepo.GetAll()
+	result := []model.User{}
+	for _, user := range users {
+		if !user.IsConfirmed {
+			result = append(result, user)
+		}
+	}
+	return result
 }

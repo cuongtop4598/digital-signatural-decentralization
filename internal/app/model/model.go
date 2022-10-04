@@ -20,6 +20,8 @@ type User struct {
 	BlockTimetamp   int       `json:"block_timestamp,omitempty"`
 	BlockHash       string    `json:"block_hash,omitempty"`
 	TransactionHash string    `json:"transaction_hash"`
+	IsAdmin         bool      `json:"is_admin"`
+	IsConfirmed     bool      `json:"is_confirmed"`
 	CreateAt        time.Time `json:"creat_at,omitempty"`
 	UpdateAt        time.Time `json:"update_at,omitempty"`
 	DeleteAt        time.Time `json:"dalete_at,omitempty"`

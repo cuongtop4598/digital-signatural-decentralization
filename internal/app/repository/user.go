@@ -31,6 +31,10 @@ func (repo *UserRepo) Create(user model.User) error {
 	return nil
 }
 
+func (repo *UserRepo) UpdateConfirmState(user model.User) {
+	repo.DB.Model(&user).Where("phone = ?", user.Phone).Update("is_confirmed", true)
+}
+
 func (repo *UserRepo) IsExist(phone string, publicKey string) bool {
 	var exist bool
 	err := repo.DB.Model(&model.User{}).Select("count(*) > 0").Where("phone = ? or public_key = ?", phone, publicKey).Find(&exist).Error
@@ -39,6 +43,16 @@ func (repo *UserRepo) IsExist(phone string, publicKey string) bool {
 		return false
 	}
 	return exist
+}
+
+func (repo *UserRepo) GetAll() []model.User {
+	users := []model.User{}
+	result := repo.DB.Model(&model.User{}).Find(&users)
+	if result.Error != nil {
+		return nil
+	} else {
+		return users
+	}
 }
 
 func (repo *UserRepo) GetUserByPubkey(pubkey string) (*model.User, error) {

@@ -8,7 +8,7 @@ make: *** No rule to make target 'all'.  Stop.
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Sat Sep 10 09:55:37 2022
+# Make data base, printed on Tue Oct 04 07:55:36 2022
 
 # Variables
 
@@ -45,7 +45,7 @@ GOPATH = C:\Users\cuong\go
 # automatic
 @D = $(patsubst %/,%,$(patsubst %\,%,$(dir $@)))
 # environment
-CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_27612_RBFZRXVICCXQBHWP
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_23748_QIYNXVRHEXSMFSDK
 # environment
 FPS_BROWSER_USER_PROFILE_STRING = Default
 # environment
@@ -61,7 +61,7 @@ VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # environment
 CONDA_PROMPT_MODIFIER = False
 # environment
-VSCODE_CODE_CACHE_PATH = C:\Users\cuong\AppData\Roaming\Code\CachedData\e4503b30fc78200f846c62cf8091b76ff5547662
+VSCODE_CODE_CACHE_PATH = C:\Users\cuong\AppData\Roaming\Code\CachedData\74b1f979648cc44d385a2286793c226e611f59e7
 # environment
 LANG = C
 # default
@@ -101,7 +101,7 @@ MAKEFILE_LIST := Makefile
 # automatic
 @F = $(notdir $@)
 # environment
-VSCODE_PID = 27612
+VSCODE_PID = 23748
 # automatic
 ?D = $(patsubst %/,%,$(patsubst %\,%,$(dir $?)))
 # environment
@@ -139,7 +139,7 @@ MAKELEVEL := 0
 # default
 MAKE = $(MAKE_COMMAND)
 # environment
-PATH = C:\Users\cuong\AppData\Local\oh-my-posh;C:\Program Files\WindowsApps\Microsoft.PowerShell_7.2.6.0_x64__8wekyb3d8bbwe;C:\Program Files\Geth;C:\Program Files (x86)\VMware\VMware Workstation\bin\;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files\Go\bin;C:\Program Files\Git\cmd;C:\Program Files\nodejs\;C:\Program Files (x86)\Common Files\Acronis\SnapAPI\;C:\Program Files\Docker\Docker\resources\bin;C:\ProgramData\DockerDesktop\version-bin;C:\Program Files\Java\jdk-12.0.2\bin;C:\Program Files\Java\jdk-14.0.1\bin;C:\ProgramData\chocolatey\bin;C:\Ruby31-x64\bin;C:\Program Files\Geth\abigen;C:\Program Files\Geth\geth;C:\Users\cuong\scoop\apps\gcc\current\bin;C:\Users\cuong\scoop\shims;C:\Users\cuong\AppData\Local\Programs\Python\Python310\Scripts\;C:\Users\cuong\AppData\Local\Programs\Python\Python310\;C:\Users\cuong\AppData\Local\Microsoft\WindowsApps;C:\Users\cuong\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\cuong\go\bin;C:\Users\cuong\AppData\Local\GitHubDesktop\bin;C:\Users\cuong\AppData\Roaming\npm;C:\intelFPGA\18.1\modelsim_ase\win32aloem
+PATH = C:\Users\cuong\AppData\Local\oh-my-posh;C:\Program Files\WindowsApps\Microsoft.PowerShell_7.2.6.0_x64__8wekyb3d8bbwe;C:\Program Files\Geth;C:\Program Files (x86)\VMware\VMware Workstation\bin\;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files\Go\bin;C:\Program Files\Git\cmd;C:\Program Files\nodejs\;C:\Program Files (x86)\Common Files\Acronis\SnapAPI\;C:\Program Files\Docker\Docker\resources\bin;C:\ProgramData\DockerDesktop\version-bin;C:\Program Files\Java\jdk-12.0.2\bin;C:\Program Files\Java\jdk-14.0.1\bin;C:\ProgramData\chocolatey\bin;C:\Ruby31-x64\bin;C:\Users\cuong\.cargo\bin;C:\Program Files\Geth\abigen;C:\Program Files\Geth\geth;C:\Users\cuong\scoop\apps\gcc\current\bin;C:\Users\cuong\scoop\shims;C:\Users\cuong\AppData\Local\Programs\Python\Python310\Scripts\;C:\Users\cuong\AppData\Local\Programs\Python\Python310\;C:\Users\cuong\AppData\Local\Microsoft\WindowsApps;C:\Users\cuong\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\cuong\go\bin;C:\Users\cuong\AppData\Local\GitHubDesktop\bin;C:\Users\cuong\AppData\Roaming\npm;C:\intelFPGA\18.1\modelsim_ase\win32aloem
 # environment
 ZES_ENABLE_SYSMAN = 1
 # environment
@@ -153,7 +153,7 @@ PROMPT = $P$G
 # environment
 CHOCOLATEYLASTPATHUPDATE = 132984776452807825
 # environment
-WT_SESSION = 1fc9955f-8fc8-4b67-b95c-ab1e6e6b9aa2
+WT_SESSION = 036f6106-efb3-4fac-846e-ec9106083813
 # environment
 LOGONSERVER = \\TOPER
 # environment
@@ -217,7 +217,7 @@ ELECTRON_RUN_AS_NODE = 1
 # environment
 TEMP = C:\Users\cuong\AppData\Local\Temp
 # environment
-VSCODE_IPC_HOOK = \\.\pipe\e94ae9dbae3ecdd11f46d8acb5f6d9e3-1.70.2-main-sock
+VSCODE_IPC_HOOK = \\.\pipe\e94ae9dbae3ecdd11f46d8acb5f6d9e3-1.71.2-main-sock
 # environment
 GOPROXY = https://proxy.golang.org,direct
 # default
@@ -313,6 +313,6 @@ run:
 # strcache performance: lookups = 35 / hit rate = 20%
 # hash-table stats:
 # Load=28/8192=0%, Rehash=0, Collisions=0/35=0%
-# Finished Make data base on Sat Sep 10 09:55:37 2022
+# Finished Make data base on Tue Oct 04 07:55:36 2022
 
  

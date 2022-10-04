@@ -36,6 +36,7 @@ func DocumentRouter(docService *service.DocumentService, documentRepo *repositor
 	ar := r.Group("/document", middleware.AuthMiddleware())
 	ar.POST("/savesign", dc.SaveSignedDocument)
 	ar.POST("/upload", dc.Upload)
+	ar.GET("/list", dc.GetAllIsPublic)
 	ar.GET("/list/:publickey", dc.GetDocs)
 	ar.GET("/signature", dc.GetSign)
 
@@ -166,6 +167,10 @@ func (dc *DocumentController) SaveSignedDocument(c *gin.Context) {
 	blockNumber := c.Request.FormValue("block_number")
 	blockHash := c.Request.FormValue("block_hash")
 	txHash := c.Request.FormValue("transaction_hash")
+	isPublic, err := strconv.ParseBool(c.Request.FormValue("public"))
+	if err != nil {
+		log.Println(err)
+	}
 	documentId, err := strconv.ParseInt(c.Request.FormValue("document_id"), 10, 64)
 	if err != nil {
 		log.Println("Document Id must be integer value: ", err)
@@ -207,7 +212,8 @@ func (dc *DocumentController) SaveSignedDocument(c *gin.Context) {
 		blockHash,
 		txHash,
 		blockNumber,
-		int(documentId))
+		int(documentId),
+		isPublic)
 	if err != nil {
 		log.Println("create document error:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -228,7 +234,7 @@ func (dc *DocumentController) SaveSignedDocument(c *gin.Context) {
 			BlockHash:       blockHash,
 			TransactionHash: txHash,
 			Signature:       signature,
-			Public:          false,
+			Public:          isPublic,
 			TypeFile:        "pdf",
 		},
 	})
@@ -237,6 +243,24 @@ func (dc *DocumentController) SaveSignedDocument(c *gin.Context) {
 func (dc *DocumentController) GetDocs(c *gin.Context) {
 	publickey := c.Param("publickey")
 	docs, err := dc.documentService.GetDocumentByPublickey(publickey)
+	if err != nil {
+		log.Println("get list document error:", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    http.StatusInternalServerError,
+			"message": err.Error(),
+			"data":    "",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "OK",
+		"data":    docs,
+	})
+}
+
+func (dc *DocumentController) GetAllIsPublic(c *gin.Context) {
+	docs, err := dc.documentService.GetAllIsPublic()
 	if err != nil {
 		log.Println("get list document error:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{

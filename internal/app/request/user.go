@@ -11,6 +11,15 @@ type UserInfo struct {
 	PublicKey   string `json:"public_key"`
 }
 
+type UserConfirm struct {
+	Name        string `json:"name"`
+	Gmail       string `json:"gmail"`
+	CardID      string `json:"card_id"`
+	Phone       string `json:"phone"`
+	DateOfBirth string `json:"date_of_birth"`
+	PublicKey   string `json:"public_key"`
+}
+
 type Login struct {
 	Phone    string `json:"phone"`
 	Password string `json:"password"`

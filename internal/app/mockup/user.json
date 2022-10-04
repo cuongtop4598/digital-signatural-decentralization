@@ -1,1 +1,11 @@
-[]
+[{
+    "name": "admin",
+    "public_key": "0x19b76800446fe8508fc5d50c6600fd2ac5cbaf60",
+    "card_id": "999999",
+    "phone": "123456789",
+    "date_of_birth": "04/05/1998",
+    "gmail": "cuongtop4598@gmai.com",
+    "is_admin": true,
+    "is_confirmed": true,
+    "password": "313233e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}]

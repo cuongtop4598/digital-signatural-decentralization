@@ -47,6 +47,29 @@ type DocumentEvent struct {
 	CreateAccountSuccess  string
 }
 
+func (d *DocumentService) GetAllIsPublic() (*response.ListDocumentResponse, error) {
+	result := response.ListDocumentResponse{}
+	docs, err := d.documentRepo.AllIsPublic()
+	if err != nil {
+		d.log.Sugar().Error(err)
+		return nil, err
+	}
+	for _, doc := range docs {
+		result.Documents = append(result.Documents, response.DocumentResponse{
+			IndexOnchain:    doc.IndexOnchain,
+			Owner:           doc.Owner,
+			Name:            doc.Name,
+			BlockNumber:     doc.BlockNumber,
+			BlockHash:       doc.BlockHash,
+			TransactionHash: doc.TransactionHash,
+			Signature:       doc.Signature,
+			Public:          doc.Public,
+			TypeFile:        doc.TypeFile,
+		})
+	}
+	return &result, nil
+}
+
 func (d *DocumentService) GetDocumentByPhone(phone string) (*response.ListDocumentResponse, error) {
 	result := response.ListDocumentResponse{}
 	userPublicKey, err := d.userRepo.GetPublickeyByPhone(phone)
@@ -130,7 +153,8 @@ func (d *DocumentService) StoreDocument(
 	blockHash string,
 	transactionHash string,
 	blockNumber string,
-	documentId int) error {
+	documentId int,
+	isPublic bool) error {
 	document := model.Document{
 		ID:              [16]byte{},
 		IndexOnchain:    documentId,
@@ -140,7 +164,7 @@ func (d *DocumentService) StoreDocument(
 		BlockHash:       blockHash,
 		TransactionHash: transactionHash,
 		Signature:       signature,
-		Public:          false,
+		Public:          isPublic,
 		TypeFile:        fileType,
 		CreateAt:        time.Now(),
 		UpdateAt:        time.Time{},

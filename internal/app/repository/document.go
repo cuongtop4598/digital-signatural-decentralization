@@ -24,6 +24,15 @@ func (repo *DocumentRepo) Create(doc *model.Document) error {
 	return result.Error
 }
 
+func (repo *DocumentRepo) AllIsPublic() ([]model.Document, error) {
+	docs := []model.Document{}
+	result := repo.DB.Model(&model.Document{}).Where("public = ? ", true).Find(&docs)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return docs, nil
+}
+
 func (repo *DocumentRepo) AllByOwner(publickey string) ([]model.Document, error) {
 	docs := []model.Document{}
 	result := repo.DB.Model(&model.Document{}).Where("owner = ? ", publickey).Find(&docs)

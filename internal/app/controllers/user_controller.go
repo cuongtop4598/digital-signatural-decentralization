@@ -29,9 +29,32 @@ func UserRouter(db *gorm.DB, log *zap.Logger, userService *service.UserService, 
 	}
 	ar := r.Group("/user")
 	ar.POST("/register", uc.Register)
+	ar.POST("/confirm", uc.Confirm)
 	ar.GET("/profile/:phone", uc.GetProfile)
 	ar.POST("/verify", uc.Verify)
 	ar.POST("/login", uc.Login)
+	ar.GET("/confirmed", uc.GetUserConfirmed)
+	ar.GET("/unconfirmed", uc.GetUserUnConfirmed)
+}
+
+func (uc *UserController) Confirm(c *gin.Context) {
+	userInfo := request.UserConfirm{}
+	err := c.ShouldBindJSON(&userInfo)
+	if err != nil {
+		uc.log.Error(err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"status": "false"})
+		return
+	}
+	uc.log.Sugar().Info(userInfo)
+	if len(userInfo.Phone) <= 0 || len(userInfo.PublicKey) <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"status": "false"})
+		return
+	}
+	err = uc.userService.Confirm(c, userInfo)
+	if err != nil {
+		c.JSON(http.StatusNotAcceptable, err)
+	}
+	c.JSON(http.StatusOK, gin.H{"status": true})
 }
 
 func (uc *UserController) Register(c *gin.Context) {
@@ -44,7 +67,6 @@ func (uc *UserController) Register(c *gin.Context) {
 	}
 	uc.log.Sugar().Info(userInfo)
 	if userInfo.Phone == "" || userInfo.PublicKey == "" || userInfo.Password == "" {
-		log.Error(err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"status": "false"})
 		return
 	}
@@ -102,4 +124,14 @@ func (uc *UserController) Verify(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusOK, gin.H{"message": "user information is wrong"})
 	}
+}
+
+func (uc *UserController) GetUserConfirmed(c *gin.Context) {
+	users := uc.userService.GetUserConfirmed()
+	c.JSON(http.StatusOK, users)
+}
+
+func (uc *UserController) GetUserUnConfirmed(c *gin.Context) {
+	users := uc.userService.GetUserUnConfirmed()
+	c.JSON(http.StatusOK, users)
 }
