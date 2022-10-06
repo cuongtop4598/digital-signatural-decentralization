@@ -64,8 +64,7 @@ func (dc *DocumentController) Upload(c *gin.Context) {
 
 	err := c.Request.ParseMultipartForm(32 << 20) // maxMemory 32MB
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
+		log.Println(err)
 	}
 	file, h, err := c.Request.FormFile("filedata")
 	if err != nil {
@@ -115,9 +114,9 @@ func (dc *DocumentController) Upload(c *gin.Context) {
 func (dc *DocumentController) Download(c *gin.Context) {
 	name := c.Param("filename")
 	owner := c.Param("owner")
-	files := utils.SearchFileInPath("static/" + owner + "/")
+	files := utils.SearchFileInPath("./static/" + owner + "/")
 	for _, file := range files {
-		if file == ("static/" + owner + "/" + name) {
+		if file == ("static\\" + owner + "\\" + name) {
 			isPublic, err := dc.documentRepo.IsPublic(name)
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": err})
