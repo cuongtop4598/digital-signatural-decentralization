@@ -63,6 +63,7 @@ func (s *UserService) Confirm(c *gin.Context, userInfo request.UserConfirm) erro
 RETRY:
 	tx, err := documentIntance.StoreUser(txOption, userInfo.Name, userInfo.CardID, userInfo.DateOfBirth, userInfo.Phone, userInfo.Gmail, address)
 	if err != nil && retry < 30 {
+		s.logger.Sugar().Error(err)
 		s.logger.Sugar().Info("Retry store user onchain!")
 		time.Sleep(5 * time.Second)
 		retry++
