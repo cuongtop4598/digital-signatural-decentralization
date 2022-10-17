@@ -12,6 +12,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/google/uuid"
 	"go.uber.org/zap"
 )
 
@@ -121,6 +122,46 @@ func (d *DocumentService) GetDocumentByPublickey(publickey string) ([]model.Docu
 	return docs, nil
 }
 
+func (d *DocumentService) GetMultiDocumentByPartner(partner string) ([]response.MultiSignerDocumentResponse, error) {
+	result := response.ListMultiSingerDocumentResponse{}
+	docs, err := d.documentRepo.AllMultiSignerByPartner(partner)
+	if err != nil {
+		d.log.Sugar().Error(err)
+		return nil, err
+	}
+
+	for _, doc := range docs {
+		creater, err := d.userRepo.GetUserByPubkey(doc.Creater)
+		if err != nil {
+			creater = &model.User{}
+		}
+		signerA, err := d.userRepo.GetUserByPubkey(doc.PartnerA)
+		if err != nil {
+			signerA = &model.User{}
+		}
+		signerB, err := d.userRepo.GetUserByPubkey(doc.PartnerB)
+		if err != nil {
+			signerB = &model.User{}
+		}
+		result.Documents = append(result.Documents, response.MultiSignerDocumentResponse{
+			IndexOnchain:    doc.IndexOnchain,
+			Creater:         creater.Phone,
+			PartnerA:        signerA.Phone,
+			PartnerB:        signerB.Phone,
+			Name:            doc.Name,
+			BlockNumber:     doc.BlockNumber,
+			BlockHash:       doc.BlockHash,
+			TransactionHash: doc.TransactionHash,
+			SignatureA:      doc.SignatureA,
+			Digest:          doc.Digest,
+			SignDateA:       doc.SignDateA,
+			Public:          doc.Public,
+			TypeFile:        doc.TypeFile,
+		})
+	}
+	return result.Documents, nil
+}
+
 func (d *DocumentService) VerifyDocument(phone string, digest string, documentIndex *big.Int) (bool, error) {
 	documentAbi, err := abi.NewDocument(d.contractAddress, d.client)
 	if err != nil {
@@ -156,7 +197,6 @@ func (d *DocumentService) StoreDocument(
 	documentId int,
 	isPublic bool) error {
 	document := model.Document{
-		ID:              [16]byte{},
 		IndexOnchain:    documentId,
 		Owner:           publickeys,
 		Name:            fileName,
@@ -175,4 +215,61 @@ func (d *DocumentService) StoreDocument(
 		return err
 	}
 	return nil
+}
+
+func (d *DocumentService) StoreMultiSignDocument(
+	filename string,
+	fileType string,
+	creater string,
+	partnerB string,
+	blockHash string,
+	digest string,
+	signatureA string,
+	transactionHash string,
+	blockNumber string,
+	documentIndex int,
+	created_date string,
+	isPublic bool,
+) error {
+	document := model.MultipleDocument{
+		IndexOnchain:    documentIndex,
+		Creater:         creater,
+		PartnerA:        creater,
+		PartnerB:        partnerB,
+		Name:            filename,
+		BlockNumber:     blockNumber,
+		BlockHash:       blockHash,
+		TransactionHash: transactionHash,
+		SignatureA:      signatureA,
+		Digest:          digest,
+		SignDateA:       created_date,
+		Public:          isPublic,
+		TypeFile:        fileType,
+		CreateAt:        time.Now(),
+		UpdateAt:        time.Time{},
+		DeleteAt:        time.Time{},
+	}
+	err := d.documentRepo.CreateMultiSignerDocument(&document)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *DocumentService) UpdatePartnerInMultiSign(id string, complete bool, signatureB, signDateB string) error {
+	document := model.MultipleDocument{
+		ID:         uuid.MustParse(id),
+		Complete:   complete,
+		SignatureB: signatureB,
+		SignDateB:  signDateB,
+	}
+	err := d.documentRepo.UpdateMultiSignerState(&document)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *DocumentService) GetMultiByDigest(digest string) *model.MultipleDocument {
+	return d.documentRepo.GetMultiByDigest(digest)
 }

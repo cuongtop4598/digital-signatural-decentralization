@@ -43,6 +43,29 @@ type Document struct {
 	DeleteAt        time.Time `json:"delete_at,omitempty"`
 }
 
+type MultipleDocument struct {
+	ID              uuid.UUID `gorm:"primaryKey, autoIncrement"`
+	IndexOnchain    int       `json:"index_onchain"`
+	Creater         string    `json:"creater" gorm:"type:text"`
+	Name            string    `json:"name"`
+	BlockNumber     string    `json:"block_number,omitempty"`
+	BlockHash       string    `json:"block_hash,omitempty"`
+	TransactionHash string    `json:"transaction_hash"`
+	PartnerA        string    `json:"partner_a" gorm:"type:text"`
+	PartnerB        string    `json:"partner_b" gorm:"type:text"`
+	SignatureA      string    `json:"signature_a"`
+	SignatureB      string    `json:"signature_b"`
+	Digest          string    `gorm:"type:text"`
+	SignDateA       string    `json:"sign_date_a"`
+	SignDateB       string    `json:"sign_date_b"`
+	Complete        bool      `json:"complete"`
+	Public          bool      `json:"public"`
+	TypeFile        string    `json:"type_file"`
+	CreateAt        time.Time `json:"create_at,omitempty"`
+	UpdateAt        time.Time `json:"update_at,omitempty"`
+	DeleteAt        time.Time `json:"delete_at,omitempty"`
+}
+
 type UserAllow struct {
 	UserID uuid.UUID
 	DocID  uuid.UUID

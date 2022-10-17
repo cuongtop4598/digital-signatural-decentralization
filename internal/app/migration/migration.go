@@ -13,12 +13,16 @@ func Migrate(db *gorm.DB, log *zap.Logger) error {
 	if tx.HasTable("documents") {
 		tx.DropTable("documents")
 	}
+	if tx.HasTable("multiple_documents") {
+		tx.DropTable("multiple_documents")
+	}
 	if tx.HasTable("users") {
 		tx.DropTable("users")
 	}
 	err := tx.AutoMigrate(
 		&model.User{},
 		&model.Document{},
+		&model.MultipleDocument{},
 		&model.UserAllow{},
 		&model.Transaction{},
 		&model.Role{},
